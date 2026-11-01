@@ -3,6 +3,7 @@ name = "obsidian-mcp"
 version = "0.1.0"
 description = "A MCP server to interact with Obsidian vault via Obsidian CLI"
 readme = "README.md"
+license = "MIT"
 authors = [{ name = "AkimioJR", email = "akimio.jr@gmail.com" }]
 requires-python = ">=3.10"
 dependencies = [
