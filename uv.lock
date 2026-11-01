@@ -441,7 +441,7 @@ wheels = [
 ]
 
 [[package]]
-name = "obsidian-mcp"
+name = "obsidian-cli-mcp"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

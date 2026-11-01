@@ -1,4 +1,4 @@
-# obsidian-mcp
+# obsidian-cli-mcp
 
 <p align="left">
   <a href="README.md">简体中文</a> | <b>English</b>
@@ -31,9 +31,9 @@
 
 ## 🚀 Quick Setup for MCP Clients
 
-### Method 1: Run directly from GitHub via `uvx` (Recommended, Zero-install)
+### Method 1: Run via `uvx` (Recommended, Zero-install)
 
-No need to clone the repository locally. `uvx` automatically pulls the latest code and launches the server in an isolated environment.
+No need to clone the repository locally. `uvx` automatically launches the server in an isolated environment.
 
 Add this to your Claude Desktop (`claude_desktop_config.json`), Cursor, or Codex (`mcp.json`):
 
@@ -42,11 +42,7 @@ Add this to your Claude Desktop (`claude_desktop_config.json`), Cursor, or Codex
   "mcpServers": {
     "obsidian": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/AkimioJR/obsidian-mcp.git",
-        "obsidian-mcp"
-      ],
+      "args": ["obsidian-cli-mcp"],
       "env": {
         "OBSIDIAN_VAULT": "MyVault"
       }
@@ -55,17 +51,19 @@ Add this to your Claude Desktop (`claude_desktop_config.json`), Cursor, or Codex
 }
 ```
 
-> **Tip**: To lock to a specific branch or version tag, append `@branch` or `@tag`:  
-> `git+https://github.com/AkimioJR/obsidian-mcp.git@main`
+> **Tip**: To run directly from GitHub or lock to a specific version/branch:  
+> `uvx --from git+https://github.com/AkimioJR/obsidian-cli-mcp.git obsidian-cli-mcp`
 
 ---
 
 ### Method 2: Install as a standalone tool via `uv tool install` (Recommended for daily use)
 
-Install `obsidian-mcp` as a global CLI command in an isolated environment without polluting your system Python:
+Install `obsidian-cli-mcp` as a global CLI command in an isolated environment without polluting your system Python:
 
 ```bash
-uv tool install git+https://github.com/AkimioJR/obsidian-mcp.git
+uv tool install obsidian-cli-mcp
+# Or install directly from GitHub:
+# uv tool install git+https://github.com/AkimioJR/obsidian-cli-mcp.git
 ```
 
 Once installed, use the standalone command directly in your MCP client config:
@@ -74,7 +72,8 @@ Once installed, use the standalone command directly in your MCP client config:
 {
   "mcpServers": {
     "obsidian": {
-      "command": "obsidian-mcp",
+      "command": "uv",
+      "args": ["tool", "run", "obsidian-cli-mcp"],
       "env": {
         "OBSIDIAN_VAULT": "MyVault"
       }
@@ -83,17 +82,21 @@ Once installed, use the standalone command directly in your MCP client config:
 }
 ```
 
+> **Tip**: Launching via `uv tool run` ensures GUI clients (like Claude Desktop) reliably locate the tool even if `~/.local/bin` is not in your system GUI `PATH`.
+
 > **Upgrade**: Update to the latest code anytime by running:  
-> `uv tool upgrade obsidian-mcp`
+> `uv tool upgrade obsidian-cli-mcp`
 
 ---
 
-### Method 3: Install via `pip` from GitHub
+### Method 3: Install via `pip`
 
 You can also install it into your active Python environment using `pip`:
 
 ```bash
-pip install git+https://github.com/AkimioJR/obsidian-mcp.git
+pip install obsidian-cli-mcp
+# Or from GitHub:
+# pip install git+https://github.com/AkimioJR/obsidian-cli-mcp.git
 ```
 
 Then configure your MCP client with the installed binary:
@@ -102,7 +105,7 @@ Then configure your MCP client with the installed binary:
 {
   "mcpServers": {
     "obsidian": {
-      "command": "obsidian-mcp",
+      "command": "obsidian-cli-mcp",
       "env": {
         "OBSIDIAN_VAULT": "MyVault"
       }
@@ -120,8 +123,8 @@ If you want to contribute or develop locally:
 ### 1. Clone Repository & Install Dependencies
 
 ```bash
-git clone https://github.com/AkimioJR/obsidian-mcp.git
-cd obsidian-mcp
+git clone https://github.com/AkimioJR/obsidian-cli-mcp.git
+cd obsidian-cli-mcp
 
 # Sync all runtime, test, and dev dependencies using uv
 uv sync
@@ -130,7 +133,7 @@ uv sync
 ### 2. Run the MCP Server Locally
 
 ```bash
-uv run obsidian-mcp
+uv run obsidian-cli-mcp
 ```
 
 ### 3. Local Development MCP Configuration
@@ -144,9 +147,9 @@ Point your MCP client directly to your local development checkout:
       "command": "uv",
       "args": [
         "--directory",
-        "/absolute/path/to/obsidian-mcp",
+        "/absolute/path/to/obsidian-cli-mcp",
         "run",
-        "obsidian-mcp"
+        "obsidian-cli-mcp"
       ],
       "env": {
         "OBSIDIAN_VAULT": "MyVault"
@@ -213,11 +216,11 @@ All tools support an optional `vault` parameter to override the active vault per
 - `vault`: Show vault information such as name, path, file count, folder count, or total size.
 - `vaults`: List all known Obsidian vaults and their local absolute paths.
 - `files`: List files in the vault, with optional filtering by folder or file extension.
-- `folders` / `obsidian_folder`: Inspect and list folder structures and details.
+- `folders` / `folder`: Inspect and list folder structures and details.
 - `recents`: List recently opened files in the vault.
 - `bookmarks`: List all bookmarks in the vault (returns JSON).
 - `workspace`: Get the current workspace window layout tree.
-- `reload` / `obsidian_restart` / `obsidian_version`: Reload vault, restart desktop app, or query version.
+- `reload` / `restart` / `version`: Reload vault, restart desktop app, or query version.
 
 ### 6. Commands & Automation
 - `command`: Execute an Obsidian internal or plugin command by its command ID.
@@ -227,5 +230,5 @@ All tools support an optional `vault` parameter to override the active vault per
 - `eval`: Execute JavaScript code inside the Obsidian Electron runtime and return the result.
 
 ### 7. Plugins
-- `plugins` / `obsidian_plugins_enabled`: List installed or enabled plugins.
-- `plugin_enable` / `obsidian_plugin_disable`: Enable or disable a specified plugin.
+- `plugins` / `plugins_enabled`: List installed or enabled plugins.
+- `plugin_enable` / `plugin_disable`: Enable or disable a specified plugin.

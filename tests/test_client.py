@@ -2,9 +2,9 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from obsidian_mcp.cli import CommandExecutionResult
-from obsidian_mcp.client import ObsidianClient
-from obsidian_mcp.exceptions import ObsidianCLIError, ObsidianNotFoundError
+from obsidian_cli_mcp.cli import CommandExecutionResult
+from obsidian_cli_mcp.client import ObsidianClient
+from obsidian_cli_mcp.exceptions import ObsidianCLIError, ObsidianNotFoundError
 
 
 def test_build_args_basic():
@@ -56,7 +56,7 @@ def test_cli_not_found(monkeypatch):
 async def test_execute_success():
     client = ObsidianClient(cli_path="/mock/obsidian")
     with patch(
-        "obsidian_mcp.client.run_cli_command",
+        "obsidian_cli_mcp.client.run_cli_command",
         new=AsyncMock(
             return_value=CommandExecutionResult(
                 returncode=0, stdout="Success output", stderr=""
@@ -71,7 +71,7 @@ async def test_execute_success():
 async def test_execute_json_parsing():
     client = ObsidianClient(cli_path="/mock/obsidian")
     with patch(
-        "obsidian_mcp.client.run_cli_command",
+        "obsidian_cli_mcp.client.run_cli_command",
         new=AsyncMock(
             return_value=CommandExecutionResult(
                 returncode=0,
@@ -92,7 +92,7 @@ async def test_execute_error_handling():
 
     # 非零退出码错误
     with patch(
-        "obsidian_mcp.client.run_cli_command",
+        "obsidian_cli_mcp.client.run_cli_command",
         new=AsyncMock(
             return_value=CommandExecutionResult(
                 returncode=1, stdout="", stderr="Something failed"
@@ -105,7 +105,7 @@ async def test_execute_error_handling():
 
     # 退出码为 0 但内容输出 Error: ...
     with patch(
-        "obsidian_mcp.client.run_cli_command",
+        "obsidian_cli_mcp.client.run_cli_command",
         new=AsyncMock(
             return_value=CommandExecutionResult(
                 returncode=0, stdout='Error: File "missing.md" not found.', stderr=""

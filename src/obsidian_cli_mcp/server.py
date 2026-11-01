@@ -12,7 +12,7 @@ def create_server(
     """创建并配置 Obsidian MCP 服务器实例。"""
     client = ObsidianClient(vault=vault, cli_path=cli_path, timeout=timeout)
     server = MCPServer(
-        name="obsidian-mcp",
+        name="obsidian-cli-mcp",
         version="0.1.0",
         instructions="Obsidian CLI MCP server providing full control over Obsidian vaults.",
     )

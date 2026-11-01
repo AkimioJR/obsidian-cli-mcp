@@ -1,5 +1,5 @@
 [project]
-name = "obsidian-mcp"
+name = "obsidian-cli-mcp"
 version = "0.1.0"
 description = "A MCP server to interact with Obsidian vault via Obsidian CLI"
 readme = "README.md"
@@ -12,12 +12,12 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/AkimioJR/obsidian-mcp"
-Repository = "https://github.com/AkimioJR/obsidian-mcp.git"
-Issues = "https://github.com/AkimioJR/obsidian-mcp/issues"
+Homepage = "https://github.com/AkimioJR/obsidian-cli-mcp"
+Repository = "https://github.com/AkimioJR/obsidian-cli-mcp.git"
+Issues = "https://github.com/AkimioJR/obsidian-cli-mcp/issues"
 
 [project.scripts]
-obsidian-mcp = "obsidian_mcp:main"
+obsidian-cli-mcp = "obsidian_cli_mcp:main"
 
 [build-system]
 requires = ["uv_build>=0.13.6,<0.14.0"]

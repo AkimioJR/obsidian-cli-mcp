@@ -3,8 +3,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from mcp.types import CallToolResult, TextContent
 
-from obsidian_mcp.cli import CommandExecutionResult
-from obsidian_mcp.server import create_server
+from obsidian_cli_mcp.cli import CommandExecutionResult
+from obsidian_cli_mcp.server import create_server
 
 
 def test_server_tools_registered():
@@ -22,7 +22,7 @@ def test_server_tools_registered():
 async def test_tool_call_success():
     server = create_server(cli_path="/mock/obsidian")
     with patch(
-        "obsidian_mcp.client.run_cli_command",
+        "obsidian_cli_mcp.client.run_cli_command",
         new=AsyncMock(
             return_value=CommandExecutionResult(
                 returncode=0, stdout="1.14.5", stderr=""
@@ -40,7 +40,7 @@ async def test_tool_call_success():
 async def test_tool_call_error_caught_gracefully():
     server = create_server(cli_path="/mock/obsidian")
     with patch(
-        "obsidian_mcp.client.run_cli_command",
+        "obsidian_cli_mcp.client.run_cli_command",
         new=AsyncMock(
             return_value=CommandExecutionResult(
                 returncode=0,

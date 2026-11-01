@@ -1,4 +1,4 @@
-# obsidian-mcp
+# obsidian-cli-mcp
 
 <p align="left">
   <b>简体中文</b> | <a href="README_en.md">English</a>
@@ -31,9 +31,9 @@
 
 ## 🚀 快速接入 MCP 客户端
 
-### 方式一：通过 `uvx` 直接从 GitHub 加载（推荐，免克隆开箱即用）
+### 方式一：通过 `uvx` 运行（推荐，免安装开箱即用）
 
-无需预先下载代码到本地，`uvx` 会自动拉取最新仓库并在隔离环境中极速启动。
+无需预先下载代码到本地，`uvx` 会自动在隔离环境中极速启动。
 
 在 Claude Desktop（`claude_desktop_config.json`）、Cursor 或 Codex（`mcp.json`）中添加：
 
@@ -42,11 +42,7 @@
   "mcpServers": {
     "obsidian": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/AkimioJR/obsidian-mcp.git",
-        "obsidian-mcp"
-      ],
+      "args": ["obsidian-cli-mcp"],
       "env": {
         "OBSIDIAN_VAULT": "MyVault"
       }
@@ -55,26 +51,29 @@
 }
 ```
 
-> **提示**：如需锁定指定分支或版本，可追加 `@branch` 或 `@tag`，例如：  
-> `git+https://github.com/AkimioJR/obsidian-mcp.git@main`
+> **提示**：如需直接从 GitHub 加载或锁定分支/版本：  
+> `uvx --from git+https://github.com/AkimioJR/obsidian-cli-mcp.git obsidian-cli-mcp`
 
 ---
 
 ### 方式二：通过 `uv tool install` 安装为独立工具（高频使用推荐）
 
-使用 `uv tool install` 将其安装在独立的隔离环境中，既不污染系统 Python，又能生成全局可执行命令并实现秒级启动：
+使用 `uv tool install` 将其安装在独立的隔离环境中，既不污染系统 Python，又能生成全局命令并实现秒级启动：
 
 ```bash
-uv tool install git+https://github.com/AkimioJR/obsidian-mcp.git
+uv tool install obsidian-cli-mcp
+# 或直接从 GitHub 仓库安装：
+# uv tool install git+https://github.com/AkimioJR/obsidian-cli-mcp.git
 ```
 
-安装完成后，系统将获得全局 `obsidian-mcp` 命令。在 MCP 客户端配置中直接指定可执行程序即可：
+安装完成后，系统将获得全局 `obsidian-cli-mcp`（及 `obsidian-cli-mcp`）命令。在 MCP 客户端配置中直接指定可执行程序即可：
 
 ```json
 {
   "mcpServers": {
     "obsidian": {
-      "command": "obsidian-mcp",
+      "command": "uv",
+      "args": ["tool", "run", "obsidian-cli-mcp"],
       "env": {
         "OBSIDIAN_VAULT": "MyVault"
       }
@@ -83,17 +82,21 @@ uv tool install git+https://github.com/AkimioJR/obsidian-mcp.git
 }
 ```
 
-> **版本升级**：后续升级到仓库最新代码只需运行：  
-> `uv tool upgrade obsidian-mcp`
+> **提示**：通过 `uv tool run` 启动可以避免因 `~/.local/bin` 未加入系统环境变量而导致桌面端（如 Claude Desktop）报找不到命令的问题。
+
+> **版本升级**：后续升级只需运行：  
+> `uv tool upgrade obsidian-cli-mcp`
 
 ---
 
-### 方式三：通过 `pip` 从 GitHub 安装
+### 方式三：通过 `pip` 安装
 
 你也可以使用 `pip` 将其直接安装到当前 Python 环境：
 
 ```bash
-pip install git+https://github.com/AkimioJR/obsidian-mcp.git
+pip install obsidian-cli-mcp
+# 或从 GitHub 安装：
+# pip install git+https://github.com/AkimioJR/obsidian-cli-mcp.git
 ```
 
 在 MCP 客户端配置中直接调用该命令：
@@ -102,7 +105,7 @@ pip install git+https://github.com/AkimioJR/obsidian-mcp.git
 {
   "mcpServers": {
     "obsidian": {
-      "command": "obsidian-mcp",
+      "command": "obsidian-cli-mcp",
       "env": {
         "OBSIDIAN_VAULT": "MyVault"
       }
@@ -120,8 +123,8 @@ pip install git+https://github.com/AkimioJR/obsidian-mcp.git
 ### 1. 克隆仓库与安装依赖
 
 ```bash
-git clone https://github.com/AkimioJR/obsidian-mcp.git
-cd obsidian-mcp
+git clone https://github.com/AkimioJR/obsidian-cli-mcp.git
+cd obsidian-cli-mcp
 
 # 使用 uv 同步并安装所有依赖（包含开发与测试工具）
 uv sync
@@ -130,7 +133,7 @@ uv sync
 ### 2. 本地直接运行服务
 
 ```bash
-uv run obsidian-mcp
+uv run obsidian-cli-mcp
 ```
 
 ### 3. 本地开发模式下的 MCP 客户端配置
@@ -144,9 +147,9 @@ uv run obsidian-mcp
       "command": "uv",
       "args": [
         "--directory",
-        "/absolute/path/to/obsidian-mcp",
+        "/absolute/path/to/obsidian-cli-mcp",
         "run",
-        "obsidian-mcp"
+        "obsidian-cli-mcp"
       ],
       "env": {
         "OBSIDIAN_VAULT": "MyVault"
@@ -213,11 +216,11 @@ uv run ruff check .
 - `vault`: 查询 Vault 基本状态（路径、文件数、体积等）。
 - `vaults`: 列出本机已知的所有 Vault 及绝对路径。
 - `files`: 列出库内文件（支持按文件夹、后缀筛选）。
-- `folders` / `obsidian_folder`: 查看文件夹结构与详情。
+- `folders` / `folder`: 查看文件夹结构与详情。
 - `recents`: 列出最近访问的文件。
 - `bookmarks`: 查看书签列表。
 - `workspace`: 查询工作区布局树。
-- `reload` / `obsidian_restart` / `obsidian_version`: 重新加载库、重启应用、查询版本。
+- `reload` / `restart` / `version`: 重新加载库、重启应用、查询版本。
 
 ### 6. 命令、模板与高级扩展 (Commands & Ext)
 - `command`: 触发执行 Obsidian 内置或插件命令。
@@ -227,5 +230,5 @@ uv run ruff check .
 - `eval`: 在 Obsidian 运行时中执行 JavaScript 代码（高级逃生通道）。
 
 ### 7. 插件管理 (Plugins)
-- `plugins` / `obsidian_plugins_enabled`: 列出已安装/已启用的插件。
-- `plugin_enable` / `obsidian_plugin_disable`: 启用或禁用指定插件。
+- `plugins` / `plugins_enabled`: 列出已安装/已启用的插件。
+- `plugin_enable` / `plugin_disable`: 启用或禁用指定插件。
