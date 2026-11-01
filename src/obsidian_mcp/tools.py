@@ -7,7 +7,7 @@ from .exceptions import ObsidianError
 
 
 def register_tools(server: MCPServer, client: ObsidianClient) -> None:
-    """注册所有 Obsidian CLI 1:1 对应的 MCP 工具。"""
+    """Register all 1:1 mapped Obsidian CLI tools with the MCP server."""
 
     async def _call(
         command: str,
@@ -24,12 +24,12 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
             return f"Error: {e}"
 
     # ==========================================
-    # 1. 笔记与内容 (Notes & Content)
+    # 1. Notes & Content
     # ==========================================
 
     @server.tool(
         name="obsidian_read",
-        description="读取笔记文件完整内容。可按名称(file)或相对路径(path)查找。",
+        description="Read the complete content of a note by file name or vault-relative path.",
     )
     async def read(
         file: str | None = None, path: str | None = None, vault: str | None = None
@@ -38,7 +38,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_create",
-        description="创建新笔记文件。支持指定初始内容、模板、是否覆盖及是否在应用中打开。",
+        description="Create a new note file with optional content, template, overwriting, and opening in app.",
     )
     async def create(
         name: str | None = None,
@@ -64,7 +64,10 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
             vault=vault,
         )
 
-    @server.tool(name="obsidian_append", description="向指定笔记文件末尾追加内容。")
+    @server.tool(
+        name="obsidian_append",
+        description="Append content to the end of a specified note file.",
+    )
     async def append(
         content: str,
         file: str | None = None,
@@ -79,7 +82,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_prepend", description="向指定笔记文件开头前置插入内容。"
+        name="obsidian_prepend",
+        description="Prepend content to the beginning of a specified note file.",
     )
     async def prepend(
         content: str,
@@ -96,7 +100,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_delete",
-        description="删除指定笔记文件。默认移至废纸篓，设置 permanent=True 可永久删除。",
+        description="Delete a note file. Moves to trash by default, or permanently deletes if permanent=True.",
     )
     async def delete(
         file: str | None = None,
@@ -112,7 +116,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_move",
-        description="移动或重命名笔记文件到目标文件夹或目标路径。",
+        description="Move or rename a note file to a destination folder or path.",
     )
     async def move(
         to: str,
@@ -122,7 +126,10 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     ) -> Any:
         return await _call("move", {"to": to, "file": file, "path": path}, vault=vault)
 
-    @server.tool(name="obsidian_rename", description="重命名笔记文件名。")
+    @server.tool(
+        name="obsidian_rename",
+        description="Rename a note file.",
+    )
     async def rename(
         name: str,
         file: str | None = None,
@@ -134,7 +141,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_open", description="在 Obsidian 图形窗口中打开指定文件。"
+        name="obsidian_open",
+        description="Open and focus a note file in the Obsidian workspace.",
     )
     async def open_file(
         file: str | None = None,
@@ -148,18 +156,18 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_random_read",
-        description="随机读取库或指定文件夹中的一篇笔记。",
+        description="Read a random note from the vault or a specified folder.",
     )
     async def random_read(folder: str | None = None, vault: str | None = None) -> Any:
         return await _call("random:read", {"folder": folder}, vault=vault)
 
     # ==========================================
-    # 2. 元数据与属性 (Properties & Frontmatter)
+    # 2. Metadata & Properties (Frontmatter)
     # ==========================================
 
     @server.tool(
         name="obsidian_properties",
-        description="列出库或指定文件中的所有属性 (Frontmatter/Properties)。",
+        description="List all frontmatter properties in the vault or for a specific file (returns JSON).",
     )
     async def properties(
         file: str | None = None,
@@ -188,7 +196,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_property_read", description="读取指定文件上某个属性的值。"
+        name="obsidian_property_read",
+        description="Read the value of a specific property from a file.",
     )
     async def property_read(
         name: str,
@@ -204,7 +213,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_property_set",
-        description="设置指定文件上的某个属性值。支持 text/list/number/checkbox/date/datetime 等类型。",
+        description="Set a property on a file with optional type (text, list, number, checkbox, date, datetime).",
     )
     async def property_set(
         name: str,
@@ -223,7 +232,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_property_remove", description="从指定文件中移除某个属性。"
+        name="obsidian_property_remove",
+        description="Remove a property from a file.",
     )
     async def property_remove(
         name: str,
@@ -238,12 +248,12 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     # ==========================================
-    # 3. 图谱与双链 (Graph & Links)
+    # 3. Graph & Links
     # ==========================================
 
     @server.tool(
         name="obsidian_backlinks",
-        description="获取指向指定笔记的反向链接列表（返回 JSON 结构）。",
+        description="List backlinks pointing to a specified note (returns JSON).",
     )
     async def backlinks(
         file: str | None = None,
@@ -266,7 +276,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_links", description="获取指定笔记中的所有外向链接列表。"
+        name="obsidian_links",
+        description="List outgoing links from a specified note.",
     )
     async def links(
         file: str | None = None,
@@ -282,7 +293,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_unresolved",
-        description="列出库中所有未解析的双链（即尚未创建的笔记链接）。",
+        description="List unresolved links in the vault pointing to non-existent notes (returns JSON).",
     )
     async def unresolved(
         counts: bool = False,
@@ -299,14 +310,14 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_orphans",
-        description="列出库中没有被任何其他笔记反向链接的孤立笔记文件。",
+        description="List orphan notes that have no incoming links from other notes.",
     )
     async def orphans(total: bool = False, vault: str | None = None) -> Any:
         return await _call("orphans", {"total": total}, vault=vault)
 
     @server.tool(
         name="obsidian_deadends",
-        description="列出库中没有指向任何其他笔记的末端笔记文件。",
+        description="List dead-end notes that contain no outgoing links to other notes.",
     )
     async def deadends(
         total: bool = False,
@@ -317,7 +328,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_outline",
-        description="获取指定笔记文件的大纲标题层级结构（返回 JSON）。",
+        description="Get the heading outline hierarchy of a note (returns JSON).",
     )
     async def outline(
         file: str | None = None,
@@ -334,7 +345,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_aliases",
-        description="获取库中或指定文件的别名 (aliases) 列表。",
+        description="List aliases in the vault or for a specified note.",
     )
     async def aliases(
         file: str | None = None,
@@ -358,7 +369,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_wordcount",
-        description="统计指定笔记或当前笔记的字数与字符数。",
+        description="Count words and characters in a note or the active note.",
     )
     async def wordcount(
         file: str | None = None,
@@ -374,12 +385,12 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     # ==========================================
-    # 4. 标签与任务 (Tags & Tasks)
+    # 4. Tags & Tasks
     # ==========================================
 
     @server.tool(
         name="obsidian_tags",
-        description="获取库中或指定笔记中的所有标签 (tags) 列表及出现频次。",
+        description="List all tags and their occurrence counts in the vault or note (returns JSON).",
     )
     async def tags(
         file: str | None = None,
@@ -407,7 +418,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_tag",
-        description="获取特定标签的详细出现信息与文件列表。",
+        description="Get details and file occurrences for a specific tag.",
     )
     async def tag(
         name: str,
@@ -423,7 +434,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_tasks",
-        description="获取库中或指定笔记中的任务 (tasks) 待办事项列表。",
+        description="List tasks in the vault with optional filters for completion, note, or status (returns JSON).",
     )
     async def tasks(
         file: str | None = None,
@@ -457,7 +468,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_task",
-        description="查看或更新特定任务的状态（勾选、取消、标记完成等）。",
+        description="Show or update a specific task status (toggle, mark done, or set status character).",
     )
     async def task(
         ref: str | None = None,
@@ -488,12 +499,12 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     # ==========================================
-    # 5. 库与工作区 (Vault & Workspace)
+    # 5. Vault & Workspace
     # ==========================================
 
     @server.tool(
         name="obsidian_vault",
-        description="查看指定或当前 Vault 的基本信息（名称、路径、文件数、体积等）。",
+        description="Show vault information such as name, path, file count, folder count, or total size.",
     )
     async def vault_info(
         info: Literal["name", "path", "files", "folders", "size"] | None = None,
@@ -503,14 +514,14 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_vaults",
-        description="列出本机已知的所有 Obsidian Vault 列表及绝对路径。",
+        description="List all known Obsidian vaults and their local absolute paths.",
     )
     async def vaults(total: bool = False, verbose: bool = True) -> Any:
         return await _call("vaults", {"total": total, "verbose": verbose})
 
     @server.tool(
         name="obsidian_files",
-        description="列出库内所有文件，可按目录或扩展名筛选。",
+        description="List files in the vault, with optional filtering by folder or file extension.",
     )
     async def files(
         folder: str | None = None,
@@ -522,7 +533,10 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
             "files", {"folder": folder, "ext": ext, "total": total}, vault=vault
         )
 
-    @server.tool(name="obsidian_folders", description="列出库中的文件夹列表。")
+    @server.tool(
+        name="obsidian_folders",
+        description="List folders in the vault.",
+    )
     async def folders(
         folder: str | None = None,
         total: bool = False,
@@ -530,7 +544,10 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     ) -> Any:
         return await _call("folders", {"folder": folder, "total": total}, vault=vault)
 
-    @server.tool(name="obsidian_folder", description="查看指定文件夹的详情信息。")
+    @server.tool(
+        name="obsidian_folder",
+        description="Show information about a specific folder.",
+    )
     async def folder_info(
         path: str,
         info: Literal["files", "folders", "size"] | None = None,
@@ -538,13 +555,16 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     ) -> Any:
         return await _call("folder", {"path": path, "info": info}, vault=vault)
 
-    @server.tool(name="obsidian_recents", description="列出最近打开过的文件列表。")
+    @server.tool(
+        name="obsidian_recents",
+        description="List recently opened files in the vault.",
+    )
     async def recents(total: bool = False, vault: str | None = None) -> Any:
         return await _call("recents", {"total": total}, vault=vault)
 
     @server.tool(
         name="obsidian_bookmarks",
-        description="获取库中所有的书签 (bookmarks) 列表。",
+        description="List all bookmarks in the vault (returns JSON).",
     )
     async def bookmarks(
         total: bool = False,
@@ -559,49 +579,54 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_workspace", description="获取当前工作区窗口布局树结构。"
+        name="obsidian_workspace",
+        description="Get the current workspace window layout tree.",
     )
     async def workspace(ids: bool = False, vault: str | None = None) -> Any:
         return await _call("workspace", {"ids": ids}, vault=vault)
 
-    @server.tool(name="obsidian_reload", description="重新加载当前 Vault 界面与索引。")
+    @server.tool(
+        name="obsidian_reload",
+        description="Reload the vault interface and re-index notes.",
+    )
     async def reload_vault(vault: str | None = None) -> Any:
         return await _call("reload", vault=vault)
 
     @server.tool(
-        name="obsidian_restart", description="重启整个 Obsidian 桌面应用程序。"
+        name="obsidian_restart",
+        description="Restart the Obsidian desktop application.",
     )
     async def restart_app() -> Any:
         return await _call("restart")
 
     @server.tool(
         name="obsidian_version",
-        description="获取当前安装的 Obsidian 客户端版本号。",
+        description="Show the installed Obsidian desktop application version.",
     )
     async def version() -> Any:
         return await _call("version")
 
     # ==========================================
-    # 6. 命令、模板与扩展 (Commands & Ext)
+    # 6. Commands & Automation
     # ==========================================
 
     @server.tool(
         name="obsidian_command",
-        description="通过命令 ID 直接触发执行 Obsidian 的内置或插件命令。",
+        description="Execute an Obsidian internal or plugin command by its command ID.",
     )
     async def execute_command(id: str, vault: str | None = None) -> Any:
         return await _call("command", {"id": id}, vault=vault)
 
     @server.tool(
         name="obsidian_commands",
-        description="列出 Obsidian 当前所有可用的命令及其 ID。",
+        description="List all available Obsidian commands and their command IDs.",
     )
     async def list_commands(filter: str | None = None, vault: str | None = None) -> Any:
         return await _call("commands", {"filter": filter}, vault=vault)
 
     @server.tool(
         name="obsidian_template_read",
-        description="读取模板文件的内容，可选择解析内置模板变量。",
+        description="Read a template file's content, with optional resolution of template variables.",
     )
     async def template_read(
         name: str,
@@ -617,25 +642,25 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="obsidian_template_insert",
-        description="将指定模板插入到当前活跃的笔记中。",
+        description="Insert a template into the currently active note.",
     )
     async def template_insert(name: str, vault: str | None = None) -> Any:
         return await _call("template:insert", {"name": name}, vault=vault)
 
     @server.tool(
         name="obsidian_eval",
-        description="在 Obsidian Electron 运行时环境中执行 JavaScript 代码并返回执行结果。",
+        description="Execute JavaScript code inside the Obsidian Electron runtime and return the result.",
     )
     async def eval_js(code: str, vault: str | None = None) -> Any:
         return await _call("eval", {"code": code}, vault=vault)
 
     # ==========================================
-    # 7. 插件管理 (Plugins)
+    # 7. Plugins
     # ==========================================
 
     @server.tool(
         name="obsidian_plugins",
-        description="列出已安装的插件列表（支持区分 core/community）。",
+        description="List installed community or core plugins (returns JSON).",
     )
     async def plugins(
         filter: Literal["core", "community"] | None = None,
@@ -650,7 +675,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_plugins_enabled", description="列出当前已启用的插件列表。"
+        name="obsidian_plugins_enabled",
+        description="List enabled community or core plugins (returns JSON).",
     )
     async def plugins_enabled(
         filter: Literal["core", "community"] | None = None,
@@ -665,7 +691,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_plugin_enable", description="启用指定的社区或核心插件。"
+        name="obsidian_plugin_enable",
+        description="Enable a specified community or core plugin.",
     )
     async def plugin_enable(
         id: str,
@@ -674,6 +701,9 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     ) -> Any:
         return await _call("plugin:enable", {"id": id, "filter": filter}, vault=vault)
 
-    @server.tool(name="obsidian_plugin_disable", description="禁用指定的插件。")
+    @server.tool(
+        name="obsidian_plugin_disable",
+        description="Disable a specified plugin.",
+    )
     async def plugin_disable(id: str, vault: str | None = None) -> Any:
         return await _call("plugin:disable", {"id": id}, vault=vault)
