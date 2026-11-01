@@ -177,55 +177,55 @@ uv run ruff check .
 All tools support an optional `vault` parameter to override the active vault per call. All parameters include full JSON Schema descriptions and type constraints.
 
 ### 1. Notes & Content
-- `obsidian_read`: Read the complete content of a note by file name or vault-relative path.
-- `obsidian_create`: Create a new note file with optional content, template, overwriting, and opening in app.
-- `obsidian_append`: Append content to the end of a specified note file.
-- `obsidian_prepend`: Prepend content to the beginning of a specified note file.
-- `obsidian_delete`: Delete a note file (moves to trash by default, or permanently deletes if `permanent=True`).
-- `obsidian_move`: Move or rename a note file to a destination folder or path.
-- `obsidian_rename`: Rename a note file.
-- `obsidian_open`: Open and focus a note file in the Obsidian workspace.
-- `obsidian_random_read`: Read a random note from the entire vault or a specified folder.
+- `read`: Read the complete content of a note by file name or vault-relative path.
+- `create`: Create a new note file with optional content, template, overwriting, and opening in app.
+- `append`: Append content to the end of a specified note file.
+- `prepend`: Prepend content to the beginning of a specified note file.
+- `delete`: Delete a note file (moves to trash by default, or permanently deletes if `permanent=True`).
+- `move`: Move or rename a note file to a destination folder or path.
+- `rename`: Rename a note file.
+- `open`: Open and focus a note file in the Obsidian workspace.
+- `random_read`: Read a random note from the entire vault or a specified folder.
 
 ### 2. Metadata & Properties (Frontmatter)
-- `obsidian_properties`: List all frontmatter properties in the vault or for a specific file (returns JSON).
-- `obsidian_property_read`: Read the value of a specific property from a file.
-- `obsidian_property_set`: Set a property on a file with optional type (text, list, number, checkbox, date, datetime).
-- `obsidian_property_remove`: Remove a property from a file.
+- `properties`: List all frontmatter properties in the vault or for a specific file (returns JSON).
+- `property_read`: Read the value of a specific property from a file.
+- `property_set`: Set a property on a file with optional type (text, list, number, checkbox, date, datetime).
+- `property_remove`: Remove a property from a file.
 
 ### 3. Graph & Links
-- `obsidian_backlinks`: List backlinks pointing to a specified note (returns JSON).
-- `obsidian_links`: List outgoing links from a specified note.
-- `obsidian_unresolved`: List unresolved links in the vault pointing to non-existent notes (returns JSON).
-- `obsidian_orphans`: List orphan notes that have no incoming links from other notes.
-- `obsidian_deadends`: List dead-end notes that contain no outgoing links to other notes.
-- `obsidian_outline`: Get the heading outline hierarchy of a note (returns JSON).
-- `obsidian_aliases`: List aliases in the vault or for a specified note.
-- `obsidian_wordcount`: Count words and characters in a note or the active note.
+- `backlinks`: List backlinks pointing to a specified note (returns JSON).
+- `links`: List outgoing links from a specified note.
+- `unresolved`: List unresolved links in the vault pointing to non-existent notes (returns JSON).
+- `orphans`: List orphan notes that have no incoming links from other notes.
+- `deadends`: List dead-end notes that contain no outgoing links to other notes.
+- `outline`: Get the heading outline hierarchy of a note (returns JSON).
+- `aliases`: List aliases in the vault or for a specified note.
+- `wordcount`: Count words and characters in a note or the active note.
 
 ### 4. Tags & Tasks
-- `obsidian_tags`: List all tags and their occurrence counts in the vault or note (returns JSON).
-- `obsidian_tag`: Get details and file occurrences for a specific tag.
-- `obsidian_tasks`: List tasks in the vault with optional filters for completion, note, or status (returns JSON).
-- `obsidian_task`: Show or update a specific task status (toggle, mark done, or set status character).
+- `tags`: List all tags and their occurrence counts in the vault or note (returns JSON).
+- `tag`: Get details and file occurrences for a specific tag.
+- `tasks`: List tasks in the vault with optional filters for completion, note, or status (returns JSON).
+- `task`: Show or update a specific task status (toggle, mark done, or set status character).
 
 ### 5. Vault & Workspace
-- `obsidian_vault`: Show vault information such as name, path, file count, folder count, or total size.
-- `obsidian_vaults`: List all known Obsidian vaults and their local absolute paths.
-- `obsidian_files`: List files in the vault, with optional filtering by folder or file extension.
-- `obsidian_folders` / `obsidian_folder`: Inspect and list folder structures and details.
-- `obsidian_recents`: List recently opened files in the vault.
-- `obsidian_bookmarks`: List all bookmarks in the vault (returns JSON).
-- `obsidian_workspace`: Get the current workspace window layout tree.
-- `obsidian_reload` / `obsidian_restart` / `obsidian_version`: Reload vault, restart desktop app, or query version.
+- `vault`: Show vault information such as name, path, file count, folder count, or total size.
+- `vaults`: List all known Obsidian vaults and their local absolute paths.
+- `files`: List files in the vault, with optional filtering by folder or file extension.
+- `folders` / `obsidian_folder`: Inspect and list folder structures and details.
+- `recents`: List recently opened files in the vault.
+- `bookmarks`: List all bookmarks in the vault (returns JSON).
+- `workspace`: Get the current workspace window layout tree.
+- `reload` / `obsidian_restart` / `obsidian_version`: Reload vault, restart desktop app, or query version.
 
 ### 6. Commands & Automation
-- `obsidian_command`: Execute an Obsidian internal or plugin command by its command ID.
-- `obsidian_commands`: List all available Obsidian commands and their command IDs.
-- `obsidian_template_read`: Read a template file's content, with optional resolution of template variables.
-- `obsidian_template_insert`: Insert a template into the currently active note.
-- `obsidian_eval`: Execute JavaScript code inside the Obsidian Electron runtime and return the result.
+- `command`: Execute an Obsidian internal or plugin command by its command ID.
+- `commands`: List all available Obsidian commands and their command IDs.
+- `template_read`: Read a template file's content, with optional resolution of template variables.
+- `template_insert`: Insert a template into the currently active note.
+- `eval`: Execute JavaScript code inside the Obsidian Electron runtime and return the result.
 
 ### 7. Plugins
-- `obsidian_plugins` / `obsidian_plugins_enabled`: List installed or enabled plugins.
-- `obsidian_plugin_enable` / `obsidian_plugin_disable`: Enable or disable a specified plugin.
+- `plugins` / `obsidian_plugins_enabled`: List installed or enabled plugins.
+- `plugin_enable` / `obsidian_plugin_disable`: Enable or disable a specified plugin.

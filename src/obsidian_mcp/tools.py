@@ -29,7 +29,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     # ==========================================
 
     @server.tool(
-        name="obsidian_read",
+        name="read",
         description="Read the complete content of a note by file name or vault-relative path.",
     )
     async def read(
@@ -49,7 +49,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("read", {"file": file, "path": path}, vault=vault)
 
     @server.tool(
-        name="obsidian_create",
+        name="create",
         description="Create a new note file with optional content, template, overwriting, and opening in app.",
     )
     async def create(
@@ -101,7 +101,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_append",
+        name="append",
         description="Append content to the end of a specified note file.",
     )
     async def append(
@@ -132,7 +132,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_prepend",
+        name="prepend",
         description="Prepend content to the beginning of a specified note file.",
     )
     async def prepend(
@@ -163,7 +163,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_delete",
+        name="delete",
         description="Delete a note file. Moves to trash by default, or permanently deletes if permanent=True.",
     )
     async def delete(
@@ -191,7 +191,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_move",
+        name="move",
         description="Move or rename a note file to a destination folder or path.",
     )
     async def move(
@@ -214,7 +214,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("move", {"to": to, "file": file, "path": path}, vault=vault)
 
     @server.tool(
-        name="obsidian_rename",
+        name="rename",
         description="Rename a note file.",
     )
     async def rename(
@@ -239,7 +239,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_open",
+        name="open",
         description="Open and focus a note file in the Obsidian workspace.",
     )
     async def open_file(
@@ -265,7 +265,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_random_read",
+        name="random_read",
         description="Read a random note from the vault or a specified folder.",
     )
     async def random_read(
@@ -285,7 +285,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     # ==========================================
 
     @server.tool(
-        name="obsidian_properties",
+        name="properties",
         description="List all frontmatter properties in the vault or for a specific file (returns JSON).",
     )
     async def properties(
@@ -339,7 +339,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_property_read",
+        name="property_read",
         description="Read the value of a specific property from a file.",
     )
     async def property_read(
@@ -366,7 +366,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_property_set",
+        name="property_set",
         description="Set a property on a file with optional type (text, list, number, checkbox, date, datetime).",
     )
     async def property_set(
@@ -402,7 +402,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_property_remove",
+        name="property_remove",
         description="Remove a property from a file.",
     )
     async def property_remove(
@@ -433,7 +433,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     # ==========================================
 
     @server.tool(
-        name="obsidian_backlinks",
+        name="backlinks",
         description="List backlinks pointing to a specified note (returns JSON).",
     )
     async def backlinks(
@@ -472,7 +472,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_links",
+        name="links",
         description="List outgoing links from a specified note.",
     )
     async def links(
@@ -500,7 +500,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_unresolved",
+        name="unresolved",
         description="List unresolved links in the vault pointing to non-existent notes (returns JSON).",
     )
     async def unresolved(
@@ -529,7 +529,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_orphans",
+        name="orphans",
         description="List orphan notes that have no incoming links from other notes.",
     )
     async def orphans(
@@ -545,7 +545,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("orphans", {"total": total}, vault=vault)
 
     @server.tool(
-        name="obsidian_deadends",
+        name="deadends",
         description="List dead-end notes that contain no outgoing links to other notes.",
     )
     async def deadends(
@@ -565,7 +565,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("deadends", {"total": total, "all": all}, vault=vault)
 
     @server.tool(
-        name="obsidian_outline",
+        name="outline",
         description="Get the heading outline hierarchy of a note (returns JSON).",
     )
     async def outline(
@@ -594,7 +594,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_aliases",
+        name="aliases",
         description="List aliases in the vault or for a specified note.",
     )
     async def aliases(
@@ -636,7 +636,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_wordcount",
+        name="wordcount",
         description="Count words and characters in a note or the active note.",
     )
     async def wordcount(
@@ -672,7 +672,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     # ==========================================
 
     @server.tool(
-        name="obsidian_tags",
+        name="tags",
         description="List all tags and their occurrence counts in the vault or note (returns JSON).",
     )
     async def tags(
@@ -721,7 +721,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_tag",
+        name="tag",
         description="Get details and file occurrences for a specific tag.",
     )
     async def tag(
@@ -748,7 +748,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_tasks",
+        name="tasks",
         description="List tasks in the vault with optional filters for completion, note, or status (returns JSON).",
     )
     async def tasks(
@@ -812,7 +812,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_task",
+        name="task",
         description="Show or update a specific task status (toggle, mark done, or set status character).",
     )
     async def task(
@@ -878,7 +878,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     # ==========================================
 
     @server.tool(
-        name="obsidian_vault",
+        name="vault",
         description="Show vault information such as name, path, file count, folder count, or total size.",
     )
     async def vault_info(
@@ -894,7 +894,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("vault", {"info": info}, vault=vault)
 
     @server.tool(
-        name="obsidian_vaults",
+        name="vaults",
         description="List all known Obsidian vaults and their local absolute paths.",
     )
     async def vaults(
@@ -910,7 +910,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("vaults", {"total": total, "verbose": verbose})
 
     @server.tool(
-        name="obsidian_files",
+        name="files",
         description="List files in the vault, with optional filtering by folder or file extension.",
     )
     async def files(
@@ -936,7 +936,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_folders",
+        name="folders",
         description="List folders in the vault.",
     )
     async def folders(
@@ -956,7 +956,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("folders", {"folder": folder, "total": total}, vault=vault)
 
     @server.tool(
-        name="obsidian_folder",
+        name="folder",
         description="Show information about a specific folder.",
     )
     async def folder_info(
@@ -975,7 +975,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("folder", {"path": path, "info": info}, vault=vault)
 
     @server.tool(
-        name="obsidian_recents",
+        name="recents",
         description="List recently opened files in the vault.",
     )
     async def recents(
@@ -991,7 +991,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("recents", {"total": total}, vault=vault)
 
     @server.tool(
-        name="obsidian_bookmarks",
+        name="bookmarks",
         description="List all bookmarks in the vault (returns JSON).",
     )
     async def bookmarks(
@@ -1016,7 +1016,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_workspace",
+        name="workspace",
         description="Get the current workspace window layout tree.",
     )
     async def workspace(
@@ -1032,7 +1032,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("workspace", {"ids": ids}, vault=vault)
 
     @server.tool(
-        name="obsidian_reload",
+        name="reload",
         description="Reload the vault interface and re-index notes.",
     )
     async def reload_vault(
@@ -1044,14 +1044,14 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("reload", vault=vault)
 
     @server.tool(
-        name="obsidian_restart",
+        name="restart",
         description="Restart the Obsidian desktop application.",
     )
     async def restart_app() -> Any:
         return await _call("restart")
 
     @server.tool(
-        name="obsidian_version",
+        name="version",
         description="Show the installed Obsidian desktop application version.",
     )
     async def version() -> Any:
@@ -1062,7 +1062,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     # ==========================================
 
     @server.tool(
-        name="obsidian_command",
+        name="command",
         description="Execute an Obsidian internal or plugin command by its command ID.",
     )
     async def execute_command(
@@ -1077,7 +1077,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("command", {"id": id}, vault=vault)
 
     @server.tool(
-        name="obsidian_commands",
+        name="commands",
         description="List all available Obsidian commands and their command IDs.",
     )
     async def list_commands(
@@ -1093,7 +1093,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("commands", {"filter": filter}, vault=vault)
 
     @server.tool(
-        name="obsidian_template_read",
+        name="template_read",
         description="Read a template file's content, with optional resolution of template variables.",
     )
     async def template_read(
@@ -1120,7 +1120,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_template_insert",
+        name="template_insert",
         description="Insert a template into the currently active note.",
     )
     async def template_insert(
@@ -1135,7 +1135,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("template:insert", {"name": name}, vault=vault)
 
     @server.tool(
-        name="obsidian_eval",
+        name="eval",
         description="Execute JavaScript code inside the Obsidian Electron runtime and return the result.",
     )
     async def eval_js(
@@ -1154,7 +1154,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     # ==========================================
 
     @server.tool(
-        name="obsidian_plugins",
+        name="plugins",
         description="List installed community or core plugins (returns JSON).",
     )
     async def plugins(
@@ -1179,7 +1179,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_plugins_enabled",
+        name="plugins_enabled",
         description="List enabled community or core plugins (returns JSON).",
     )
     async def plugins_enabled(
@@ -1204,7 +1204,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_plugin_enable",
+        name="plugin_enable",
         description="Enable a specified community or core plugin.",
     )
     async def plugin_enable(
@@ -1223,7 +1223,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("plugin:enable", {"id": id, "filter": filter}, vault=vault)
 
     @server.tool(
-        name="obsidian_plugin_disable",
+        name="plugin_disable",
         description="Disable a specified plugin.",
     )
     async def plugin_disable(

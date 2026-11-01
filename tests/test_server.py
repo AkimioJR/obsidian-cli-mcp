@@ -11,11 +11,11 @@ def test_server_tools_registered():
     server = create_server(cli_path="/mock/obsidian")
     tools = server._tool_manager._tools
     assert len(tools) == 45
-    assert "obsidian_read" in tools
-    assert "obsidian_create" in tools
-    assert "obsidian_tags" in tools
-    assert "obsidian_vaults" in tools
-    assert "obsidian_version" in tools
+    assert "read" in tools
+    assert "create" in tools
+    assert "tags" in tools
+    assert "vaults" in tools
+    assert "version" in tools
 
 
 @pytest.mark.asyncio
@@ -29,7 +29,7 @@ async def test_tool_call_success():
             )
         ),
     ):
-        result = await server.call_tool("obsidian_version", {})
+        result = await server.call_tool("version", {})
         assert isinstance(result, CallToolResult)
         item = result.content[0]
         assert isinstance(item, TextContent)
@@ -49,7 +49,7 @@ async def test_tool_call_error_caught_gracefully():
             )
         ),
     ):
-        result = await server.call_tool("obsidian_read", {"file": "missing.md"})
+        result = await server.call_tool("read", {"file": "missing.md"})
         assert isinstance(result, CallToolResult)
         item = result.content[0]
         assert isinstance(item, TextContent)
@@ -59,7 +59,7 @@ async def test_tool_call_error_caught_gracefully():
 
 def test_tool_literal_schema_enums():
     server = create_server(cli_path="/mock/obsidian")
-    vault_tool = server._tool_manager._tools["obsidian_vault"]
+    vault_tool = server._tool_manager._tools["vault"]
     info_param = vault_tool.parameters["properties"]["info"]
     # 验证 Literal 会被转换为 schema 中的 enum 约束
     any_of = info_param.get("anyOf", [])
@@ -73,11 +73,11 @@ def test_tool_literal_schema_enums():
 
 def test_tool_parameter_descriptions():
     server = create_server(cli_path="/mock/obsidian")
-    read_tool = server._tool_manager._tools["obsidian_read"]
+    read_tool = server._tool_manager._tools["read"]
     file_param = read_tool.parameters["properties"]["file"]
     assert "resolves like wikilinks" in file_param.get("description", "")
 
-    append_tool = server._tool_manager._tools["obsidian_append"]
+    append_tool = server._tool_manager._tools["append"]
     content_param = append_tool.parameters["properties"]["content"]
     assert "Content to append" in content_param.get("description", "")
     assert "content" in append_tool.parameters.get("required", [])
