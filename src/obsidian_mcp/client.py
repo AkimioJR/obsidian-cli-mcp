@@ -17,7 +17,9 @@ class ObsidianClient:
         timeout: int = 30,
     ) -> None:
         self.vault = vault or os.getenv("OBSIDIAN_VAULT")
-        resolved_cli = cli_path or os.getenv("OBSIDIAN_CLI_PATH") or shutil.which("obsidian")
+        resolved_cli = (
+            cli_path or os.getenv("OBSIDIAN_CLI_PATH") or shutil.which("obsidian")
+        )
         if not resolved_cli:
             raise ObsidianNotFoundError(
                 "Obsidian CLI executable not found. Please install Obsidian CLI or set OBSIDIAN_CLI_PATH."
@@ -73,14 +75,21 @@ class ObsidianClient:
 
         # 检查错误：非零退出码或 stdout 以 Error: 开头
         if res.returncode != 0:
-            err_msg = res.stderr or res.stdout or f"Command '{command}' failed with exit code {res.returncode}"
+            err_msg = (
+                res.stderr
+                or res.stdout
+                or f"Command '{command}' failed with exit code {res.returncode}"
+            )
             raise ObsidianCLIError(
                 err_msg, returncode=res.returncode, stderr=res.stderr, stdout=res.stdout
             )
 
         if res.stdout.startswith("Error:"):
             raise ObsidianCLIError(
-                res.stdout, returncode=res.returncode, stderr=res.stderr, stdout=res.stdout
+                res.stdout,
+                returncode=res.returncode,
+                stderr=res.stderr,
+                stdout=res.stdout,
             )
 
         if parse_json:

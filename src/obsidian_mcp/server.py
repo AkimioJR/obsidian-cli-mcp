@@ -1,4 +1,5 @@
 from mcp.server.mcpserver import MCPServer
+
 from .client import ObsidianClient
 from .tools import register_tools
 

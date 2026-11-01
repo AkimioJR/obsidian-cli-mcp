@@ -6,9 +6,9 @@ from .exceptions import ObsidianCLIError, ObsidianError, ObsidianNotFoundError
 from .server import create_server
 
 __all__ = [
+    "ObsidianCLIError",
     "ObsidianClient",
     "ObsidianError",
-    "ObsidianCLIError",
     "ObsidianNotFoundError",
     "create_server",
     "main",
