@@ -1,5 +1,9 @@
 # obsidian-mcp
 
+<p align="left">
+  <b>简体中文</b> | <a href="README_en.md">English</a>
+</p>
+
 **通过 Obsidian CLI 操控 Obsidian 笔记库的 MCP (Model Context Protocol) 服务器**
 
 > **为什么通过 Obsidian CLI 而不是直接读写本地文件？**
