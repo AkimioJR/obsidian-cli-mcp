@@ -10,9 +10,9 @@
 
 ## 🛠️ 前置条件
 
-1. **Obsidian 桌面端**：已安装并正常运行。
+1. **Obsidian 桌面端**：已安装并保持运行状态。
 2. **Obsidian CLI**：已在系统 PATH 中（如 `/opt/homebrew/bin/obsidian`）。
-   - 可通过运行 `obsidian version` 检查可用性。
+   - 可在终端运行 `obsidian version` 验证安装。
 
 ---
 
@@ -20,22 +20,90 @@
 
 | 环境变量 | 说明 | 默认值 |
 | :--- | :--- | :--- |
-| `OBSIDIAN_VAULT` | 默认操控的 Vault 笔记库名称（工具未指定 `vault` 参数时使用） | 未设置时由 Obsidian CLI 自动绑定当前活跃库 |
-| `OBSIDIAN_CLI_PATH` | Obsidian CLI 可执行文件的绝对路径 | 自动在 PATH 中探测（如 `which obsidian`） |
+| `OBSIDIAN_VAULT` | 默认操控的目标 Vault 笔记库名称（工具未显式指定 `vault` 参数时自动使用） | 未设置时由 Obsidian CLI 自动绑定当前活跃库 |
+| `OBSIDIAN_CLI_PATH` | Obsidian CLI 可执行文件的绝对路径 | 自动在系统 PATH 中探测（如 `which obsidian`） |
 
 ---
 
-## 🚀 快速启动与 MCP 客户端配置
+## 🚀 快速接入 MCP 客户端
 
-### 命令行运行
+### 方式一：通过 `uvx` 直接从 GitHub 加载（推荐，免克隆开箱即用）
+
+无需预先下载代码到本地，`uvx` 会自动拉取最新仓库并在隔离环境中极速启动。
+
+在 Claude Desktop（`claude_desktop_config.json`）、Cursor 或 Codex（`mcp.json`）中添加：
+
+```json
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/AkimioJR/obsidian-mcp.git",
+        "obsidian-mcp"
+      ],
+      "env": {
+        "OBSIDIAN_VAULT": "MyVault"
+      }
+    }
+  }
+}
+```
+
+> **提示**：如需锁定指定分支或版本，可追加 `@branch` 或 `@tag`，例如：  
+> `git+https://github.com/AkimioJR/obsidian-mcp.git@main`
+
+---
+
+### 方式二：通过 `pip` 从 GitHub 安装
+
+你也可以使用 `pip` 将其直接安装到当前 Python 环境：
+
+```bash
+pip install git+https://github.com/AkimioJR/obsidian-mcp.git
+```
+
+安装完成后，系统将获得全局 `obsidian-mcp` 命令。在 MCP 客户端配置中直接指定可执行程序即可：
+
+```json
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "obsidian-mcp",
+      "env": {
+        "OBSIDIAN_VAULT": "MyVault"
+      }
+    }
+  }
+}
+```
+
+---
+
+## 💻 本地开发与调试 (Local Development)
+
+如果你需要对本项目进行二次开发或定制功能：
+
+### 1. 克隆仓库与安装依赖
+
+```bash
+git clone https://github.com/AkimioJR/obsidian-mcp.git
+cd obsidian-mcp
+
+# 使用 uv 同步并安装所有依赖（包含开发与测试工具）
+uv sync
+```
+
+### 2. 本地直接运行服务
 
 ```bash
 uv run obsidian-mcp
 ```
 
-### 接入 Claude Desktop / Cursor / Codex
+### 3. 本地开发模式下的 MCP 客户端配置
 
-在客户端的 `claude_desktop_config.json` 或 `mcp.json` 中添加配置：
+开发阶段可直接将客户端指向本地源码目录：
 
 ```json
 {
@@ -44,7 +112,7 @@ uv run obsidian-mcp
       "command": "uv",
       "args": [
         "--directory",
-        "/path/to/obsidian-mcp",
+        "/absolute/path/to/obsidian-mcp",
         "run",
         "obsidian-mcp"
       ],
@@ -56,13 +124,27 @@ uv run obsidian-mcp
 }
 ```
 
+### 4. 运行单元测试与代码检查
+
+```bash
+# 执行自动化单元测试（覆盖参数组装、错误防御与 Schema 校验）
+uv run pytest
+
+# 静态类型检查 (Type Checking)
+uv run ty check src tests
+
+# 代码格式化与规范检查
+uv run ruff format .
+uv run ruff check .
+```
+
 ---
 
 ## 📦 支持的 MCP 工具清单 (45 项全量 1:1 映射)
 
-所有工具均支持可选的 `vault` 参数，用于临时跨库操作。
+所有工具均支持可选的 `vault` 参数，用于随时指定目标库；所有参数均附带精确的 JSON Schema 描述与类型约束。
 
-### 1. 笔记与内容 (Notes)
+### 1. 笔记与内容 (Notes & Content)
 - `obsidian_read`: 按文件名或相对路径读取笔记内容。
 - `obsidian_create`: 创建新笔记，支持指定模板、内容、是否覆盖与打开方式。
 - `obsidian_append`: 向笔记末尾追加内容。
@@ -115,16 +197,3 @@ uv run obsidian-mcp
 ### 7. 插件管理 (Plugins)
 - `obsidian_plugins` / `obsidian_plugins_enabled`: 列出已安装/已启用的插件。
 - `obsidian_plugin_enable` / `obsidian_plugin_disable`: 启用或禁用指定插件。
-
----
-
-## 🧪 运行测试与格式化
-
-```bash
-# 运行单元测试
-uv run pytest
-
-# 代码格式化与规范检查
-uv run ruff format .
-uv run ruff check .
-```
