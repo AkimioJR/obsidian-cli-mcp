@@ -1,0 +1,23 @@
+[project]
+name = "obsidian-mcp"
+version = "0.1.0"
+description = "A mcp server for Obsidian though the command line interface."
+readme = "README.md"
+authors = [{ name = "AkimioJR", email = "akimio.jr@gmail.com" }]
+requires-python = ">=3.14"
+dependencies = [
+    "mcp>=2.3.0",
+]
+
+[project.scripts]
+obsidian-mcp = "obsidian_mcp:main"
+
+[build-system]
+requires = ["uv_build>=0.13.6,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.3",
+    "ty>=0.0.95",
+]
