@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 
@@ -111,7 +111,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_move", description="移动或重命名笔记文件到目标文件夹或目标路径。"
+        name="obsidian_move",
+        description="移动或重命名笔记文件到目标文件夹或目标路径。",
     )
     async def move(
         to: str,
@@ -146,7 +147,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_random_read", description="随机读取库或指定文件夹中的一篇笔记。"
+        name="obsidian_random_read",
+        description="随机读取库或指定文件夹中的一篇笔记。",
     )
     async def random_read(folder: str | None = None, vault: str | None = None) -> Any:
         return await _call("random:read", {"folder": folder}, vault=vault)
@@ -164,7 +166,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         path: str | None = None,
         name: str | None = None,
         total: bool = False,
-        sort: str | None = None,
+        sort: Literal["name", "count"] | None = None,
         counts: bool = False,
         active: bool = False,
         vault: str | None = None,
@@ -207,7 +209,9 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     async def property_set(
         name: str,
         value: str,
-        type: str | None = None,
+        type: (
+            Literal["text", "list", "number", "checkbox", "date", "datetime"] | None
+        ) = None,
         file: str | None = None,
         path: str | None = None,
         vault: str | None = None,
@@ -329,7 +333,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_aliases", description="获取库中或指定文件的别名 (aliases) 列表。"
+        name="obsidian_aliases",
+        description="获取库中或指定文件的别名 (aliases) 列表。",
     )
     async def aliases(
         file: str | None = None,
@@ -352,7 +357,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_wordcount", description="统计指定笔记或当前笔记的字数与字符数。"
+        name="obsidian_wordcount",
+        description="统计指定笔记或当前笔记的字数与字符数。",
     )
     async def wordcount(
         file: str | None = None,
@@ -380,7 +386,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         path: str | None = None,
         total: bool = False,
         counts: bool = False,
-        sort: str | None = None,
+        sort: Literal["name", "count"] | None = None,
         active: bool = False,
         vault: str | None = None,
     ) -> Any:
@@ -400,7 +406,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         )
 
     @server.tool(
-        name="obsidian_tag", description="获取特定标签的详细出现信息与文件列表。"
+        name="obsidian_tag",
+        description="获取特定标签的详细出现信息与文件列表。",
     )
     async def tag(
         name: str,
@@ -488,7 +495,10 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         name="obsidian_vault",
         description="查看指定或当前 Vault 的基本信息（名称、路径、文件数、体积等）。",
     )
-    async def vault_info(info: str | None = None, vault: str | None = None) -> Any:
+    async def vault_info(
+        info: Literal["name", "path", "files", "folders", "size"] | None = None,
+        vault: str | None = None,
+    ) -> Any:
         return await _call("vault", {"info": info}, vault=vault)
 
     @server.tool(
@@ -499,7 +509,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("vaults", {"total": total, "verbose": verbose})
 
     @server.tool(
-        name="obsidian_files", description="列出库内所有文件，可按目录或扩展名筛选。"
+        name="obsidian_files",
+        description="列出库内所有文件，可按目录或扩展名筛选。",
     )
     async def files(
         folder: str | None = None,
@@ -522,7 +533,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(name="obsidian_folder", description="查看指定文件夹的详情信息。")
     async def folder_info(
         path: str,
-        info: str | None = None,
+        info: Literal["files", "folders", "size"] | None = None,
         vault: str | None = None,
     ) -> Any:
         return await _call("folder", {"path": path, "info": info}, vault=vault)
@@ -532,7 +543,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("recents", {"total": total}, vault=vault)
 
     @server.tool(
-        name="obsidian_bookmarks", description="获取库中所有的书签 (bookmarks) 列表。"
+        name="obsidian_bookmarks",
+        description="获取库中所有的书签 (bookmarks) 列表。",
     )
     async def bookmarks(
         total: bool = False,
@@ -563,7 +575,8 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         return await _call("restart")
 
     @server.tool(
-        name="obsidian_version", description="获取当前安装的 Obsidian 客户端版本号。"
+        name="obsidian_version",
+        description="获取当前安装的 Obsidian 客户端版本号。",
     )
     async def version() -> Any:
         return await _call("version")
@@ -625,7 +638,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         description="列出已安装的插件列表（支持区分 core/community）。",
     )
     async def plugins(
-        filter: str | None = None,
+        filter: Literal["core", "community"] | None = None,
         versions: bool = False,
         vault: str | None = None,
     ) -> Any:
@@ -640,7 +653,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
         name="obsidian_plugins_enabled", description="列出当前已启用的插件列表。"
     )
     async def plugins_enabled(
-        filter: str | None = None,
+        filter: Literal["core", "community"] | None = None,
         versions: bool = False,
         vault: str | None = None,
     ) -> Any:
@@ -656,7 +669,7 @@ def register_tools(server: MCPServer, client: ObsidianClient) -> None:
     )
     async def plugin_enable(
         id: str,
-        filter: str | None = None,
+        filter: Literal["core", "community"] | None = None,
         vault: str | None = None,
     ) -> Any:
         return await _call("plugin:enable", {"id": id, "filter": filter}, vault=vault)

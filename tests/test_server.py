@@ -48,3 +48,17 @@ async def test_tool_call_error_caught_gracefully():
         result = await server.call_tool("obsidian_read", {"file": "missing.md"})
         assert "Error:" in result.content[0].text
         assert "missing.md" in result.content[0].text
+
+
+def test_tool_literal_schema_enums():
+    server = create_server(cli_path="/mock/obsidian")
+    vault_tool = server._tool_manager._tools["obsidian_vault"]
+    info_param = vault_tool.parameters["properties"]["info"]
+    # 验证 Literal 会被转换为 schema 中的 enum 约束
+    any_of = info_param.get("anyOf", [])
+    enum_vals = None
+    for branch in any_of:
+        if "enum" in branch:
+            enum_vals = branch["enum"]
+            break
+    assert enum_vals == ["name", "path", "files", "folders", "size"]
