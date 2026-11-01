@@ -81,3 +81,32 @@ def test_tool_parameter_descriptions():
     content_param = append_tool.parameters["properties"]["content"]
     assert "Content to append" in content_param.get("description", "")
     assert "content" in append_tool.parameters.get("required", [])
+
+
+@pytest.mark.asyncio
+async def test_tool_call_json_result():
+    server = create_server(cli_path="/mock/obsidian")
+    with patch(
+        "obsidian_cli_mcp.client.run_cli_command",
+        new=AsyncMock(
+            return_value=CommandExecutionResult(
+                returncode=0,
+                stdout='[{"tag": "#obsidian", "count": 12}]',
+                stderr="",
+            )
+        ),
+    ):
+        result = await server.call_tool("tags", {})
+        assert isinstance(result, CallToolResult)
+        item = result.content[0]
+        assert isinstance(item, TextContent)
+        assert "#obsidian" in item.text
+
+
+def test_all_tools_have_description_and_schema():
+    server = create_server(cli_path="/mock/obsidian")
+    tools = server._tool_manager._tools
+    assert len(tools) == 45
+    for tool in tools.values():
+        assert tool.description and len(tool.description.strip()) > 0
+        assert "properties" in tool.parameters

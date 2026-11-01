@@ -11,16 +11,24 @@ on:
 jobs:
   lint:
     strategy:
+      fail-fast: false
       matrix:
-        python-version:
-          - "3.10"
-          - "3.11"
-          - "3.12"
-          - "3.13"
-          - "3.14"
-          - "3.15"
+        include:
+          # Linux: full Python version coverage (fast & standard)
+          - { os: ubuntu-latest, python-version: "3.10" }
+          - { os: ubuntu-latest, python-version: "3.11" }
+          - { os: ubuntu-latest, python-version: "3.12" }
+          - { os: ubuntu-latest, python-version: "3.13" }
+          - { os: ubuntu-latest, python-version: "3.14" }
+          - { os: ubuntu-latest, python-version: "3.15" }
 
-    runs-on: ubuntu-latest
+          # macOS & Windows: platform-specific paths, line endings, and subprocess testing
+          - { os: macos-latest, python-version: "3.12" }
+          - { os: macos-latest, python-version: "3.14" }
+          - { os: windows-latest, python-version: "3.12" }
+          - { os: windows-latest, python-version: "3.14" }
+
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
 
@@ -31,8 +39,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
-          pip install . ruff ty pytest pytest-asyncio
+          python -m pip install --upgrade pip
+          python -m pip install . ruff ty pytest pytest-asyncio
 
       - name: Run ruff check
         run: ruff check .
@@ -44,4 +52,4 @@ jobs:
         run: ty check src tests
 
       - name: Run pytest
-        run: pytest
+        run: python -m pytest

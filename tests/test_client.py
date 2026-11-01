@@ -130,3 +130,31 @@ def test_build_args_empty_string_guard():
         },
     )
     assert args == ["create", "name=Note.md", "content="]
+
+
+def test_client_custom_properties():
+    client = ObsidianClient(
+        vault="CustomVault", cli_path="/custom/obsidian", timeout=60
+    )
+    assert client.vault == "CustomVault"
+    assert client.cli_path == "/custom/obsidian"
+    assert client.timeout == 60
+
+    args = client._build_args("read", {"file": "note.md"})
+    assert "vault=CustomVault" in args
+
+
+@pytest.mark.asyncio
+async def test_execute_timeout_handling():
+    client = ObsidianClient(cli_path="/mock/obsidian")
+    with patch(
+        "obsidian_cli_mcp.client.run_cli_command",
+        new=AsyncMock(
+            return_value=CommandExecutionResult(
+                returncode=-1, stdout="", stderr="Command timed out after 30 seconds"
+            )
+        ),
+    ):
+        with pytest.raises(ObsidianCLIError) as exc_info:
+            await client.execute("read", {"file": "slow.md"})
+        assert "timed out" in str(exc_info.value)
