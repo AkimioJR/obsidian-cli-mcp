@@ -69,3 +69,15 @@ def test_tool_literal_schema_enums():
             enum_vals = branch["enum"]
             break
     assert enum_vals == ["name", "path", "files", "folders", "size"]
+
+
+def test_tool_parameter_descriptions():
+    server = create_server(cli_path="/mock/obsidian")
+    read_tool = server._tool_manager._tools["obsidian_read"]
+    file_param = read_tool.parameters["properties"]["file"]
+    assert "resolves like wikilinks" in file_param.get("description", "")
+
+    append_tool = server._tool_manager._tools["obsidian_append"]
+    content_param = append_tool.parameters["properties"]["content"]
+    assert "Content to append" in content_param.get("description", "")
+    assert "content" in append_tool.parameters.get("required", [])
