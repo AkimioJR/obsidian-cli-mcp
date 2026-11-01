@@ -115,3 +115,18 @@ async def test_execute_error_handling():
         with pytest.raises(ObsidianCLIError) as exc_info:
             await client.execute("read", {"file": "missing.md"})
         assert 'Error: File "missing.md" not found.' in str(exc_info.value)
+
+
+def test_build_args_empty_string_guard():
+    client = ObsidianClient(cli_path="/mock/obsidian")
+    args = client._build_args(
+        "create",
+        {
+            "name": "Note.md",
+            "file": "",
+            "path": "   ",
+            "content": "",  # 白名单，保留
+            "template": None,
+        },
+    )
+    assert args == ["create", "name=Note.md", "content="]

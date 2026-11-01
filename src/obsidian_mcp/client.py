@@ -6,6 +6,9 @@ from typing import Any
 from .cli import CommandExecutionResult, run_cli_command
 from .exceptions import ObsidianCLIError, ObsidianNotFoundError
 
+# 允许保留空字符串的参数（如清空属性值、创建空白内容等）
+ALLOW_EMPTY_VALUE_KEYS = {"content", "value"}
+
 
 class ObsidianClient:
     """Obsidian CLI 异步客户端。负责参数序列化、环境变量回退、执行控制与结果解析。"""
@@ -38,6 +41,7 @@ class ObsidianClient:
         规则：
         - True: 转换为裸 flag（例如 verbose=True -> 'verbose'）
         - False / None: 忽略该参数
+        - 纯空白字符串（若非 content/value 白名单）: 忽略该参数，防止意外触发 CLI 对活跃文件的回退行为
         - 其余类型: 转换为 key=value 字符串
         """
         args = [command]
@@ -45,14 +49,20 @@ class ObsidianClient:
 
         # 确定目标 vault：参数指定 > 实例/环境变量默认 > 不传（回退到活跃库）
         target_vault = vault if vault is not None else self.vault
-        if target_vault is not None and "vault" not in merged_params:
-            merged_params["vault"] = target_vault
+        if target_vault and target_vault.strip() and "vault" not in merged_params:
+            merged_params["vault"] = target_vault.strip()
 
         for key, val in merged_params.items():
             if val is None or val is False:
                 continue
             if val is True:
                 args.append(key)
+            elif (
+                isinstance(val, str)
+                and not val.strip()
+                and key not in ALLOW_EMPTY_VALUE_KEYS
+            ):
+                continue
             else:
                 args.append(f"{key}={val}")
 
