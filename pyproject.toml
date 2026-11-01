@@ -1,7 +1,7 @@
 [project]
 name = "obsidian-mcp"
 version = "0.1.0"
-description = "An MCP server to interact with Obsidian vault via Obsidian CLI"
+description = "A MCP server to interact with Obsidian vault via Obsidian CLI"
 readme = "README.md"
 authors = [{ name = "AkimioJR", email = "akimio.jr@gmail.com" }]
 requires-python = ">=3.14"
@@ -19,7 +19,7 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "pytest>=8.0.0",
-    "pytest-asyncio>=0.24.0",
+    "pytest-asyncio>=1.4.1",
     "ruff>=0.17.3",
     "ty>=0.0.95",
 ]
