@@ -1,41 +1,49 @@
-# obsidian-cli-mcp
+<p align="center">
+  <img src="./assets/readme/hero.svg" width="100%" alt="obsidian-cli-mcp - Model Context Protocol Server for Obsidian">
+</p>
 
-<p align="left">
+<p align="center">
+  <a href="https://github.com/AkimioJR/obsidian-cli-mcp/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT"></a>
+  <a href="https://pypi.org/project/obsidian-cli-mcp/"><img src="https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+"></a>
+  <a href="https://modelcontextprotocol.io/"><img src="https://img.shields.io/badge/Protocol-MCP%202.3+-8B5CF6.svg?style=flat-square" alt="MCP 2.3+"></a>
+  <a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/badge/Package-uv%20%2F%20uvx-10B981.svg?style=flat-square" alt="uvx ready"></a>
+</p>
+
+<p align="center">
   <a href="README.md">简体中文</a> | <b>English</b>
 </p>
 
-**An MCP (Model Context Protocol) server to control Obsidian vaults via the native Obsidian CLI.**
-
-> **Why interact via Obsidian CLI instead of directly reading/writing vault files?**
-> 1. **Ensure Runtime State & Plugin Synchronization**: Actions executed via CLI immediately update Obsidian's internal graph, Dataview cache, tag indexes, and active editor tabs without requiring app restarts or file system polling.
-> 2. **Bypass macOS Privacy Protections (TCC)**: Direct file system operations across user directories often trigger macOS sandbox and Full Disk Access permissions. Interacting with the running Obsidian Electron app via its CLI requires no intrusive permissions.
-
 ---
 
-## 🛠️ Prerequisites
+## 💡 Why obsidian-cli-mcp?
 
-1. **Obsidian Desktop App**: Installed and running.
-2. **Obsidian CLI**: Available in your system `PATH` (e.g. `/opt/homebrew/bin/obsidian`).
-   - Run `obsidian version` in your terminal to verify installation.
+**A full-featured MCP (Model Context Protocol) server with 45 tools to interact with Obsidian vaults via the official Obsidian CLI.**
 
----
+Many AI clients attempt to read and write local Markdown files directly on disk, but this approach introduces significant flaws in real personal knowledge management (PKM) workflows. `obsidian-cli-mcp` connects to the running Obsidian Electron app via official CLI IPC (Inter-Process Communication), completely solving these pain points:
 
-## ⚙️ Environment Variables
+<p align="center">
+  <img src="./assets/readme/workflow.svg" width="100%" alt="Architecture Comparison: Native CLI IPC vs Traditional File I/O">
+</p>
 
-| Variable | Description | Default |
+### Architecture Comparison
+
+| Feature | Direct File I/O | obsidian-cli-mcp (Official CLI IPC) |
 | :--- | :--- | :--- |
-| `OBSIDIAN_VAULT` | Default target vault name (used when tool calls do not specify `vault`) | Binds to currently active vault if unset |
-| `OBSIDIAN_CLI_PATH` | Absolute path to the Obsidian CLI executable | Automatically detected in system `PATH` (`which obsidian`) |
+| **Graph Sync** | ❌ Silent external writes leave backlinks & graph out-of-sync | ✅ **Instant Sync**: Backlinks, forward links & orphans update immediately |
+| **Dataview Cache** | ❌ In-memory index misses changes, returning stale data | ✅ **Live Reflection**: Frontmatter property updates trigger instant cache refresh |
+| **macOS Permissions** | ⚠️ Prone to TCC permission prompts or Full Disk Access errors | ✅ **Zero-Permission Friction**: Communicates with running app via CLI, no prompt |
+| **Active Editor Tabs** | ❌ Cannot detect active note or focus editor UI | ✅ **GUI Integration**: Focus notes with `open`, inspect live outlines, etc. |
+| **Plugins & Commands** | ❌ Cannot interact with Obsidian plugin ecosystem | ✅ **Extensible**: Trigger internal/plugin commands, toggle plugins, JS `eval` |
 
 ---
 
-## 🚀 Quick Setup for MCP Clients
+## 🚀 Quickstart
 
-### Method 1: Run via `uvx` (Recommended, Zero-install)
+### Method 1: Run via `uvx` (Recommended · Zero-Install)
 
-No need to clone the repository locally. `uvx` automatically launches the server in an isolated environment.
+No need to clone code or configure a local Python environment. `uvx` automatically launches the server in a secure, isolated sandbox.
 
-Add this to your Claude Desktop (`claude_desktop_config.json`), Cursor, or Codex (`mcp.json`):
+Add this configuration to your Claude Desktop (`claude_desktop_config.json`), Cursor, or Codex (`mcp.json`):
 
 ```json
 {
@@ -51,22 +59,22 @@ Add this to your Claude Desktop (`claude_desktop_config.json`), Cursor, or Codex
 }
 ```
 
-> **Tip**: To run directly from GitHub or lock to a specific version/branch:  
+> **Tip**: To run directly from GitHub or pin a specific branch/version:  
 > `uvx --from git+https://github.com/AkimioJR/obsidian-cli-mcp.git obsidian-cli-mcp`
 
 ---
 
-### Method 2: Install as a standalone tool via `uv tool install` (Recommended for daily use)
+### Method 2: Install as a Standalone Tool via `uv tool` (High Frequency)
 
-Install `obsidian-cli-mcp` as a global CLI command in an isolated environment without polluting your system Python:
+Install into an isolated environment without polluting system Python, generating a global command with sub-second launch speed:
 
 ```bash
 uv tool install obsidian-cli-mcp
-# Or install directly from GitHub:
+# Or install directly from GitHub main branch:
 # uv tool install git+https://github.com/AkimioJR/obsidian-cli-mcp.git
 ```
 
-Once installed, use the standalone command directly in your MCP client config:
+In MCP client config, use `uv tool run` (prevents path discovery errors in desktop apps):
 
 ```json
 {
@@ -82,16 +90,13 @@ Once installed, use the standalone command directly in your MCP client config:
 }
 ```
 
-> **Tip**: Launching via `uv tool run` ensures GUI clients (like Claude Desktop) reliably locate the tool even if `~/.local/bin` is not in your system GUI `PATH`.
-
-> **Upgrade**: Update to the latest code anytime by running:  
-> `uv tool upgrade obsidian-cli-mcp`
+> **Upgrading**: Upgrade anytime with a single command: `uv tool upgrade obsidian-cli-mcp`
 
 ---
 
 ### Method 3: Install via `pip`
 
-You can also install it into your active Python environment using `pip`:
+You can also install via traditional `pip` into your active Python environment:
 
 ```bash
 pip install obsidian-cli-mcp
@@ -99,7 +104,7 @@ pip install obsidian-cli-mcp
 # pip install git+https://github.com/AkimioJR/obsidian-cli-mcp.git
 ```
 
-Then configure your MCP client with the installed binary:
+Client configuration:
 
 ```json
 {
@@ -116,29 +121,117 @@ Then configure your MCP client with the installed binary:
 
 ---
 
+## 🛠️ Prerequisites & Configuration
+
+### Prerequisites
+
+1. **Obsidian Desktop App**: Installed and running.
+2. **Obsidian CLI**: Accessible in your system `PATH` (e.g. `/opt/homebrew/bin/obsidian` or via Homebrew).
+   - Run `obsidian version` in terminal to quickly test.
+
+### Environment Variables
+
+| Variable | Description | Default Behavior |
+| :--- | :--- | :--- |
+| `OBSIDIAN_VAULT` | Target Vault name (automatically used when tool calls omit the `vault` parameter) | Defaults to currently active vault in Obsidian |
+| `OBSIDIAN_CLI_PATH` | Absolute path to Obsidian CLI binary | Auto-detected in system `PATH` (`which obsidian`) |
+
+---
+
+## 📦 Supported 45 MCP Tools Matrix
+
+All tools support an optional `vault` parameter for multi-vault switching. All tool parameters come with strict type definitions and exact JSON Schema constraints.
+
+<p align="center">
+  <img src="./assets/readme/tools-matrix.svg" width="100%" alt="obsidian-cli-mcp 45 Tools Matrix">
+</p>
+
+<details open>
+<summary><b>Expand to view detailed tool catalog (45 tools, 1:1 mapping)</b></summary>
+
+### 1. Notes & Content (9 tools)
+- `read`: Read raw Markdown content by note name or relative path.
+- `create`: Create a new note with optional template, pre-filled content, overwrite, and auto-open.
+- `append`: Append content to the end of a note.
+- `prepend`: Prepend content to the beginning of a note.
+- `delete`: Delete a note (defaults to system trash, supports permanent deletion).
+- `move`: Move or rename note path.
+- `rename`: Rename a note file.
+- `open`: Focus and open note in the Obsidian GUI.
+- `random_read`: Randomly read a note from the vault.
+
+### 2. Properties & Frontmatter (4 tools)
+- `properties`: List all property keys across vault or for a specific file.
+- `property_read`: Read specific Frontmatter property value.
+- `property_set`: Set property value (supports text, list, number, checkbox).
+- `property_remove`: Remove a property from frontmatter.
+
+### 3. Graph & Links (8 tools)
+- `backlinks`: Get note backlink incoming edges (JSON format).
+- `links`: Get outgoing link edges from a note.
+- `unresolved`: List hanging links with no target note created yet.
+- `orphans`: List orphan notes with zero incoming backlinks.
+- `deadends`: List dead-end notes with zero outgoing links.
+- `outline`: Get heading outline hierarchy (JSON format).
+- `aliases`: List all aliases for the vault or note.
+- `wordcount`: Get character and word count statistics.
+
+### 4. Tags & Tasks (4 tools)
+- `tags`: Get all tags and their frequency distribution (JSON format).
+- `tag`: Query specific tag occurrences across notes.
+- `tasks`: Filter tasks by status (completed/todo), tag, or file.
+- `task`: Toggle checkbox state or mark task completed.
+
+### 5. Vault & Workspace (8 tools)
+- `vault`: Query Vault stats (path, total files, size, etc.).
+- `vaults`: List all known vaults and their filesystem paths.
+- `files`: List files in vault (supports folder/extension filters).
+- `folders` / `folder`: Inspect directory tree structure and metadata.
+- `recents`: List recently accessed files.
+- `bookmarks`: Read bookmarked and starred items.
+- `workspace`: Query workspace window layout tree.
+
+### 6. Commands & Extensions (5 tools)
+- `command`: Trigger internal Obsidian or plugin commands.
+- `commands`: List all available command IDs.
+- `template_read`: Read template file with variable evaluation.
+- `template_insert`: Insert template into currently active note.
+- `eval`: Execute JavaScript code inside Obsidian runtime (advanced escape hatch).
+
+### 7. Plugins & Lifecycle (7 tools)
+- `plugins` / `plugins_enabled`: List installed / active community and core plugins.
+- `plugin_enable` / `plugin_disable`: Dynamically enable or disable plugins.
+- `reload`: Reload current vault.
+- `restart`: Restart Obsidian desktop application.
+- `version`: Query current Obsidian version.
+
+</details>
+
+---
+
 ## 💻 Local Development
 
-If you want to contribute or develop locally:
+To contribute or customize this project:
 
-### 1. Clone Repository & Install Dependencies
+### 1. Clone & Sync Dependencies
 
 ```bash
 git clone https://github.com/AkimioJR/obsidian-cli-mcp.git
 cd obsidian-cli-mcp
 
-# Sync all runtime, test, and dev dependencies using uv
+# Fast sync with uv
 uv sync
 ```
 
-### 2. Run the MCP Server Locally
+### 2. Run Local Server
 
 ```bash
 uv run obsidian-cli-mcp
 ```
 
-### 3. Local Development MCP Configuration
+### 3. Client Config for Development
 
-Point your MCP client directly to your local development checkout:
+Point client directly to local source tree:
 
 ```json
 {
@@ -159,76 +252,22 @@ Point your MCP client directly to your local development checkout:
 }
 ```
 
-### 4. Run Tests & Code Quality Checks
+### 4. Automated Testing & Code Quality
 
 ```bash
-# Run unit tests
+# Run pytest unit tests
 uv run pytest
 
-# Static type checking
+# Type checking
 uv run ty check src tests
 
-# Formatting and linting
+# Code format & lint
 uv run ruff format .
 uv run ruff check .
 ```
 
 ---
 
-## 📦 Supported MCP Tools (45 1:1 Mapped CLI Commands)
+## 📄 License
 
-All tools support an optional `vault` parameter to override the active vault per call. All parameters include full JSON Schema descriptions and type constraints.
-
-### 1. Notes & Content
-- `read`: Read the complete content of a note by file name or vault-relative path.
-- `create`: Create a new note file with optional content, template, overwriting, and opening in app.
-- `append`: Append content to the end of a specified note file.
-- `prepend`: Prepend content to the beginning of a specified note file.
-- `delete`: Delete a note file (moves to trash by default, or permanently deletes if `permanent=True`).
-- `move`: Move or rename a note file to a destination folder or path.
-- `rename`: Rename a note file.
-- `open`: Open and focus a note file in the Obsidian workspace.
-- `random_read`: Read a random note from the entire vault or a specified folder.
-
-### 2. Metadata & Properties (Frontmatter)
-- `properties`: List all frontmatter properties in the vault or for a specific file (returns JSON).
-- `property_read`: Read the value of a specific property from a file.
-- `property_set`: Set a property on a file with optional type (text, list, number, checkbox, date, datetime).
-- `property_remove`: Remove a property from a file.
-
-### 3. Graph & Links
-- `backlinks`: List backlinks pointing to a specified note (returns JSON).
-- `links`: List outgoing links from a specified note.
-- `unresolved`: List unresolved links in the vault pointing to non-existent notes (returns JSON).
-- `orphans`: List orphan notes that have no incoming links from other notes.
-- `deadends`: List dead-end notes that contain no outgoing links to other notes.
-- `outline`: Get the heading outline hierarchy of a note (returns JSON).
-- `aliases`: List aliases in the vault or for a specified note.
-- `wordcount`: Count words and characters in a note or the active note.
-
-### 4. Tags & Tasks
-- `tags`: List all tags and their occurrence counts in the vault or note (returns JSON).
-- `tag`: Get details and file occurrences for a specific tag.
-- `tasks`: List tasks in the vault with optional filters for completion, note, or status (returns JSON).
-- `task`: Show or update a specific task status (toggle, mark done, or set status character).
-
-### 5. Vault & Workspace
-- `vault`: Show vault information such as name, path, file count, folder count, or total size.
-- `vaults`: List all known Obsidian vaults and their local absolute paths.
-- `files`: List files in the vault, with optional filtering by folder or file extension.
-- `folders` / `folder`: Inspect and list folder structures and details.
-- `recents`: List recently opened files in the vault.
-- `bookmarks`: List all bookmarks in the vault (returns JSON).
-- `workspace`: Get the current workspace window layout tree.
-- `reload` / `restart` / `version`: Reload vault, restart desktop app, or query version.
-
-### 6. Commands & Automation
-- `command`: Execute an Obsidian internal or plugin command by its command ID.
-- `commands`: List all available Obsidian commands and their command IDs.
-- `template_read`: Read a template file's content, with optional resolution of template variables.
-- `template_insert`: Insert a template into the currently active note.
-- `eval`: Execute JavaScript code inside the Obsidian Electron runtime and return the result.
-
-### 7. Plugins
-- `plugins` / `plugins_enabled`: List installed or enabled plugins.
-- `plugin_enable` / `plugin_disable`: Enable or disable a specified plugin.
+This project is licensed under the [MIT License](LICENSE). Contributions, bug reports, and PRs are welcome!
