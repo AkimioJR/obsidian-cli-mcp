@@ -11,6 +11,11 @@ dependencies = [
     "pydantic>=2.14.2",
 ]
 
+[project.urls]
+Homepage = "https://github.com/AkimioJR/obsidian-mcp"
+Repository = "https://github.com/AkimioJR/obsidian-mcp.git"
+Issues = "https://github.com/AkimioJR/obsidian-mcp/issues"
+
 [project.scripts]
 obsidian-mcp = "obsidian_mcp:main"
 
