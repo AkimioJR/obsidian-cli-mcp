@@ -56,7 +56,35 @@
 
 ---
 
-### 方式二：通过 `pip` 从 GitHub 安装
+### 方式二：通过 `uv tool install` 安装为独立工具（高频使用推荐）
+
+使用 `uv tool install` 将其安装在独立的隔离环境中，既不污染系统 Python，又能生成全局可执行命令并实现秒级启动：
+
+```bash
+uv tool install git+https://github.com/AkimioJR/obsidian-mcp.git
+```
+
+安装完成后，系统将获得全局 `obsidian-mcp` 命令。在 MCP 客户端配置中直接指定可执行程序即可：
+
+```json
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "obsidian-mcp",
+      "env": {
+        "OBSIDIAN_VAULT": "MyVault"
+      }
+    }
+  }
+}
+```
+
+> **版本升级**：后续升级到仓库最新代码只需运行：  
+> `uv tool upgrade obsidian-mcp`
+
+---
+
+### 方式三：通过 `pip` 从 GitHub 安装
 
 你也可以使用 `pip` 将其直接安装到当前 Python 环境：
 
@@ -64,7 +92,7 @@
 pip install git+https://github.com/AkimioJR/obsidian-mcp.git
 ```
 
-安装完成后，系统将获得全局 `obsidian-mcp` 命令。在 MCP 客户端配置中直接指定可执行程序即可：
+在 MCP 客户端配置中直接调用该命令：
 
 ```json
 {
