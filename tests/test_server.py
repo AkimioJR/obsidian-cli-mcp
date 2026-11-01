@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from mcp.types import CallToolResult, TextContent
 
 from obsidian_mcp.cli import CommandExecutionResult
 from obsidian_mcp.server import create_server
@@ -29,7 +30,10 @@ async def test_tool_call_success():
         ),
     ):
         result = await server.call_tool("obsidian_version", {})
-        assert result.content[0].text == "1.14.5"
+        assert isinstance(result, CallToolResult)
+        item = result.content[0]
+        assert isinstance(item, TextContent)
+        assert item.text == "1.14.5"
 
 
 @pytest.mark.asyncio
@@ -46,8 +50,11 @@ async def test_tool_call_error_caught_gracefully():
         ),
     ):
         result = await server.call_tool("obsidian_read", {"file": "missing.md"})
-        assert "Error:" in result.content[0].text
-        assert "missing.md" in result.content[0].text
+        assert isinstance(result, CallToolResult)
+        item = result.content[0]
+        assert isinstance(item, TextContent)
+        assert "Error:" in item.text
+        assert "missing.md" in item.text
 
 
 def test_tool_literal_schema_enums():
