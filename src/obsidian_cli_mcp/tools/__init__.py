@@ -4,7 +4,7 @@ from enum import Enum
 from mcp.server.mcpserver import MCPServer
 
 from ..client import ObsidianClient
-from ..i18n import SupportedLang, detect_language
+from ..i18n import SupportedLang
 from .base import (
     DESTRUCTIVE_WRITE,
     DYNAMIC_EVAL,
@@ -95,7 +95,7 @@ def register_tools(
 
     If features is None, all tools (all features) are registered by default.
     """
-    resolved_lang = detect_language(lang)
+    resolved_lang = SupportedLang.detect(lang)
 
     if features is None:
         enabled_features = set(Feature)

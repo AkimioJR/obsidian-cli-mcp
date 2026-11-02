@@ -9,6 +9,16 @@ class SupportedLang(str, Enum):
     EN_US = "en_US"
     ZH_CN = "zh_CN"
 
+    @property
+    def titles(self) -> dict[str, dict[str, str]]:
+        """Get the dictionary of tool titles for this language."""
+        return _TOOL_TITLES.get(self, _TOOL_TITLES[SupportedLang.EN_US])
+
+    @classmethod
+    def all_titles(cls) -> dict["SupportedLang", dict[str, dict[str, str]]]:
+        """Get the full dictionary of all tool titles across all supported languages."""
+        return _TOOL_TITLES
+
     @classmethod
     def normalize(cls, raw: str | None) -> "SupportedLang | None":
         """Normalize raw language string (e.g. 'zh', 'zh_CN', 'zh-CN', 'en', 'en-US') to SupportedLang."""
@@ -29,7 +39,7 @@ class SupportedLang(str, Enum):
         2. OBSIDIAN_LANG environment variable
         3. Standard env vars (LC_ALL, LC_MESSAGES, LANG)
         4. System locale via locale.getlocale()
-        5. Fallback to DEFAULT_LANG (EN_US)
+        5. Fallback to EN_US
         """
         # 1. Explicit parameter
         detected = cls.normalize(preferred)
@@ -67,27 +77,22 @@ class SupportedLang(str, Enum):
         Return None if not found in en_US either.
         """
         # 1. Check current language
-        lang_dict = TOOL_TITLES.get(self)
-        if lang_dict:
-            feat_dict = lang_dict.get(feature)
-            if feat_dict and tool_name in feat_dict:
-                return feat_dict[tool_name]
+        feat_dict = self.titles.get(feature)
+        if feat_dict and tool_name in feat_dict:
+            return feat_dict[tool_name]
 
         # 2. Fallback to en_US if current language is not en_US
         if self != SupportedLang.EN_US:
-            en_dict = TOOL_TITLES.get(SupportedLang.EN_US, {})
-            feat_dict = en_dict.get(feature, {})
-            if tool_name in feat_dict:
-                return feat_dict[tool_name]
+            en_feat_dict = SupportedLang.EN_US.titles.get(feature, {})
+            if tool_name in en_feat_dict:
+                return en_feat_dict[tool_name]
 
         # 3. Not found in en_US either
         return None
 
 
-DEFAULT_LANG: SupportedLang = SupportedLang.EN_US
-
-# 按 [语言][Feature][工具名] 三层结构组织的本地化标题
-TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
+# 按 [语言][Feature][工具名] 三层结构组织的私有本地化标题存储
+_TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
     SupportedLang.ZH_CN: {
         "note": {
             "read": "读取笔记",
@@ -216,16 +221,4 @@ TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
     },
 }
 
-# Compatibility helper functions
-normalize_lang = SupportedLang.normalize
-detect_language = SupportedLang.detect
-
-
-def get_tool_title(
-    feature: str,
-    tool_name: str,
-    lang: SupportedLang | str | None = None,
-) -> str | None:
-    """Get human-readable title for a tool under a specific feature and resolved language."""
-    resolved = lang if isinstance(lang, SupportedLang) else SupportedLang.detect(lang)
-    return resolved.tool_title(feature, tool_name)
+__all__ = ["SupportedLang"]
