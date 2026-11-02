@@ -151,7 +151,7 @@ pip install obsidian-cli-mcp
 ### 前置条件
 
 1. **Obsidian 桌面端**：
-   - 需要 **Obsidian v1.12.7 或更高版本**（内置官方 CLI 接口支持）；
+   - 需要 **Obsidian v1.12.7 或更高版本**（内置官方 CLI 接口支持，详见 [Obsidian CLI 演进记录](docs/obsidian-cli-changelog.md)）；
    - 在使用本 MCP 服务时，Obsidian 桌面应用需保持运行状态。
 2. **开启官方命令行界面 (Obsidian CLI)**：
    - 打开 Obsidian 桌面端，进入 **设置 (Settings)** → **关于 (About)**（部分版本位于 **常规 / General**）；

@@ -151,7 +151,7 @@ Client configuration:
 ### Prerequisites
 
 1. **Obsidian Desktop App**:
-   - Requires **Obsidian v1.12.7 or higher** (bundled with official CLI interface support);
+   - Requires **Obsidian v1.12.7 or higher** (bundled with official CLI interface support; see [Obsidian CLI Changelog](docs/obsidian-cli-changelog.md));
    - Obsidian desktop app must remain running while interacting with this MCP server.
 2. **Enable Official Command Line Interface (Obsidian CLI)**:
    - Open Obsidian, go to **Settings** → **About** (or **General** depending on version);
