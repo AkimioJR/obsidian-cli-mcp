@@ -37,12 +37,14 @@ def create_server(
         instructions="Obsidian CLI MCP server providing full control over Obsidian vaults.",
     )
 
-    # 优先使用显式传入的 features 参数，未指定时尝试读取环境变量 OBSIDIAN_FEATURES
+    # 优先使用显式传入的 features 参数，未指定时尝试读取环境变量 OBSIDIAN_FEATURES，默认采用 standard 预设
     resolved_features = features
     if resolved_features is None:
         env_feat = os.getenv("OBSIDIAN_FEATURES")
         if env_feat:
             resolved_features = [f.strip() for f in env_feat.split(",") if f.strip()]
+        else:
+            resolved_features = ["standard"]
 
     # 优先使用显式传入的 lang 参数，未指定时尝试读取环境变量 OBSIDIAN_LANG
     resolved_lang = lang or os.getenv("OBSIDIAN_LANG")

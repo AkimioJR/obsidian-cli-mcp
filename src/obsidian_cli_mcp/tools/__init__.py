@@ -101,14 +101,14 @@ class Feature(str, Enum):
     ) -> None:
         """Register tool feature groups to the MCP server.
 
-        If features is None, all tools (all features) are registered by default.
+        If features is None, standard features are registered by default.
         """
         resolved_lang = (
             lang if isinstance(lang, SupportedLang) else SupportedLang.detect(lang)
         )
 
         if features is None:
-            enabled_features = set(cls)
+            enabled_features = set(cls.presets()["standard"])
         else:
             enabled_features = set()
             for item in features:

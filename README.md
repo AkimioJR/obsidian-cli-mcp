@@ -42,7 +42,7 @@
 
 ## 💡 为什么选择 obsidian-cli-mcp？
 
-**通过 Obsidian 官方 CLI 深度整合笔记库的 45 项全能 MCP (Model Context Protocol) 服务器。**
+**通过 Obsidian 官方 CLI 深度整合笔记库的 MCP (Model Context Protocol) 服务器。**
 
 许多 AI 客户端通常尝试直接读写本地磁盘上的 Markdown 文件，但在真实知识管理工作流中存在严重的系统缺陷。`obsidian-cli-mcp` 通过官方 CLI 进程间通信（IPC）桥接运行中的 Obsidian 桌面应用，彻底解决这些痛点：
 
@@ -162,21 +162,21 @@ pip install obsidian-cli-mcp
 | `OBSIDIAN_CLI_PATH` | Obsidian CLI 可执行文件的绝对路径                                                                  | 自动在系统 PATH 中探测（如 `which obsidian`） |
 | `OBSIDIAN_TIMEOUT`  | CLI 子进程命令执行超时时间（秒，支持小数浮点或 `none`/`null` 禁用超时）                            | `30.0`                                        |
 | `OBSIDIAN_VERSION`  | 手动指定或覆盖 Obsidian 客户端版本号（用于无头/容器环境兼容性校验，如 `1.14.5`）                   | 启动时自动从 `obsidian version` 探针探测      |
-| `OBSIDIAN_FEATURES` | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,eval` 或预设 `standard,safe`） | `all`（默认启用全量 45 项工具）               |
+| `OBSIDIAN_FEATURES` | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,eval` 或预设 `standard,safe,all`） | `standard`（默认启用核心工具及日常笔记与图谱特性） |
 | `OBSIDIAN_LANG`     | 人类可读界面与工具标题的本地化语言（支持 `zh_CN`, `en_US` 等）                                     | 自动探测系统环境（未匹配时回退至 `en_US`）    |
 
 ---
 
-## 📦 支持的 45 项全量 MCP 工具矩阵
+## 📦 支持的 MCP 工具矩阵
 
 所有工具均支持可选的 `vault` 参数以随时跨库调用；所有参数均附带精确的 JSON Schema 描述与严密类型约束。
 
 <p align="center">
-  <img src="./assets/readme/tools-matrix.svg" width="100%" alt="obsidian-cli-mcp 45 项全量工具矩阵">
+  <img src="./assets/readme/tools-matrix.svg" width="100%" alt="obsidian-cli-mcp 工具矩阵">
 </p>
 
 <details open>
-<summary><b>展开查看详细工具功能清单 (45 项全量 1:1 映射)</b></summary>
+<summary><b>展开查看详细工具功能清单</b></summary>
 
 ### 🌟 基础核心工具 (Core Tools · 3 项，默认无条件加载)
 - `version`: 查询当前运行的 Obsidian 桌面客户端版本。

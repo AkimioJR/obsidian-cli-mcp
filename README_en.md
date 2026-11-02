@@ -42,7 +42,7 @@
 
 ## 💡 Why obsidian-cli-mcp?
 
-**A full-featured MCP (Model Context Protocol) server with 45 tools to interact with Obsidian vaults via the official Obsidian CLI.**
+**An MCP (Model Context Protocol) server to interact with Obsidian vaults via the official Obsidian CLI.**
 
 Many AI clients attempt to read and write local Markdown files directly on disk, but this approach introduces significant flaws in real personal knowledge management (PKM) workflows. `obsidian-cli-mcp` connects to the running Obsidian Electron app via official CLI IPC (Inter-Process Communication), completely solving these pain points:
 
@@ -162,21 +162,21 @@ Client configuration:
 | `OBSIDIAN_CLI_PATH` | Absolute path to Obsidian CLI binary                                                                                        | Auto-detected in system `PATH` (`which obsidian`)      |
 | `OBSIDIAN_TIMEOUT`  | CLI subprocess execution timeout in seconds (supports floats, `none`/`null` to disable)                                     | `30.0`                                                 |
 | `OBSIDIAN_VERSION`  | Manually specify/override Obsidian client version (e.g. `1.14.5` for headless/container environments)                       | Auto-detected from `obsidian version` at startup       |
-| `OBSIDIAN_FEATURES` | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,vault,plugin,eval` or presets `standard,safe`) | `all` (all 45 tools enabled by default)                |
+| `OBSIDIAN_FEATURES` | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,vault,plugin,eval` or presets `standard,safe,all`) | `standard` (default: core tools plus standard features) |
 | `OBSIDIAN_LANG`     | Localization language for human-readable tool titles (supports `zh_CN`, `en_US`)                                            | Auto-detected from system locale (fallback to `en_US`) |
 
 ---
 
-## 📦 Supported 45 MCP Tools Matrix
+## 📦 Supported MCP Tools Matrix
 
 All tools support an optional `vault` parameter for multi-vault switching. All tool parameters come with strict type definitions and exact JSON Schema constraints.
 
 <p align="center">
-  <img src="./assets/readme/tools-matrix.svg" width="100%" alt="obsidian-cli-mcp 45 Tools Matrix">
+  <img src="./assets/readme/tools-matrix.svg" width="100%" alt="obsidian-cli-mcp Tools Matrix">
 </p>
 
 <details open>
-<summary><b>Expand to view detailed tool catalog (45 tools, 1:1 mapping)</b></summary>
+<summary><b>Expand to view detailed tool catalog</b></summary>
 
 ### 🌟 Core Tools (Core · 3 tools, always loaded by default)
 - `version`: Query installed Obsidian desktop application version.

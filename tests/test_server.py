@@ -8,14 +8,19 @@ from obsidian_cli_mcp.server import create_server
 
 
 def test_server_tools_registered():
+    # 默认加载 standard 预设 (3 core + 25 standard = 28)
     server = create_server(cli_path="/mock/obsidian")
     tools = server._tool_manager._tools
-    assert len(tools) == 45
+    assert len(tools) == 28
     assert "read" in tools
     assert "create" in tools
     assert "tags" in tools
     assert "vaults" in tools
     assert "version" in tools
+
+    # 显式指定 all 预设时启用全量 45 项工具
+    server_all = create_server(cli_path="/mock/obsidian", features=["all"])
+    assert len(server_all._tool_manager._tools) == 45
 
 
 @pytest.mark.asyncio
@@ -104,7 +109,7 @@ async def test_tool_call_json_result():
 
 
 def test_all_tools_have_description_and_schema():
-    server = create_server(cli_path="/mock/obsidian")
+    server = create_server(cli_path="/mock/obsidian", features=["all"])
     tools = server._tool_manager._tools
     assert len(tools) == 45
     for tool in tools.values():
@@ -216,7 +221,7 @@ def test_feature_preset_standard():
 
 
 def test_tool_annotations_all_present():
-    server = create_server(cli_path="/mock/obsidian")
+    server = create_server(cli_path="/mock/obsidian", features=["all"])
     tools = server._tool_manager._tools
     assert len(tools) == 45
     for name, tool in tools.items():
@@ -224,7 +229,7 @@ def test_tool_annotations_all_present():
 
 
 def test_tool_annotations_hints_classification():
-    server = create_server(cli_path="/mock/obsidian")
+    server = create_server(cli_path="/mock/obsidian", features=["all"])
     tools = server._tool_manager._tools
 
     read_only_tools = {
@@ -271,7 +276,7 @@ def test_tool_annotations_hints_classification():
 
 
 def test_tool_i18n_titles_zh_cn():
-    server = create_server(cli_path="/mock/obsidian", lang="zh_CN")
+    server = create_server(cli_path="/mock/obsidian", lang="zh_CN", features=["all"])
     tools = server._tool_manager._tools
 
     # Note operations with explicit note context
