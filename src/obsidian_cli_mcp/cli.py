@@ -10,7 +10,7 @@ class CommandExecutionResult:
 
 
 async def run_cli_command(
-    program: str, args: list[str], *, timeout: int = 30
+    program: str, args: list[str], *, timeout: float | None = 30.0
 ) -> CommandExecutionResult:
     """运行 CLI 子进程命令并等待输出。"""
     try:
@@ -29,10 +29,14 @@ async def run_cli_command(
             stderr=stderr.decode("utf-8", errors="replace").strip(),
         )
     except TimeoutError:
-        process.kill()
+        try:
+            process.kill()
+        except ProcessLookupError:
+            pass
         await process.wait()
+        timeout_msg = f" after {timeout} seconds" if timeout is not None else ""
         return CommandExecutionResult(
             returncode=-1,
             stdout="",
-            stderr=f"Command timed out after {timeout} seconds",
+            stderr=f"Command timed out{timeout_msg}",
         )

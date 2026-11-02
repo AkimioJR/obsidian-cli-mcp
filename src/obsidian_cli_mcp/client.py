@@ -17,7 +17,7 @@ class ObsidianClient:
         self,
         vault: str | None = None,
         cli_path: str | None = None,
-        timeout: int = 30,
+        timeout: float | None = None,
     ) -> None:
         self.vault = vault or os.getenv("OBSIDIAN_VAULT")
         resolved_cli = (
@@ -28,7 +28,23 @@ class ObsidianClient:
                 "Obsidian CLI executable not found. Please install Obsidian CLI or set OBSIDIAN_CLI_PATH."
             )
         self.cli_path = resolved_cli
-        self.timeout = timeout
+
+        # 确定超时时间：显式参数 > 环境变量 OBSIDIAN_TIMEOUT > 默认 30.0 秒
+        if timeout is not None:
+            self.timeout: float | None = timeout
+        else:
+            env_timeout = os.getenv("OBSIDIAN_TIMEOUT")
+            if env_timeout is not None:
+                env_val = env_timeout.strip().lower()
+                if env_val in ("none", "null"):
+                    self.timeout = None
+                else:
+                    try:
+                        self.timeout = float(env_val)
+                    except ValueError:
+                        self.timeout = 30.0
+            else:
+                self.timeout = 30.0
 
     def _build_args(
         self,
@@ -75,12 +91,13 @@ class ObsidianClient:
         *,
         parse_json: bool = False,
         vault: str | None = None,
-        timeout: int | None = None,
+        timeout: float | None = None,
     ) -> Any:
         """执行 Obsidian CLI 命令并返回文本或解析后的 JSON。"""
         cli_args = self._build_args(command, params, vault=vault)
+        effective_timeout = timeout if timeout is not None else self.timeout
         res: CommandExecutionResult = await run_cli_command(
-            self.cli_path, cli_args, timeout=timeout or self.timeout
+            self.cli_path, cli_args, timeout=effective_timeout
         )
 
         # 检查错误：非零退出码或 stdout 以 Error: 开头

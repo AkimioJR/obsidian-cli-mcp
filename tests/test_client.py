@@ -134,14 +134,44 @@ def test_build_args_empty_string_guard():
 
 def test_client_custom_properties():
     client = ObsidianClient(
-        vault="CustomVault", cli_path="/custom/obsidian", timeout=60
+        vault="CustomVault", cli_path="/custom/obsidian", timeout=60.0
     )
     assert client.vault == "CustomVault"
     assert client.cli_path == "/custom/obsidian"
-    assert client.timeout == 60
+    assert client.timeout == 60.0
 
     args = client._build_args("read", {"file": "note.md"})
     assert "vault=CustomVault" in args
+
+
+def test_client_timeout_resolution(monkeypatch):
+    # 1. 默认超时为 30.0 秒
+    client_default = ObsidianClient(cli_path="/mock/obsidian")
+    assert client_default.timeout == 30.0
+
+    # 2. 支持显式传入 float (Double) 类型超时
+    client_float = ObsidianClient(cli_path="/mock/obsidian", timeout=12.5)
+    assert client_float.timeout == 12.5
+
+    # 3. 支持环境变量 OBSIDIAN_TIMEOUT 传入 float
+    monkeypatch.setenv("OBSIDIAN_TIMEOUT", "45.5")
+    client_env = ObsidianClient(cli_path="/mock/obsidian")
+    assert client_env.timeout == 45.5
+
+    # 4. 支持环境变量设置为 none / null 禁用超时
+    monkeypatch.setenv("OBSIDIAN_TIMEOUT", "none")
+    client_no_timeout = ObsidianClient(cli_path="/mock/obsidian")
+    assert client_no_timeout.timeout is None
+
+    # 5. 显式参数优先级高于环境变量
+    monkeypatch.setenv("OBSIDIAN_TIMEOUT", "99.0")
+    client_override = ObsidianClient(cli_path="/mock/obsidian", timeout=10.0)
+    assert client_override.timeout == 10.0
+
+    # 6. 非法环境变量格式自动回退到 30.0
+    monkeypatch.setenv("OBSIDIAN_TIMEOUT", "invalid_number")
+    client_invalid = ObsidianClient(cli_path="/mock/obsidian")
+    assert client_invalid.timeout == 30.0
 
 
 @pytest.mark.asyncio

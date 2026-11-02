@@ -98,9 +98,12 @@ async def call_tool(
     *,
     parse_json: bool = False,
     vault: str | None = None,
+    timeout: float | None = None,
 ) -> Any:
     """Execute an Obsidian CLI command and return output or formatted error."""
     try:
-        return await client.execute(command, params, parse_json=parse_json, vault=vault)
+        return await client.execute(
+            command, params, parse_json=parse_json, vault=vault, timeout=timeout
+        )
     except ObsidianError as e:
         return f"Error: {e}"

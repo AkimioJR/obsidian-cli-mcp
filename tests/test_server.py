@@ -422,3 +422,14 @@ def test_package_and_server_version():
     # 4. 验证注入到 MCPServer 实例的 version 字段
     server = create_server(cli_path="/mock/obsidian")
     assert server.version == __version__
+
+
+def test_server_timeout_configuration(monkeypatch):
+    # 1. 支持通过参数传入 float 超时
+    server_custom = create_server(cli_path="/mock/obsidian", timeout=15.5)
+    assert server_custom is not None
+
+    # 2. 支持环境变量 OBSIDIAN_TIMEOUT 传入 float
+    monkeypatch.setenv("OBSIDIAN_TIMEOUT", "45.0")
+    server_env = create_server(cli_path="/mock/obsidian")
+    assert server_env is not None

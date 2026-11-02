@@ -160,6 +160,7 @@ Client configuration:
 | :------------------ | :-------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------ |
 | `OBSIDIAN_VAULT`    | Target Vault name (automatically used when tool calls omit the `vault` parameter)                                           | Defaults to currently active vault in Obsidian    |
 | `OBSIDIAN_CLI_PATH` | Absolute path to Obsidian CLI binary                                                                                        | Auto-detected in system `PATH` (`which obsidian`) |
+| `OBSIDIAN_TIMEOUT`  | CLI subprocess execution timeout in seconds (supports floats, `none`/`null` to disable)                                    | `30.0`                                            |
 | `OBSIDIAN_FEATURES` | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,vault,plugin,eval` or presets `standard,safe`) | `all` (all 45 tools enabled by default)           |
 | `OBSIDIAN_LANG`     | Localization language for human-readable tool titles (supports `zh_CN`, `en_US`)            | Auto-detected from system locale (fallback to `en_US`) |
 

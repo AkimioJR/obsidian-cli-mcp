@@ -11,7 +11,7 @@ from .tools import Feature, register_core_tools
 def create_server(
     vault: str | None = None,
     cli_path: str | None = None,
-    timeout: int = 30,
+    timeout: float | None = None,
     features: Iterable[Feature | str] | None = None,
     lang: str | None = None,
 ) -> MCPServer:
