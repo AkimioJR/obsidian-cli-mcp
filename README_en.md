@@ -150,9 +150,14 @@ Client configuration:
 
 ### Prerequisites
 
-1. **Obsidian Desktop App**: Installed and running.
-2. **Obsidian CLI**: Accessible in your system `PATH` (e.g. `/opt/homebrew/bin/obsidian` or via Homebrew).
-   - Run `obsidian version` in terminal to quickly test.
+1. **Obsidian Desktop App**:
+   - Requires **Obsidian v1.12.7 or higher** (bundled with official CLI interface support);
+   - Obsidian desktop app must remain running while interacting with this MCP server.
+2. **Enable Official Command Line Interface (Obsidian CLI)**:
+   - Open Obsidian, go to **Settings** → **About** (or **General** depending on version);
+   - Locate and toggle on **Command line interface**;
+   - Click **Register** next to *Set up CLI to work in the terminal* to link `obsidian` into your system `$PATH`;
+   - Restart your terminal and run `obsidian version` to verify setup (outputting version confirms readiness).
 
 ### Environment Variables
 

@@ -150,9 +150,14 @@ pip install obsidian-cli-mcp
 
 ### 前置条件
 
-1. **Obsidian 桌面端**：已安装并保持运行状态。
-2. **Obsidian CLI**：已在系统环境变量 `PATH` 中（如 `/opt/homebrew/bin/obsidian` 或通过 Homebrew 安装）。
-   - 可在终端运行 `obsidian version` 快速自测。
+1. **Obsidian 桌面端**：
+   - 需要 **Obsidian v1.12.7 或更高版本**（内置官方 CLI 接口支持）；
+   - 在使用本 MCP 服务时，Obsidian 桌面应用需保持运行状态。
+2. **开启官方命令行界面 (Obsidian CLI)**：
+   - 打开 Obsidian 桌面端，进入 **设置 (Settings)** → **关于 (About)**（部分版本位于 **常规 / General**）；
+   - 找到 **命令行界面 (Command line interface)** 选项并开启；
+   - 点击 **注册 / 在终端中设置 CLI (Set up CLI to work in the terminal)** 按钮，将 `obsidian` 注册到系统的 `PATH` 路径中；
+   - 重启终端后执行 `obsidian version`，若成功输出版本号（如 `1.14.5 (installer 1.14.5)`）即表示就绪。
 
 ### 环境变量配置
 
