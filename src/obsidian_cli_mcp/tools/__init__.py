@@ -128,16 +128,11 @@ _FEATURE_REGISTRY: dict[
     Feature.EVAL: register_eval_tools,
 }
 
-# Module-level aliases for backwards compatibility
-PRESETS: dict[str, set[Feature]] = Feature.presets()
-register_tools = Feature.register_tools
-
 __all__ = [
     "DESTRUCTIVE_WRITE",
     "DYNAMIC_EVAL",
     "IDEMPOTENT_WRITE",
     "NON_IDEMPOTENT_WRITE",
-    "PRESETS",
     "READ_ONLY",
     "Feature",
     "ToolRegistrar",
@@ -148,6 +143,5 @@ __all__ = [
     "register_property_tools",
     "register_tag_tools",
     "register_task_tools",
-    "register_tools",
     "register_vault_tools",
 ]

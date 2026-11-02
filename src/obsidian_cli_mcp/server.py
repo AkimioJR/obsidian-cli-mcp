@@ -4,7 +4,7 @@ from collections.abc import Iterable
 from mcp.server.mcpserver import MCPServer
 
 from .client import ObsidianClient
-from .tools import Feature, register_tools
+from .tools import Feature
 
 
 def create_server(
@@ -32,5 +32,10 @@ def create_server(
     # 优先使用显式传入的 lang 参数，未指定时尝试读取环境变量 OBSIDIAN_LANG
     resolved_lang = lang or os.getenv("OBSIDIAN_LANG")
 
-    register_tools(server, client, features=resolved_features, lang=resolved_lang)
+    Feature.register_tools(
+        server,
+        client,
+        features=resolved_features,
+        lang=resolved_lang,
+    )
     return server
