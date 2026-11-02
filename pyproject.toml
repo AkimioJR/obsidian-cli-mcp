@@ -6,6 +6,17 @@ readme = "README.md"
 license = "MIT"
 authors = [{ name = "AkimioJR", email = "akimio.jr@gmail.com" }]
 requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Utilities",
+]
 dependencies = [
     "mcp>=2.3.0",
     "pydantic>=2.14.2",
