@@ -1,17 +1,42 @@
-<p align="center">
-  <img src="./assets/readme/hero.svg" width="100%" alt="obsidian-cli-mcp - Model Context Protocol Server for Obsidian">
-</p>
+[license]: https://github.com/AkimioJR/obsidian-cli-mcp/blob/main/LICENSE
+[license-badge]: https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square
+[python]: https://pypi.org/project/obsidian-cli-mcp
+[python-badge]: https://img.shields.io/pypi/pyversions/obsidian-cli-mcp?style=flat-square&logo=python&logoColor=white
+[pypi]: https://pypi.org/project/obsidian-cli-mcp
+[pypi-badge]: https://img.shields.io/pypi/v/obsidian-cli-mcp?style=flat-square&logo=pypi&logoColor=white
+[uv]: https://github.com/astral-sh/uv
+[uv-badge]: https://img.shields.io/badge/Package-uv%20%2F%20uvx-10B981.svg?style=flat-square
+[mcp]: https://modelcontextprotocol.io
+[mcp-badge]: https://img.shields.io/badge/Protocol-MCP%202.3+-8B5CF6.svg?style=flat-square
+[ci]: https://github.com/AkimioJR/obsidian-cli-mcp/actions/workflows/lint.yaml
+[ci-badge]: https://img.shields.io/github/actions/workflow/status/AkimioJR/obsidian-cli-mcp/lint.yaml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI
+[release]: https://github.com/AkimioJR/obsidian-cli-mcp/releases/latest
+[release-badge]: https://img.shields.io/github/v/release/AkimioJR/obsidian-cli-mcp?style=flat-square
+[pr]: https://github.com/AkimioJR/obsidian-cli-mcp/pulls
+[pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
+[issue]: https://github.com/AkimioJR/obsidian-cli-mcp/issues/new
+[issue-badge]: https://img.shields.io/badge/Issues-welcome-brightgreen.svg?style=flat-square
 
-<p align="center">
-  <a href="https://github.com/AkimioJR/obsidian-cli-mcp/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT"></a>
-  <a href="https://pypi.org/project/obsidian-cli-mcp/"><img src="https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+"></a>
-  <a href="https://modelcontextprotocol.io/"><img src="https://img.shields.io/badge/Protocol-MCP%202.3+-8B5CF6.svg?style=flat-square" alt="MCP 2.3+"></a>
-  <a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/badge/Package-uv%20%2F%20uvx-10B981.svg?style=flat-square" alt="uvx ready"></a>
-</p>
+<div align="center">
+  <p>
+    <img src="./assets/readme/hero.svg" width="100%" alt="obsidian-cli-mcp - Model Context Protocol Server for Obsidian">
+  </p>
 
-<p align="center">
-  <a href="README.md">简体中文</a> | <b>English</b>
-</p>
+[![pypi][pypi-badge]][pypi]
+[![python][python-badge]][python]
+[![uv][uv-badge]][uv]
+[![mcp][mcp-badge]][mcp]
+[![ci][ci-badge]][ci]
+
+[![release][release-badge]][release]
+[![license][license-badge]][license]
+[![pr][pr-badge]][pr]
+[![issue][issue-badge]][issue]
+
+  <p>
+    <a href="README.md">简体中文</a> | <b>English</b>
+  </p>
+</div>
 
 ---
 
@@ -27,13 +52,13 @@ Many AI clients attempt to read and write local Markdown files directly on disk,
 
 ### Architecture Comparison
 
-| Feature | Direct File I/O | obsidian-cli-mcp (Official CLI IPC) |
-| :--- | :--- | :--- |
-| **Graph Sync** | ❌ Silent external writes leave backlinks & graph out-of-sync | ✅ **Instant Sync**: Backlinks, forward links & orphans update immediately |
-| **Dataview Cache** | ❌ In-memory index misses changes, returning stale data | ✅ **Live Reflection**: Frontmatter property updates trigger instant cache refresh |
-| **macOS Permissions** | ⚠️ Prone to TCC permission prompts or Full Disk Access errors | ✅ **Zero-Permission Friction**: Communicates with running app via CLI, no prompt |
-| **Active Editor Tabs** | ❌ Cannot detect active note or focus editor UI | ✅ **GUI Integration**: Focus notes with `open`, inspect live outlines, etc. |
-| **Plugins & Commands** | ❌ Cannot interact with Obsidian plugin ecosystem | ✅ **Extensible**: Trigger internal/plugin commands, toggle plugins, JS `eval` |
+| Feature                | Direct File I/O                                              | obsidian-cli-mcp (Official CLI IPC)                                               |
+| :--------------------- | :----------------------------------------------------------- | :-------------------------------------------------------------------------------- |
+| **Graph Sync**         | ❌ Silent external writes leave backlinks & graph out-of-sync | ✅ **Instant Sync**: Backlinks, forward links & orphans update immediately         |
+| **Dataview Cache**     | ❌ In-memory index misses changes, returning stale data       | ✅ **Live Reflection**: Frontmatter property updates trigger instant cache refresh |
+| **macOS Permissions**  | ⚠️ Prone to TCC permission prompts or Full Disk Access errors | ✅ **Zero-Permission Friction**: Communicates with running app via CLI, no prompt  |
+| **Active Editor Tabs** | ❌ Cannot detect active note or focus editor UI               | ✅ **GUI Integration**: Focus notes with `open`, inspect live outlines, etc.       |
+| **Plugins & Commands** | ❌ Cannot interact with Obsidian plugin ecosystem             | ✅ **Extensible**: Trigger internal/plugin commands, toggle plugins, JS `eval`     |
 
 ---
 
@@ -131,11 +156,11 @@ Client configuration:
 
 ### Environment Variables
 
-| Variable | Description | Default Behavior |
-| :--- | :--- | :--- |
-| `OBSIDIAN_VAULT` | Target Vault name (automatically used when tool calls omit the `vault` parameter) | Defaults to currently active vault in Obsidian |
-| `OBSIDIAN_CLI_PATH` | Absolute path to Obsidian CLI binary | Auto-detected in system `PATH` (`which obsidian`) |
-| `OBSIDIAN_FEATURES` | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,vault,plugin,eval` or presets `standard,safe`) | `all` (all 45 tools enabled by default) |
+| Variable            | Description                                                                                                                 | Default Behavior                                  |
+| :------------------ | :-------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------ |
+| `OBSIDIAN_VAULT`    | Target Vault name (automatically used when tool calls omit the `vault` parameter)                                           | Defaults to currently active vault in Obsidian    |
+| `OBSIDIAN_CLI_PATH` | Absolute path to Obsidian CLI binary                                                                                        | Auto-detected in system `PATH` (`which obsidian`) |
+| `OBSIDIAN_FEATURES` | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,vault,plugin,eval` or presets `standard,safe`) | `all` (all 45 tools enabled by default)           |
 
 ---
 

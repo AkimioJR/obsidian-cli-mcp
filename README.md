@@ -1,17 +1,42 @@
-<p align="center">
-  <img src="./assets/readme/hero.svg" width="100%" alt="obsidian-cli-mcp - Model Context Protocol Server for Obsidian">
-</p>
+[license]: https://github.com/AkimioJR/obsidian-cli-mcp/blob/main/LICENSE
+[license-badge]: https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square
+[python]: https://pypi.org/project/obsidian-cli-mcp
+[python-badge]: https://img.shields.io/pypi/pyversions/obsidian-cli-mcp?style=flat-square&logo=python&logoColor=white
+[pypi]: https://pypi.org/project/obsidian-cli-mcp
+[pypi-badge]: https://img.shields.io/pypi/v/obsidian-cli-mcp?style=flat-square&logo=pypi&logoColor=white
+[uv]: https://github.com/astral-sh/uv
+[uv-badge]: https://img.shields.io/badge/Package-uv%20%2F%20uvx-10B981.svg?style=flat-square
+[mcp]: https://modelcontextprotocol.io
+[mcp-badge]: https://img.shields.io/badge/Protocol-MCP%202.3+-8B5CF6.svg?style=flat-square
+[ci]: https://github.com/AkimioJR/obsidian-cli-mcp/actions/workflows/lint.yaml
+[ci-badge]: https://img.shields.io/github/actions/workflow/status/AkimioJR/obsidian-cli-mcp/lint.yaml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI
+[release]: https://github.com/AkimioJR/obsidian-cli-mcp/releases/latest
+[release-badge]: https://img.shields.io/github/v/release/AkimioJR/obsidian-cli-mcp?style=flat-square
+[pr]: https://github.com/AkimioJR/obsidian-cli-mcp/pulls
+[pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
+[issue]: https://github.com/AkimioJR/obsidian-cli-mcp/issues/new
+[issue-badge]: https://img.shields.io/badge/Issues-welcome-brightgreen.svg?style=flat-square
 
-<p align="center">
-  <a href="https://github.com/AkimioJR/obsidian-cli-mcp/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT"></a>
-  <a href="https://pypi.org/project/obsidian-cli-mcp/"><img src="https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+"></a>
-  <a href="https://modelcontextprotocol.io/"><img src="https://img.shields.io/badge/Protocol-MCP%202.3+-8B5CF6.svg?style=flat-square" alt="MCP 2.3+"></a>
-  <a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/badge/Package-uv%20%2F%20uvx-10B981.svg?style=flat-square" alt="uvx ready"></a>
-</p>
+<div align="center">
+  <p>
+    <img src="./assets/readme/hero.svg" width="100%" alt="obsidian-cli-mcp - Model Context Protocol Server for Obsidian">
+  </p>
 
-<p align="center">
-  <b>简体中文</b> | <a href="README_en.md">English</a>
-</p>
+[![pypi][pypi-badge]][pypi]
+[![python][python-badge]][python]
+[![uv][uv-badge]][uv]
+[![mcp][mcp-badge]][mcp]
+[![ci][ci-badge]][ci]
+
+[![release][release-badge]][release]
+[![license][license-badge]][license]
+[![pr][pr-badge]][pr]
+[![issue][issue-badge]][issue]
+
+  <p>
+    <b>简体中文</b> | <a href="README_en.md">English</a>
+  </p>
+</div>
 
 ---
 
@@ -131,11 +156,11 @@ pip install obsidian-cli-mcp
 
 ### 环境变量配置
 
-| 环境变量            | 说明                                                                     | 默认行为                                      |
-| :------------------ | :----------------------------------------------------------------------- | :-------------------------------------------- |
-| `OBSIDIAN_VAULT`    | 默认操控的目标 Vault 笔记库名称（工具未显式传入 `vault` 参数时自动采用） | 未设置时由 Obsidian CLI 自动绑定当前活跃库    |
-| `OBSIDIAN_CLI_PATH` | Obsidian CLI 可执行文件的绝对路径                                        | 自动在系统 PATH 中探测（如 `which obsidian`） |
-| `OBSIDIAN_FEATURES` | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,eval` 或预设 `standard,safe`） | `all`（默认启用全量 45 项工具） |
+| 环境变量            | 说明                                                                                               | 默认行为                                      |
+| :------------------ | :------------------------------------------------------------------------------------------------- | :-------------------------------------------- |
+| `OBSIDIAN_VAULT`    | 默认操控的目标 Vault 笔记库名称（工具未显式传入 `vault` 参数时自动采用）                           | 未设置时由 Obsidian CLI 自动绑定当前活跃库    |
+| `OBSIDIAN_CLI_PATH` | Obsidian CLI 可执行文件的绝对路径                                                                  | 自动在系统 PATH 中探测（如 `which obsidian`） |
+| `OBSIDIAN_FEATURES` | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,eval` 或预设 `standard,safe`） | `all`（默认启用全量 45 项工具）               |
 
 ---
 
