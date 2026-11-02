@@ -4,15 +4,21 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from .base import READ_ONLY, call_tool
+from ..i18n import SupportedLang, get_tool_title
+from .base import READ_ONLY, call_tool, make_annotations
 
 
-def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
+def register_graph_tools(
+    server: MCPServer,
+    client: ObsidianClient,
+    lang: SupportedLang | None = None,
+) -> None:
     """Register graph, links, and structure tools (Feature: graph)."""
 
     @server.tool(
         name="backlinks",
-        annotations=READ_ONLY,
+        title=get_tool_title("graph", "backlinks", lang),
+        annotations=make_annotations(READ_ONLY, "graph", "backlinks", lang),
         description="List backlinks pointing to a specified note (returns JSON).",
     )
     async def backlinks(
@@ -53,7 +59,8 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="links",
-        annotations=READ_ONLY,
+        title=get_tool_title("graph", "links", lang),
+        annotations=make_annotations(READ_ONLY, "graph", "links", lang),
         description="List outgoing links from a specified note.",
     )
     async def links(
@@ -83,7 +90,8 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="unresolved",
-        annotations=READ_ONLY,
+        title=get_tool_title("graph", "unresolved", lang),
+        annotations=make_annotations(READ_ONLY, "graph", "unresolved", lang),
         description="List unresolved links in the vault pointing to non-existent notes (returns JSON).",
     )
     async def unresolved(
@@ -114,7 +122,8 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="orphans",
-        annotations=READ_ONLY,
+        title=get_tool_title("graph", "orphans", lang),
+        annotations=make_annotations(READ_ONLY, "graph", "orphans", lang),
         description="List orphan notes that have no incoming links from other notes.",
     )
     async def orphans(
@@ -131,7 +140,8 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="deadends",
-        annotations=READ_ONLY,
+        title=get_tool_title("graph", "deadends", lang),
+        annotations=make_annotations(READ_ONLY, "graph", "deadends", lang),
         description="List dead-end notes that contain no outgoing links to other notes.",
     )
     async def deadends(
@@ -154,7 +164,8 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="outline",
-        annotations=READ_ONLY,
+        title=get_tool_title("graph", "outline", lang),
+        annotations=make_annotations(READ_ONLY, "graph", "outline", lang),
         description="Get the heading outline hierarchy of a note (returns JSON).",
     )
     async def outline(
@@ -185,7 +196,8 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="aliases",
-        annotations=READ_ONLY,
+        title=get_tool_title("graph", "aliases", lang),
+        annotations=make_annotations(READ_ONLY, "graph", "aliases", lang),
         description="List aliases in the vault or for a specified note.",
     )
     async def aliases(
@@ -229,7 +241,8 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="wordcount",
-        annotations=READ_ONLY,
+        title=get_tool_title("graph", "wordcount", lang),
+        annotations=make_annotations(READ_ONLY, "graph", "wordcount", lang),
         description="Count words and characters in a note or the active note.",
     )
     async def wordcount(

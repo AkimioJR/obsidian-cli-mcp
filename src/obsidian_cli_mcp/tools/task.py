@@ -4,16 +4,22 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from .base import NON_IDEMPOTENT_WRITE, READ_ONLY, call_tool
+from ..i18n import SupportedLang, get_tool_title
+from .base import NON_IDEMPOTENT_WRITE, READ_ONLY, call_tool, make_annotations
 
 
-def register_task_tools(server: MCPServer, client: ObsidianClient) -> None:
+def register_task_tools(
+    server: MCPServer,
+    client: ObsidianClient,
+    lang: SupportedLang | None = None,
+) -> None:
     """Register task management tools (Feature: task)."""
 
     @server.tool(
         name="tasks",
+        title=get_tool_title("task", "tasks", lang),
         description="List tasks in the vault with optional filters for completion, note, or status (returns JSON).",
-        annotations=READ_ONLY,
+        annotations=make_annotations(READ_ONLY, "task", "tasks", lang),
     )
     async def tasks(
         file: str | None = Field(
@@ -78,8 +84,9 @@ def register_task_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="task",
+        title=get_tool_title("task", "task", lang),
         description="Show or update a specific task status (toggle, mark done, or set status character).",
-        annotations=NON_IDEMPOTENT_WRITE,
+        annotations=make_annotations(NON_IDEMPOTENT_WRITE, "task", "task", lang),
     )
     async def task(
         ref: str | None = Field(

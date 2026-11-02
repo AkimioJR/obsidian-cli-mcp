@@ -4,6 +4,7 @@ from enum import Enum
 from mcp.server.mcpserver import MCPServer
 
 from ..client import ObsidianClient
+from ..i18n import SupportedLang, detect_language
 from .base import (
     DESTRUCTIVE_WRITE,
     DYNAMIC_EVAL,
@@ -34,7 +35,9 @@ class Feature(str, Enum):
     EVAL = "eval"
 
 
-FEATURE_REGISTRY: dict[Feature, Callable[[MCPServer, ObsidianClient], None]] = {
+FEATURE_REGISTRY: dict[
+    Feature, Callable[[MCPServer, ObsidianClient, SupportedLang | None], None]
+] = {
     Feature.NOTE: register_note_tools,
     Feature.PROPERTY: register_property_tools,
     Feature.TAG: register_tag_tools,
@@ -85,11 +88,14 @@ def register_tools(
     server: MCPServer,
     client: ObsidianClient,
     features: Iterable[Feature | str] | None = None,
+    lang: SupportedLang | str | None = None,
 ) -> None:
     """Register tool feature groups to the MCP server.
 
     If features is None, all tools (all features) are registered by default.
     """
+    resolved_lang = detect_language(lang)
+
     if features is None:
         enabled_features = set(Feature)
     else:
@@ -99,7 +105,7 @@ def register_tools(
 
     for feature in Feature:
         if feature in enabled_features:
-            FEATURE_REGISTRY[feature](server, client)
+            FEATURE_REGISTRY[feature](server, client, resolved_lang)
 
 
 __all__ = [

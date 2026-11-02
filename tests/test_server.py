@@ -243,3 +243,56 @@ def test_tool_annotations_hints_classification():
         if t.annotations and t.annotations.open_world_hint
     }
     assert open_world_tools == {"eval"}
+
+
+def test_tool_i18n_titles_zh_cn():
+    server = create_server(cli_path="/mock/obsidian", lang="zh_CN")
+    tools = server._tool_manager._tools
+
+    # Note operations with explicit note context
+    assert tools["read"].title == "读取笔记"
+    assert (
+        tools["read"].annotations is not None
+        and tools["read"].annotations.title == "读取笔记"
+    )
+    assert tools["create"].title == "创建笔记"
+    assert tools["append"].title == "追加笔记内容"
+    assert (
+        tools["append"].annotations is not None
+        and tools["append"].annotations.title == "追加笔记内容"
+    )
+    assert tools["prepend"].title == "前置插入笔记"
+    assert (
+        tools["prepend"].annotations is not None
+        and tools["prepend"].annotations.title == "前置插入笔记"
+    )
+    assert tools["delete"].title == "删除笔记"
+
+    # Other domains
+    assert tools["properties"].title == "查看属性概览"
+    assert tools["backlinks"].title == "获取反向链接"
+    assert tools["tags"].title == "列出所有标签"
+    assert tools["tasks"].title == "多维筛选任务"
+    assert tools["vault"].title == "查询当前库信息"
+    assert tools["command"].title == "执行命令"
+    assert tools["eval"].title == "执行 JavaScript 代码"
+
+
+def test_tool_i18n_titles_en_us_and_fallback(monkeypatch):
+    # Explicit en_US
+    server_en = create_server(cli_path="/mock/obsidian", lang="en_US")
+    tools_en = server_en._tool_manager._tools
+    assert tools_en["read"].title == "Read Note"
+    assert tools_en["append"].title == "Append Note Content"
+    assert tools_en["prepend"].title == "Prepend Note Content"
+    assert tools_en["delete"].title == "Delete Note"
+
+    # Via OBSIDIAN_LANG=zh
+    monkeypatch.setenv("OBSIDIAN_LANG", "zh")
+    server_zh_env = create_server(cli_path="/mock/obsidian")
+    assert server_zh_env._tool_manager._tools["append"].title == "追加笔记内容"
+
+    # Via unrecognized language fallback to en_US
+    monkeypatch.setenv("OBSIDIAN_LANG", "invalid_lang")
+    server_fallback = create_server(cli_path="/mock/obsidian")
+    assert server_fallback._tool_manager._tools["read"].title == "Read Note"

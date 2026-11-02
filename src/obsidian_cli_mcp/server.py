@@ -12,8 +12,9 @@ def create_server(
     cli_path: str | None = None,
     timeout: int = 30,
     features: Iterable[Feature | str] | None = None,
+    lang: str | None = None,
 ) -> MCPServer:
-    """创建并配置 Obsidian MCP 服务器实例。支持通过 features 列表或 OBSIDIAN_FEATURES 环境变量过滤工具集。"""
+    """创建并配置 Obsidian MCP 服务器实例。支持通过 features 过滤工具集，通过 lang 配置本地化语言。"""
     client = ObsidianClient(vault=vault, cli_path=cli_path, timeout=timeout)
     server = MCPServer(
         name="obsidian-cli-mcp",
@@ -28,5 +29,8 @@ def create_server(
         if env_feat:
             resolved_features = [f.strip() for f in env_feat.split(",") if f.strip()]
 
-    register_tools(server, client, features=resolved_features)
+    # 优先使用显式传入的 lang 参数，未指定时尝试读取环境变量 OBSIDIAN_LANG
+    resolved_lang = lang or os.getenv("OBSIDIAN_LANG")
+
+    register_tools(server, client, features=resolved_features, lang=resolved_lang)
     return server

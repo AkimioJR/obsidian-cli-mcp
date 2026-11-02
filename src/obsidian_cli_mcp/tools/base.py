@@ -4,6 +4,7 @@ from mcp.types import ToolAnnotations
 
 from ..client import ObsidianClient
 from ..exceptions import ObsidianError
+from ..i18n import SupportedLang, get_tool_title
 
 # Reusable Tool Annotation Presets conforming to MCP 2.x standard
 READ_ONLY = ToolAnnotations(
@@ -40,6 +41,17 @@ DYNAMIC_EVAL = ToolAnnotations(
     idempotent_hint=False,
     open_world_hint=True,
 )
+
+
+def make_annotations(
+    base: ToolAnnotations,
+    feature: str,
+    tool_name: str,
+    lang: SupportedLang | None = None,
+) -> ToolAnnotations:
+    """Clone a base ToolAnnotations preset and attach the localized title."""
+    title = get_tool_title(feature, tool_name, lang)
+    return base.model_copy(update={"title": title})
 
 
 async def call_tool(
