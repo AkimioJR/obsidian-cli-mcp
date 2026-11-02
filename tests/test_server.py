@@ -296,3 +296,28 @@ def test_tool_i18n_titles_en_us_and_fallback(monkeypatch):
     monkeypatch.setenv("OBSIDIAN_LANG", "invalid_lang")
     server_fallback = create_server(cli_path="/mock/obsidian")
     assert server_fallback._tool_manager._tools["read"].title == "Read Note"
+
+
+def test_supported_lang_enum_and_methods(monkeypatch):
+    from obsidian_cli_mcp.i18n import TOOL_TITLES, SupportedLang
+
+    assert SupportedLang.normalize("zh") == SupportedLang.ZH_CN
+    assert SupportedLang.normalize("zh-CN") == SupportedLang.ZH_CN
+    assert SupportedLang.normalize("en") == SupportedLang.EN_US
+    assert SupportedLang.normalize("en-US") == SupportedLang.EN_US
+    assert SupportedLang.normalize("fr_FR") is None
+    assert SupportedLang.normalize(None) is None
+
+    # tool_title lookup
+    assert SupportedLang.ZH_CN.tool_title("note", "read") == "读取笔记"
+    assert SupportedLang.EN_US.tool_title("note", "read") == "Read Note"
+
+    # tool_title fallback to en_US when missing in zh_CN
+    monkeypatch.setitem(
+        TOOL_TITLES[SupportedLang.EN_US]["note"], "mock_tool", "Mock Tool Title"
+    )
+    assert SupportedLang.ZH_CN.tool_title("note", "mock_tool") == "Mock Tool Title"
+
+    # tool_title returns None when missing in both zh_CN and en_US
+    assert SupportedLang.ZH_CN.tool_title("note", "completely_unknown") is None
+    assert SupportedLang.EN_US.tool_title("note", "completely_unknown") is None

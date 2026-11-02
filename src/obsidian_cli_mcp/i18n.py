@@ -1,14 +1,94 @@
 import locale
 import os
-from typing import Literal
+from enum import Enum
 
-SupportedLang = Literal["en_US", "zh_CN"]
 
-DEFAULT_LANG: SupportedLang = "en_US"
+class SupportedLang(str, Enum):
+    """Supported localization languages for Obsidian CLI MCP."""
+
+    EN_US = "en_US"
+    ZH_CN = "zh_CN"
+
+    @classmethod
+    def normalize(cls, raw: str | None) -> "SupportedLang | None":
+        """Normalize raw language string (e.g. 'zh', 'zh_CN', 'zh-CN', 'en', 'en-US') to SupportedLang."""
+        if not raw:
+            return None
+        cleaned = raw.strip().lower().replace("-", "_")
+        if cleaned.startswith("zh"):
+            return cls.ZH_CN
+        if cleaned.startswith("en"):
+            return cls.EN_US
+        return None
+
+    @classmethod
+    def detect(cls, preferred: str | None = None) -> "SupportedLang":
+        """Detect language with priority:
+
+        1. Explicit preferred parameter
+        2. OBSIDIAN_LANG environment variable
+        3. Standard env vars (LC_ALL, LC_MESSAGES, LANG)
+        4. System locale via locale.getlocale()
+        5. Fallback to DEFAULT_LANG (EN_US)
+        """
+        # 1. Explicit parameter
+        detected = cls.normalize(preferred)
+        if detected:
+            return detected
+
+        # 2. OBSIDIAN_LANG
+        detected = cls.normalize(os.getenv("OBSIDIAN_LANG"))
+        if detected:
+            return detected
+
+        # 3. System environment variables
+        for var in ("LC_ALL", "LC_MESSAGES", "LANG"):
+            val = os.getenv(var)
+            detected = cls.normalize(val)
+            if detected:
+                return detected
+
+        # 4. Safe locale.getlocale()
+        try:
+            sys_loc, _ = locale.getlocale()
+            detected = cls.normalize(sys_loc)
+            if detected:
+                return detected
+        except (locale.Error, ValueError):
+            pass
+
+        # 5. Default fallback
+        return cls.EN_US
+
+    def tool_title(self, feature: str, tool_name: str) -> str | None:
+        """Get localized tool title under this language.
+
+        Fallback to en_US if not found in current language.
+        Return None if not found in en_US either.
+        """
+        # 1. Check current language
+        lang_dict = TOOL_TITLES.get(self)
+        if lang_dict:
+            feat_dict = lang_dict.get(feature)
+            if feat_dict and tool_name in feat_dict:
+                return feat_dict[tool_name]
+
+        # 2. Fallback to en_US if current language is not en_US
+        if self != SupportedLang.EN_US:
+            en_dict = TOOL_TITLES.get(SupportedLang.EN_US, {})
+            feat_dict = en_dict.get(feature, {})
+            if tool_name in feat_dict:
+                return feat_dict[tool_name]
+
+        # 3. Not found in en_US either
+        return None
+
+
+DEFAULT_LANG: SupportedLang = SupportedLang.EN_US
 
 # 按 [语言][Feature][工具名] 三层结构组织的本地化标题
 TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
-    "zh_CN": {
+    SupportedLang.ZH_CN: {
         "note": {
             "read": "读取笔记",
             "create": "创建笔记",
@@ -71,7 +151,7 @@ TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "eval": "执行 JavaScript 代码",
         },
     },
-    "en_US": {
+    SupportedLang.EN_US: {
         "note": {
             "read": "Read Note",
             "create": "Create Note",
@@ -136,66 +216,16 @@ TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
     },
 }
 
-
-def normalize_lang(raw: str | None) -> SupportedLang | None:
-    """Normalize raw language string (e.g. 'zh', 'zh_CN', 'zh-CN', 'en', 'en-US') to SupportedLang."""
-    if not raw:
-        return None
-    cleaned = raw.strip().lower().replace("-", "_")
-    if cleaned.startswith("zh"):
-        return "zh_CN"
-    if cleaned.startswith("en"):
-        return "en_US"
-    return None
-
-
-def detect_language(preferred: str | None = None) -> SupportedLang:
-    """Detect language with priority:
-
-    1. Explicit preferred parameter
-    2. OBSIDIAN_LANG environment variable
-    3. Standard env vars (LC_ALL, LC_MESSAGES, LANG)
-    4. System locale via locale.getlocale()
-    5. Fallback to DEFAULT_LANG (en_US)
-    """
-    # 1. Explicit parameter
-    detected = normalize_lang(preferred)
-    if detected:
-        return detected
-
-    # 2. OBSIDIAN_LANG
-    detected = normalize_lang(os.getenv("OBSIDIAN_LANG"))
-    if detected:
-        return detected
-
-    # 3. System environment variables
-    for var in ("LC_ALL", "LC_MESSAGES", "LANG"):
-        val = os.getenv(var)
-        detected = normalize_lang(val)
-        if detected:
-            return detected
-
-    # 4. Safe locale.getlocale()
-    try:
-        sys_loc, _ = locale.getlocale()
-        detected = normalize_lang(sys_loc)
-        if detected:
-            return detected
-    except (locale.Error, ValueError):
-        pass
-
-    # 5. Default fallback
-    return DEFAULT_LANG
+# Compatibility helper functions
+normalize_lang = SupportedLang.normalize
+detect_language = SupportedLang.detect
 
 
 def get_tool_title(
-    feature: str, tool_name: str, lang: SupportedLang | None = None
-) -> str:
+    feature: str,
+    tool_name: str,
+    lang: SupportedLang | str | None = None,
+) -> str | None:
     """Get human-readable title for a tool under a specific feature and resolved language."""
-    target_lang = lang or detect_language()
-    features = TOOL_TITLES.get(target_lang, TOOL_TITLES[DEFAULT_LANG])
-    feature_tools = features.get(feature, {})
-    if tool_name in feature_tools:
-        return feature_tools[tool_name]
-    # Fallback to default lang
-    return TOOL_TITLES[DEFAULT_LANG].get(feature, {}).get(tool_name, tool_name)
+    resolved = lang if isinstance(lang, SupportedLang) else SupportedLang.detect(lang)
+    return resolved.tool_title(feature, tool_name)
