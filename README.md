@@ -176,7 +176,12 @@ pip install obsidian-cli-mcp
 <details open>
 <summary><b>展开查看详细工具功能清单 (45 项全量 1:1 映射)</b></summary>
 
-### 1. 笔记与内容 (Notes & Content · 9 项)
+### 🌟 基础核心工具 (Core Tools · 3 项，默认无条件加载)
+- `version`: 查询当前运行的 Obsidian 桌面客户端版本。
+- `vaults`: 列出本机已知的所有 Vault 笔记库及绝对路径。
+- `vault`: 查询当前 Vault 基本状态（名称、物理路径、文件数、体积等）。
+
+### 1. 笔记与内容 (Feature: `note` · 9 项)
 - `read`: 按文件名或相对路径读取笔记 Markdown 原文。
 - `create`: 创建新笔记，支持指定模板、预填充内容、静默覆盖与默认打开。
 - `append`: 向指定笔记末尾追加内容。
@@ -187,13 +192,13 @@ pip install obsidian-cli-mcp
 - `open`: 在 Obsidian 桌面端图形界面中聚焦打开笔记。
 - `random_read`: 随机读取库内的一篇笔记（漫游探索）。
 
-### 2. 元数据与属性 (Properties & Frontmatter · 4 项)
+### 2. 元数据与属性 (Feature: `property` · 4 项)
 - `properties`: 列出库中或指定笔记的全部属性概览。
 - `property_read`: 读取笔记指定 Frontmatter 属性值。
 - `property_set`: 设置属性值（支持 text、list、number、checkbox 等丰富类型）。
 - `property_remove`: 移除笔记中的指定属性字段。
 
-### 3. 图谱与双链拓扑 (Graph & Links · 8 项)
+### 3. 图谱与双链拓扑 (Feature: `graph` · 8 项)
 - `backlinks`: 获取笔记的反向链接列表（JSON 格式）。
 - `links`: 获取笔记的外向链接列表。
 - `unresolved`: 列出未创建实体的悬空双链（等待补全的想法）。
@@ -203,36 +208,33 @@ pip install obsidian-cli-mcp
 - `aliases`: 列出库中或指定文件的别名列表。
 - `wordcount`: 统计字数与字符数分布。
 
-### 4. 标签管理 (Tag · 2 项)
+### 4. 标签管理 (Feature: `tag` · 2 项)
 - `tags`: 获取所有标签及其统计分布（JSON 格式）。
 - `tag`: 检索特定标签在各个笔记中的具体出现详情。
 
-### 5. 待办任务 (Task · 2 项)
+### 5. 待办任务 (Feature: `task` · 2 项)
 - `tasks`: 按状态（已完成/待办）、标签或所在文件多维筛选任务。
 - `task`: 切换任务的勾选完成状态。
 
-### 6. 笔记库与工作区 (Vault & Workspace · 8 项)
-- `vault`: 查询当前 Vault 基本状态（物理路径、文件数、体积等）。
-- `vaults`: 列出本机已知的所有 Vault 及绝对路径。
+### 6. 笔记库与工作区 (Feature: `vault` · 8 项)
 - `files`: 列出库内文件清单（支持按文件夹与后缀筛选）。
 - `folders` / `folder`: 浏览文件夹目录树与结构详情。
 - `recents`: 列出最近访问的历史文件。
 - `bookmarks`: 查看书签与星标项目列表。
 - `workspace`: 查询当前工作区窗口布局树。
+- `reload`: 重新加载当前笔记库界面。
+- `restart`: 重启 Obsidian 桌面客户端。
 
-### 7. 命令与高级扩展 (Commands & Ext · 5 项)
+### 7. 命令与模板自动化 (Feature: `plugin` · 8 项)
 - `command`: 触发执行 Obsidian 内置或第三方插件命令。
 - `commands`: 列出当前可用的全部命令 ID 清单。
 - `template_read`: 读取模板文件并支持占位符变量解析。
 - `template_insert`: 将模板内容插入到当前活跃笔记。
-- `eval`: 在 Obsidian 运行时环境中直接执行 JavaScript 代码（高级逃生通道）。
-
-### 8. 插件管理与生命周期 (Plugins & Lifecycle · 7 项)
 - `plugins` / `plugins_enabled`: 列出已安装 / 已启用的社区与核心插件。
 - `plugin_enable` / `plugin_disable`: 动态启用或禁用指定插件。
-- `reload`: 重新加载当前笔记库。
-- `restart`: 重启 Obsidian 桌面客户端。
-- `version`: 查询当前运行的 Obsidian 版本信息。
+
+### 8. 动态脚本执行 (Feature: `eval` · 1 项)
+- `eval`: 在 Obsidian 运行时环境中直接执行 JavaScript 代码（高级逃生通道）。
 
 </details>
 

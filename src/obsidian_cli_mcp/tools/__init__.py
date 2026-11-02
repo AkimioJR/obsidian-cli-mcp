@@ -13,6 +13,7 @@ from .base import (
     READ_ONLY,
     ToolRegistrar,
 )
+from .core import register_core_tools
 from .eval import register_eval_tools
 from .graph import register_graph_tools
 from .note import register_note_tools
@@ -136,6 +137,7 @@ __all__ = [
     "READ_ONLY",
     "Feature",
     "ToolRegistrar",
+    "register_core_tools",
     "register_eval_tools",
     "register_graph_tools",
     "register_note_tools",

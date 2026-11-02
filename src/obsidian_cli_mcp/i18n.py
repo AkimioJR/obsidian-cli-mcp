@@ -94,6 +94,11 @@ class SupportedLang(str, Enum):
 # 按 [语言][Feature][工具名] 三层结构组织的私有本地化标题存储
 _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
     SupportedLang.ZH_CN: {
+        "core": {
+            "version": "查看 Obsidian 版本",
+            "vaults": "列出已知所有库",
+            "vault": "查询当前库信息",
+        },
         "note": {
             "read": "读取笔记",
             "create": "创建笔记",
@@ -130,8 +135,6 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "wordcount": "统计字数字符",
         },
         "vault": {
-            "vault": "查询当前库信息",
-            "vaults": "列出已知所有库",
             "files": "检索库内文件",
             "folders": "列出文件夹目录",
             "folder": "查询文件夹详情",
@@ -140,7 +143,6 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "workspace": "查询工作区布局",
             "reload": "重新加载笔记库",
             "restart": "重启 Obsidian",
-            "version": "查看 Obsidian 版本",
         },
         "plugin": {
             "command": "执行命令",
@@ -157,6 +159,11 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
         },
     },
     SupportedLang.EN_US: {
+        "core": {
+            "version": "Show Obsidian Version",
+            "vaults": "List All Vaults",
+            "vault": "Show Vault Info",
+        },
         "note": {
             "read": "Read Note",
             "create": "Create Note",
@@ -193,8 +200,6 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "wordcount": "Count Words & Characters",
         },
         "vault": {
-            "vault": "Show Vault Info",
-            "vaults": "List All Vaults",
             "files": "List Files in Vault",
             "folders": "List Folders",
             "folder": "Show Folder Details",
@@ -203,7 +208,6 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "workspace": "Get Workspace Layout",
             "reload": "Reload Vault",
             "restart": "Restart Obsidian",
-            "version": "Show Obsidian Version",
         },
         "plugin": {
             "command": "Execute Command",

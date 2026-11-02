@@ -176,7 +176,12 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 <details open>
 <summary><b>Expand to view detailed tool catalog (45 tools, 1:1 mapping)</b></summary>
 
-### 1. Notes & Content (9 tools)
+### 🌟 Core Tools (Core · 3 tools, always loaded by default)
+- `version`: Query installed Obsidian desktop application version.
+- `vaults`: List all known Obsidian vaults and their local absolute paths.
+- `vault`: Query current Vault stats (name, path, total files, size, etc.).
+
+### 1. Notes & Content (Feature: `note` · 9 tools)
 - `read`: Read raw Markdown content by note name or relative path.
 - `create`: Create a new note with optional template, pre-filled content, overwrite, and auto-open.
 - `append`: Append content to the end of a note.
@@ -187,13 +192,13 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `open`: Focus and open note in the Obsidian GUI.
 - `random_read`: Randomly read a note from the vault.
 
-### 2. Properties & Frontmatter (4 tools)
+### 2. Properties & Frontmatter (Feature: `property` · 4 tools)
 - `properties`: List all property keys across vault or for a specific file.
 - `property_read`: Read specific Frontmatter property value.
 - `property_set`: Set property value (supports text, list, number, checkbox).
 - `property_remove`: Remove a property from frontmatter.
 
-### 3. Graph & Links (8 tools)
+### 3. Graph & Links (Feature: `graph` · 8 tools)
 - `backlinks`: Get note backlink incoming edges (JSON format).
 - `links`: Get outgoing link edges from a note.
 - `unresolved`: List hanging links with no target note created yet.
@@ -203,36 +208,33 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `aliases`: List all aliases for the vault or note.
 - `wordcount`: Get character and word count statistics.
 
-### 4. Tags (Tag · 2 tools)
+### 4. Tags (Feature: `tag` · 2 tools)
 - `tags`: Get all tags and their frequency distribution (JSON format).
 - `tag`: Query specific tag occurrences across notes.
 
-### 5. Tasks (Task · 2 tools)
+### 5. Tasks (Feature: `task` · 2 tools)
 - `tasks`: Filter tasks by status (completed/todo), tag, or file.
 - `task`: Toggle checkbox state or mark task completed.
 
-### 6. Vault & Workspace (8 tools)
-- `vault`: Query Vault stats (path, total files, size, etc.).
-- `vaults`: List all known vaults and their filesystem paths.
+### 6. Vault & Workspace (Feature: `vault` · 8 tools)
 - `files`: List files in vault (supports folder/extension filters).
 - `folders` / `folder`: Inspect directory tree structure and metadata.
 - `recents`: List recently accessed files.
 - `bookmarks`: Read bookmarked and starred items.
 - `workspace`: Query workspace window layout tree.
+- `reload`: Reload current vault interface.
+- `restart`: Restart Obsidian desktop application.
 
-### 7. Commands & Extensions (5 tools)
+### 7. Commands & Templates (Feature: `plugin` · 8 tools)
 - `command`: Trigger internal Obsidian or plugin commands.
 - `commands`: List all available command IDs.
 - `template_read`: Read template file with variable evaluation.
 - `template_insert`: Insert template into currently active note.
-- `eval`: Execute JavaScript code inside Obsidian runtime (advanced escape hatch).
-
-### 8. Plugins & Lifecycle (7 tools)
 - `plugins` / `plugins_enabled`: List installed / active community and core plugins.
 - `plugin_enable` / `plugin_disable`: Dynamically enable or disable plugins.
-- `reload`: Reload current vault.
-- `restart`: Restart Obsidian desktop application.
-- `version`: Query current Obsidian version.
+
+### 8. Dynamic Scripting (Feature: `eval` · 1 tool)
+- `eval`: Execute JavaScript code inside Obsidian runtime (advanced escape hatch).
 
 </details>
 

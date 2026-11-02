@@ -13,42 +13,8 @@ def register_vault_tools(
     client: ObsidianClient,
     lang: SupportedLang | None = None,
 ) -> None:
-    """Register vault status and workspace navigation tools (Feature: vault)."""
+    """Register vault file navigation, workspace and lifecycle tools (Feature: vault)."""
     reg = ToolRegistrar(server, "vault", lang)
-
-    @reg.tool(
-        name="vault",
-        annotations=READ_ONLY,
-        description="Show vault information such as name, path, file count, folder count, or total size.",
-    )
-    async def vault_info(
-        info: Literal["name", "path", "files", "folders", "size"] | None = Field(
-            default=None,
-            description="Return specific info only (name, path, files, folders, size).",
-        ),
-        vault: str | None = Field(
-            default=None,
-            description="Target a specific vault by name.",
-        ),
-    ) -> Any:
-        return await call_tool(client, "vault", {"info": info}, vault=vault)
-
-    @reg.tool(
-        name="vaults",
-        annotations=READ_ONLY,
-        description="List all known Obsidian vaults and their local absolute paths.",
-    )
-    async def vaults(
-        total: bool = Field(
-            default=False,
-            description="Return vault count.",
-        ),
-        verbose: bool = Field(
-            default=True,
-            description="Include vault paths.",
-        ),
-    ) -> Any:
-        return await call_tool(client, "vaults", {"total": total, "verbose": verbose})
 
     @reg.tool(
         name="files",
@@ -203,11 +169,3 @@ def register_vault_tools(
     )
     async def restart_app() -> Any:
         return await call_tool(client, "restart")
-
-    @reg.tool(
-        name="version",
-        annotations=READ_ONLY,
-        description="Show the installed Obsidian desktop application version.",
-    )
-    async def version() -> Any:
-        return await call_tool(client, "version")
