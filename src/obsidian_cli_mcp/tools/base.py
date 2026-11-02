@@ -7,6 +7,7 @@ from mcp.types import ToolAnnotations
 from ..client import ObsidianClient
 from ..exceptions import ObsidianError
 from ..i18n import SupportedLang
+from ..version import Version
 
 # Reusable Tool Annotation Presets conforming to MCP 2.x standard
 READ_ONLY = ToolAnnotations(
@@ -60,27 +61,39 @@ def make_annotations(
 
 
 class ToolRegistrar:
-    """Helper that binds feature context and language to register MCP tools with localized titles."""
+    """Helper that binds feature context, language, and version to register MCP tools with localized titles."""
 
     def __init__(
         self,
         server: MCPServer,
         feature: str,
         lang: SupportedLang | str | None = None,
+        version: Version | None = None,
     ) -> None:
         self.server = server
         self.feature = feature
         self.lang = (
             lang if isinstance(lang, SupportedLang) else SupportedLang.detect(lang)
         )
+        self.version = version
 
     def tool(
         self,
         name: str,
         annotations: ToolAnnotations,
         description: str | None = None,
+        *,
+        min_version: Version | str | None = None,
+        max_version: Version | str | None = None,
     ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-        """Register a tool, automatically binding localized title and annotated hints."""
+        """Register a tool, checking version compatibility and binding localized title."""
+        # 检查版本兼容性：如果指定了 min_version / max_version 且当前已知版本不满足，则跳过注册
+        if self.version is not None:
+            if min_version is not None and self.version < min_version:
+                return lambda fn: fn
+            if max_version is not None and self.version > max_version:
+                return lambda fn: fn
+
         title = self.lang.tool_title(self.feature, name)
         ann = annotations.model_copy(update={"title": title}) if title else annotations
         return self.server.tool(

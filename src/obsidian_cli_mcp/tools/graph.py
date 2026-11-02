@@ -5,16 +5,18 @@ from pydantic import Field
 
 from ..client import ObsidianClient
 from ..i18n import SupportedLang
+from ..version import Version
 from .base import READ_ONLY, ToolRegistrar, call_tool
 
 
 def register_graph_tools(
     server: MCPServer,
     client: ObsidianClient,
-    lang: SupportedLang | None = None,
+    lang: SupportedLang | str | None = None,
+    version: Version | None = None,
 ) -> None:
     """Register graph, links, and structure tools (Feature: graph)."""
-    reg = ToolRegistrar(server, "graph", lang)
+    reg = ToolRegistrar(server, "graph", lang, version=version)
 
     @reg.tool(
         name="backlinks",

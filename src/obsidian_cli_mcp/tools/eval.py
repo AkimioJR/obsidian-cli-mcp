@@ -5,16 +5,18 @@ from pydantic import Field
 
 from ..client import ObsidianClient
 from ..i18n import SupportedLang
+from ..version import Version
 from .base import DYNAMIC_EVAL, ToolRegistrar, call_tool
 
 
 def register_eval_tools(
     server: MCPServer,
     client: ObsidianClient,
-    lang: SupportedLang | None = None,
+    lang: SupportedLang | str | None = None,
+    version: Version | None = None,
 ) -> None:
     """Register JavaScript runtime execution tool (Feature: eval)."""
-    reg = ToolRegistrar(server, "eval", lang)
+    reg = ToolRegistrar(server, "eval", lang, version=version)
 
     @reg.tool(
         name="eval",

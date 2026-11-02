@@ -6,6 +6,7 @@ from .client import ObsidianClient
 from .exceptions import ObsidianCLIError, ObsidianError, ObsidianNotFoundError
 from .server import create_server
 from .tools import Feature
+from .version import Version
 
 __all__ = [
     "Feature",
@@ -13,6 +14,7 @@ __all__ = [
     "ObsidianClient",
     "ObsidianError",
     "ObsidianNotFoundError",
+    "Version",
     "__version__",
     "create_server",
     "main",

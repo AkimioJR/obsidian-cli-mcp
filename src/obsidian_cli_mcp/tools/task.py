@@ -5,16 +5,18 @@ from pydantic import Field
 
 from ..client import ObsidianClient
 from ..i18n import SupportedLang
+from ..version import Version
 from .base import NON_IDEMPOTENT_WRITE, READ_ONLY, ToolRegistrar, call_tool
 
 
 def register_task_tools(
     server: MCPServer,
     client: ObsidianClient,
-    lang: SupportedLang | None = None,
+    lang: SupportedLang | str | None = None,
+    version: Version | None = None,
 ) -> None:
     """Register task management tools (Feature: task)."""
-    reg = ToolRegistrar(server, "task", lang)
+    reg = ToolRegistrar(server, "task", lang, version=version)
 
     @reg.tool(
         name="tasks",

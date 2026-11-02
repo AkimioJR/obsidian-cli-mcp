@@ -1,10 +1,12 @@
 import json
 import os
 import shutil
+import subprocess
 from typing import Any
 
 from .cli import CommandExecutionResult, run_cli_command
 from .exceptions import ObsidianCLIError, ObsidianNotFoundError
+from .version import Version
 
 # 允许保留空字符串的参数（如清空属性值、创建空白内容等）
 ALLOW_EMPTY_VALUE_KEYS = {"content", "value"}
@@ -45,6 +47,31 @@ class ObsidianClient:
                         self.timeout = 30.0
             else:
                 self.timeout = 30.0
+
+    def get_version(self) -> Version | None:
+        """查询 Obsidian 桌面客户端版本并解析为 Version 对象。
+
+        优先读取环境变量 OBSIDIAN_VERSION，未设置时通过 CLI 'obsidian version' 探针探测。
+        """
+        env_ver = os.getenv("OBSIDIAN_VERSION")
+        if env_ver:
+            parsed = Version.try_parse(env_ver)
+            if parsed:
+                return parsed
+
+        try:
+            proc = subprocess.run(
+                [self.cli_path, "version"],
+                capture_output=True,
+                text=True,
+                timeout=5.0,
+                check=False,
+            )
+            if proc.returncode == 0 and proc.stdout:
+                return Version.try_parse(proc.stdout)
+        except (subprocess.SubprocessError, OSError, ValueError):
+            return None
+        return None
 
     def _build_args(
         self,

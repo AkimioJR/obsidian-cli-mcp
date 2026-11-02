@@ -5,16 +5,18 @@ from pydantic import Field
 
 from ..client import ObsidianClient
 from ..i18n import SupportedLang
+from ..version import Version
 from .base import IDEMPOTENT_WRITE, READ_ONLY, ToolRegistrar, call_tool
 
 
 def register_property_tools(
     server: MCPServer,
     client: ObsidianClient,
-    lang: SupportedLang | None = None,
+    lang: SupportedLang | str | None = None,
+    version: Version | None = None,
 ) -> None:
     """Register frontmatter property tools (Feature: property)."""
-    reg = ToolRegistrar(server, "property", lang)
+    reg = ToolRegistrar(server, "property", lang, version=version)
 
     @reg.tool(
         name="properties",

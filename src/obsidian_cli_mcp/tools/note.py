@@ -5,6 +5,7 @@ from pydantic import Field
 
 from ..client import ObsidianClient
 from ..i18n import SupportedLang
+from ..version import Version
 from .base import (
     DESTRUCTIVE_WRITE,
     IDEMPOTENT_WRITE,
@@ -18,10 +19,11 @@ from .base import (
 def register_note_tools(
     server: MCPServer,
     client: ObsidianClient,
-    lang: SupportedLang | None = None,
+    lang: SupportedLang | str | None = None,
+    version: Version | None = None,
 ) -> None:
     """Register note content & file manipulation tools (Feature: note)."""
-    reg = ToolRegistrar(server, "note", lang)
+    reg = ToolRegistrar(server, "note", lang, version=version)
 
     @reg.tool(
         name="read",

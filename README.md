@@ -161,6 +161,7 @@ pip install obsidian-cli-mcp
 | `OBSIDIAN_VAULT`    | 默认操控的目标 Vault 笔记库名称（工具未显式传入 `vault` 参数时自动采用）                           | 未设置时由 Obsidian CLI 自动绑定当前活跃库    |
 | `OBSIDIAN_CLI_PATH` | Obsidian CLI 可执行文件的绝对路径                                                                  | 自动在系统 PATH 中探测（如 `which obsidian`） |
 | `OBSIDIAN_TIMEOUT`  | CLI 子进程命令执行超时时间（秒，支持小数浮点或 `none`/`null` 禁用超时）                            | `30.0`                                        |
+| `OBSIDIAN_VERSION`  | 手动指定或覆盖 Obsidian 客户端版本号（用于无头/容器环境兼容性校验，如 `1.14.5`）                   | 启动时自动从 `obsidian version` 探针探测      |
 | `OBSIDIAN_FEATURES` | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,eval` 或预设 `standard,safe`） | `all`（默认启用全量 45 项工具）               |
 | `OBSIDIAN_LANG`     | 人类可读界面与工具标题的本地化语言（支持 `zh_CN`, `en_US` 等）                                     | 自动探测系统环境（未匹配时回退至 `en_US`）    |
 

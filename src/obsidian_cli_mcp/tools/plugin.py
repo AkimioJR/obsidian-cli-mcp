@@ -5,6 +5,7 @@ from pydantic import Field
 
 from ..client import ObsidianClient
 from ..i18n import SupportedLang
+from ..version import Version
 from .base import (
     IDEMPOTENT_WRITE,
     NON_IDEMPOTENT_WRITE,
@@ -17,10 +18,11 @@ from .base import (
 def register_plugin_tools(
     server: MCPServer,
     client: ObsidianClient,
-    lang: SupportedLang | None = None,
+    lang: SupportedLang | str | None = None,
+    version: Version | None = None,
 ) -> None:
     """Register plugin, command palette, and template tools (Feature: plugin)."""
-    reg = ToolRegistrar(server, "plugin", lang)
+    reg = ToolRegistrar(server, "plugin", lang, version=version)
 
     @reg.tool(
         name="command",

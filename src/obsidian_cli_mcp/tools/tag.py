@@ -5,16 +5,18 @@ from pydantic import Field
 
 from ..client import ObsidianClient
 from ..i18n import SupportedLang
+from ..version import Version
 from .base import READ_ONLY, ToolRegistrar, call_tool
 
 
 def register_tag_tools(
     server: MCPServer,
     client: ObsidianClient,
-    lang: SupportedLang | None = None,
+    lang: SupportedLang | str | None = None,
+    version: Version | None = None,
 ) -> None:
     """Register tag management tools (Feature: tag)."""
-    reg = ToolRegistrar(server, "tag", lang)
+    reg = ToolRegistrar(server, "tag", lang, version=version)
 
     @reg.tool(
         name="tags",

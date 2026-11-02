@@ -5,6 +5,7 @@ from mcp.server.mcpserver import MCPServer
 
 from ..client import ObsidianClient
 from ..i18n import SupportedLang
+from ..version import Version
 from .base import (
     DESTRUCTIVE_WRITE,
     DYNAMIC_EVAL,
@@ -41,12 +42,13 @@ class Feature(str, Enum):
         server: MCPServer,
         client: ObsidianClient,
         lang: SupportedLang | str | None = None,
+        version: Version | None = None,
     ) -> None:
         """Register all tools associated with this feature to the server."""
         resolved_lang = (
             lang if isinstance(lang, SupportedLang) else SupportedLang.detect(lang)
         )
-        _FEATURE_REGISTRY[self](server, client, resolved_lang)
+        _FEATURE_REGISTRY[self](server, client, resolved_lang, version)
 
     @classmethod
     def presets(cls) -> dict[str, set["Feature"]]:
@@ -95,6 +97,7 @@ class Feature(str, Enum):
         client: ObsidianClient,
         features: Iterable["Feature | str"] | None = None,
         lang: SupportedLang | str | None = None,
+        version: Version | None = None,
     ) -> None:
         """Register tool feature groups to the MCP server.
 
@@ -113,11 +116,12 @@ class Feature(str, Enum):
 
         for feature in cls:
             if feature in enabled_features:
-                feature.register(server, client, resolved_lang)
+                feature.register(server, client, resolved_lang, version=version)
 
 
 _FEATURE_REGISTRY: dict[
-    Feature, Callable[[MCPServer, ObsidianClient, SupportedLang | None], None]
+    Feature,
+    Callable[[MCPServer, ObsidianClient, SupportedLang | None, Version | None], None],
 ] = {
     Feature.NOTE: register_note_tools,
     Feature.PROPERTY: register_property_tools,
