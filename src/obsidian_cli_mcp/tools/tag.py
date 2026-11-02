@@ -4,7 +4,7 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from .base import call_tool
+from .base import READ_ONLY, call_tool
 
 
 def register_tag_tools(server: MCPServer, client: ObsidianClient) -> None:
@@ -13,6 +13,7 @@ def register_tag_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="tags",
         description="List all tags and their occurrence counts in the vault or note (returns JSON).",
+        annotations=READ_ONLY,
     )
     async def tags(
         file: str | None = Field(
@@ -63,6 +64,7 @@ def register_tag_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="tag",
         description="Get details and file occurrences for a specific tag.",
+        annotations=READ_ONLY,
     )
     async def tag(
         name: str = Field(

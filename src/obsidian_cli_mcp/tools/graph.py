@@ -4,7 +4,7 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from .base import call_tool
+from .base import READ_ONLY, call_tool
 
 
 def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
@@ -12,6 +12,7 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="backlinks",
+        annotations=READ_ONLY,
         description="List backlinks pointing to a specified note (returns JSON).",
     )
     async def backlinks(
@@ -52,6 +53,7 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="links",
+        annotations=READ_ONLY,
         description="List outgoing links from a specified note.",
     )
     async def links(
@@ -81,6 +83,7 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="unresolved",
+        annotations=READ_ONLY,
         description="List unresolved links in the vault pointing to non-existent notes (returns JSON).",
     )
     async def unresolved(
@@ -111,6 +114,7 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="orphans",
+        annotations=READ_ONLY,
         description="List orphan notes that have no incoming links from other notes.",
     )
     async def orphans(
@@ -127,6 +131,7 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="deadends",
+        annotations=READ_ONLY,
         description="List dead-end notes that contain no outgoing links to other notes.",
     )
     async def deadends(
@@ -149,6 +154,7 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="outline",
+        annotations=READ_ONLY,
         description="Get the heading outline hierarchy of a note (returns JSON).",
     )
     async def outline(
@@ -179,6 +185,7 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="aliases",
+        annotations=READ_ONLY,
         description="List aliases in the vault or for a specified note.",
     )
     async def aliases(
@@ -222,6 +229,7 @@ def register_graph_tools(server: MCPServer, client: ObsidianClient) -> None:
 
     @server.tool(
         name="wordcount",
+        annotations=READ_ONLY,
         description="Count words and characters in a note or the active note.",
     )
     async def wordcount(

@@ -4,7 +4,7 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from .base import call_tool
+from .base import IDEMPOTENT_WRITE, READ_ONLY, call_tool
 
 
 def register_property_tools(server: MCPServer, client: ObsidianClient) -> None:
@@ -13,6 +13,7 @@ def register_property_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="properties",
         description="List all frontmatter properties in the vault or for a specific file (returns JSON).",
+        annotations=READ_ONLY,
     )
     async def properties(
         file: str | None = Field(
@@ -68,6 +69,7 @@ def register_property_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="property_read",
         description="Read the value of a specific property from a file.",
+        annotations=READ_ONLY,
     )
     async def property_read(
         name: str = Field(
@@ -96,6 +98,7 @@ def register_property_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="property_set",
         description="Set a property on a file with optional type (text, list, number, checkbox, date, datetime).",
+        annotations=IDEMPOTENT_WRITE,
     )
     async def property_set(
         name: str = Field(
@@ -133,6 +136,7 @@ def register_property_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="property_remove",
         description="Remove a property from a file.",
+        annotations=IDEMPOTENT_WRITE,
     )
     async def property_remove(
         name: str = Field(

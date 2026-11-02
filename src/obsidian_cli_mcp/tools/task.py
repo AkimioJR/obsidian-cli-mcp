@@ -4,7 +4,7 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from .base import call_tool
+from .base import NON_IDEMPOTENT_WRITE, READ_ONLY, call_tool
 
 
 def register_task_tools(server: MCPServer, client: ObsidianClient) -> None:
@@ -13,6 +13,7 @@ def register_task_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="tasks",
         description="List tasks in the vault with optional filters for completion, note, or status (returns JSON).",
+        annotations=READ_ONLY,
     )
     async def tasks(
         file: str | None = Field(
@@ -78,6 +79,7 @@ def register_task_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="task",
         description="Show or update a specific task status (toggle, mark done, or set status character).",
+        annotations=NON_IDEMPOTENT_WRITE,
     )
     async def task(
         ref: str | None = Field(

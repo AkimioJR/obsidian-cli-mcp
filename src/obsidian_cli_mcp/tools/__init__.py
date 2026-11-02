@@ -4,6 +4,13 @@ from enum import Enum
 from mcp.server.mcpserver import MCPServer
 
 from ..client import ObsidianClient
+from .base import (
+    DESTRUCTIVE_WRITE,
+    DYNAMIC_EVAL,
+    IDEMPOTENT_WRITE,
+    NON_IDEMPOTENT_WRITE,
+    READ_ONLY,
+)
 from .eval import register_eval_tools
 from .graph import register_graph_tools
 from .note import register_note_tools
@@ -96,7 +103,12 @@ def register_tools(
 
 
 __all__ = [
+    "DESTRUCTIVE_WRITE",
+    "DYNAMIC_EVAL",
+    "IDEMPOTENT_WRITE",
+    "NON_IDEMPOTENT_WRITE",
     "PRESETS",
+    "READ_ONLY",
     "Feature",
     "register_eval_tools",
     "register_graph_tools",

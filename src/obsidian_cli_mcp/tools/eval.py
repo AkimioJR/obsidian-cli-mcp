@@ -4,7 +4,7 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from .base import call_tool
+from .base import DYNAMIC_EVAL, call_tool
 
 
 def register_eval_tools(server: MCPServer, client: ObsidianClient) -> None:
@@ -13,6 +13,7 @@ def register_eval_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="eval",
         description="Execute JavaScript code inside the Obsidian Electron runtime and return the result.",
+        annotations=DYNAMIC_EVAL,
     )
     async def eval_js(
         code: str = Field(

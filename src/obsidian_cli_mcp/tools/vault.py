@@ -4,7 +4,7 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from .base import call_tool
+from .base import IDEMPOTENT_WRITE, READ_ONLY, call_tool
 
 
 def register_vault_tools(server: MCPServer, client: ObsidianClient) -> None:
@@ -13,6 +13,7 @@ def register_vault_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="vault",
         description="Show vault information such as name, path, file count, folder count, or total size.",
+        annotations=READ_ONLY,
     )
     async def vault_info(
         info: Literal["name", "path", "files", "folders", "size"] | None = Field(
@@ -29,6 +30,7 @@ def register_vault_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="vaults",
         description="List all known Obsidian vaults and their local absolute paths.",
+        annotations=READ_ONLY,
     )
     async def vaults(
         total: bool = Field(
@@ -45,6 +47,7 @@ def register_vault_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="files",
         description="List files in the vault, with optional filtering by folder or file extension.",
+        annotations=READ_ONLY,
     )
     async def files(
         folder: str | None = Field(
@@ -71,6 +74,7 @@ def register_vault_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="folders",
         description="List folders in the vault.",
+        annotations=READ_ONLY,
     )
     async def folders(
         folder: str | None = Field(
@@ -93,6 +97,7 @@ def register_vault_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="folder",
         description="Show information about a specific folder.",
+        annotations=READ_ONLY,
     )
     async def folder_info(
         path: str = Field(
@@ -114,6 +119,7 @@ def register_vault_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="recents",
         description="List recently opened files in the vault.",
+        annotations=READ_ONLY,
     )
     async def recents(
         total: bool = Field(
@@ -130,6 +136,7 @@ def register_vault_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="bookmarks",
         description="List all bookmarks in the vault (returns JSON).",
+        annotations=READ_ONLY,
     )
     async def bookmarks(
         total: bool = Field(
@@ -156,6 +163,7 @@ def register_vault_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="workspace",
         description="Get the current workspace window layout tree.",
+        annotations=READ_ONLY,
     )
     async def workspace(
         ids: bool = Field(
@@ -172,6 +180,7 @@ def register_vault_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="reload",
         description="Reload the vault interface and re-index notes.",
+        annotations=IDEMPOTENT_WRITE,
     )
     async def reload_vault(
         vault: str | None = Field(
@@ -184,6 +193,7 @@ def register_vault_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="restart",
         description="Restart the Obsidian desktop application.",
+        annotations=IDEMPOTENT_WRITE,
     )
     async def restart_app() -> Any:
         return await call_tool(client, "restart")
@@ -191,6 +201,7 @@ def register_vault_tools(server: MCPServer, client: ObsidianClient) -> None:
     @server.tool(
         name="version",
         description="Show the installed Obsidian desktop application version.",
+        annotations=READ_ONLY,
     )
     async def version() -> Any:
         return await call_tool(client, "version")

@@ -188,3 +188,58 @@ def test_feature_preset_standard():
     assert "backlinks" in tools
     assert "eval" not in tools
     assert "plugin_enable" not in tools
+
+
+def test_tool_annotations_all_present():
+    server = create_server(cli_path="/mock/obsidian")
+    tools = server._tool_manager._tools
+    assert len(tools) == 45
+    for name, tool in tools.items():
+        assert tool.annotations is not None, f"Tool {name} is missing annotations"
+
+
+def test_tool_annotations_hints_classification():
+    server = create_server(cli_path="/mock/obsidian")
+    tools = server._tool_manager._tools
+
+    read_only_tools = {
+        name
+        for name, t in tools.items()
+        if t.annotations and t.annotations.read_only_hint
+    }
+    assert len(read_only_tools) == 29
+    assert "read" in read_only_tools
+    assert "tags" in read_only_tools
+    assert "tasks" in read_only_tools
+    assert "backlinks" in read_only_tools
+    assert "properties" in read_only_tools
+    assert "vaults" in read_only_tools
+
+    destructive_tools = {
+        name
+        for name, t in tools.items()
+        if t.annotations and t.annotations.destructive_hint
+    }
+    assert destructive_tools == {"delete", "eval"}
+
+    non_idempotent_tools = {
+        name
+        for name, t in tools.items()
+        if t.annotations and not t.annotations.idempotent_hint
+    }
+    assert non_idempotent_tools == {
+        "append",
+        "command",
+        "create",
+        "eval",
+        "prepend",
+        "task",
+        "template_insert",
+    }
+
+    open_world_tools = {
+        name
+        for name, t in tools.items()
+        if t.annotations and t.annotations.open_world_hint
+    }
+    assert open_world_tools == {"eval"}
