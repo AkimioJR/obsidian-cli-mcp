@@ -135,6 +135,7 @@ Client configuration:
 | :--- | :--- | :--- |
 | `OBSIDIAN_VAULT` | Target Vault name (automatically used when tool calls omit the `vault` parameter) | Defaults to currently active vault in Obsidian |
 | `OBSIDIAN_CLI_PATH` | Absolute path to Obsidian CLI binary | Auto-detected in system `PATH` (`which obsidian`) |
+| `OBSIDIAN_FEATURES` | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,vault,plugin,eval` or presets `standard,safe`) | `all` (all 45 tools enabled by default) |
 
 ---
 
@@ -176,13 +177,15 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `aliases`: List all aliases for the vault or note.
 - `wordcount`: Get character and word count statistics.
 
-### 4. Tags & Tasks (4 tools)
+### 4. Tags (Tag · 2 tools)
 - `tags`: Get all tags and their frequency distribution (JSON format).
 - `tag`: Query specific tag occurrences across notes.
+
+### 5. Tasks (Task · 2 tools)
 - `tasks`: Filter tasks by status (completed/todo), tag, or file.
 - `task`: Toggle checkbox state or mark task completed.
 
-### 5. Vault & Workspace (8 tools)
+### 6. Vault & Workspace (8 tools)
 - `vault`: Query Vault stats (path, total files, size, etc.).
 - `vaults`: List all known vaults and their filesystem paths.
 - `files`: List files in vault (supports folder/extension filters).
@@ -191,14 +194,14 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `bookmarks`: Read bookmarked and starred items.
 - `workspace`: Query workspace window layout tree.
 
-### 6. Commands & Extensions (5 tools)
+### 7. Commands & Extensions (5 tools)
 - `command`: Trigger internal Obsidian or plugin commands.
 - `commands`: List all available command IDs.
 - `template_read`: Read template file with variable evaluation.
 - `template_insert`: Insert template into currently active note.
 - `eval`: Execute JavaScript code inside Obsidian runtime (advanced escape hatch).
 
-### 7. Plugins & Lifecycle (7 tools)
+### 8. Plugins & Lifecycle (7 tools)
 - `plugins` / `plugins_enabled`: List installed / active community and core plugins.
 - `plugin_enable` / `plugin_disable`: Dynamically enable or disable plugins.
 - `reload`: Reload current vault.

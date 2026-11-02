@@ -135,6 +135,7 @@ pip install obsidian-cli-mcp
 | :------------------ | :----------------------------------------------------------------------- | :-------------------------------------------- |
 | `OBSIDIAN_VAULT`    | 默认操控的目标 Vault 笔记库名称（工具未显式传入 `vault` 参数时自动采用） | 未设置时由 Obsidian CLI 自动绑定当前活跃库    |
 | `OBSIDIAN_CLI_PATH` | Obsidian CLI 可执行文件的绝对路径                                        | 自动在系统 PATH 中探测（如 `which obsidian`） |
+| `OBSIDIAN_FEATURES` | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,eval` 或预设 `standard,safe`） | `all`（默认启用全量 45 项工具） |
 
 ---
 
@@ -176,13 +177,15 @@ pip install obsidian-cli-mcp
 - `aliases`: 列出库中或指定文件的别名列表。
 - `wordcount`: 统计字数与字符数分布。
 
-### 4. 标签与待办任务 (Tags & Tasks · 4 项)
+### 4. 标签管理 (Tag · 2 项)
 - `tags`: 获取所有标签及其统计分布（JSON 格式）。
 - `tag`: 检索特定标签在各个笔记中的具体出现详情。
+
+### 5. 待办任务 (Task · 2 项)
 - `tasks`: 按状态（已完成/待办）、标签或所在文件多维筛选任务。
 - `task`: 切换任务的勾选完成状态。
 
-### 5. 笔记库与工作区 (Vault & Workspace · 8 项)
+### 6. 笔记库与工作区 (Vault & Workspace · 8 项)
 - `vault`: 查询当前 Vault 基本状态（物理路径、文件数、体积等）。
 - `vaults`: 列出本机已知的所有 Vault 及绝对路径。
 - `files`: 列出库内文件清单（支持按文件夹与后缀筛选）。
@@ -191,14 +194,14 @@ pip install obsidian-cli-mcp
 - `bookmarks`: 查看书签与星标项目列表。
 - `workspace`: 查询当前工作区窗口布局树。
 
-### 6. 命令与高级扩展 (Commands & Ext · 5 项)
+### 7. 命令与高级扩展 (Commands & Ext · 5 项)
 - `command`: 触发执行 Obsidian 内置或第三方插件命令。
 - `commands`: 列出当前可用的全部命令 ID 清单。
 - `template_read`: 读取模板文件并支持占位符变量解析。
 - `template_insert`: 将模板内容插入到当前活跃笔记。
 - `eval`: 在 Obsidian 运行时环境中直接执行 JavaScript 代码（高级逃生通道）。
 
-### 7. 插件管理与生命周期 (Plugins & Lifecycle · 7 项)
+### 8. 插件管理与生命周期 (Plugins & Lifecycle · 7 项)
 - `plugins` / `plugins_enabled`: 列出已安装 / 已启用的社区与核心插件。
 - `plugin_enable` / `plugin_disable`: 动态启用或禁用指定插件。
 - `reload`: 重新加载当前笔记库。

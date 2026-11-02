@@ -4,8 +4,10 @@ import sys
 from .client import ObsidianClient
 from .exceptions import ObsidianCLIError, ObsidianError, ObsidianNotFoundError
 from .server import create_server
+from .tools import Feature
 
 __all__ = [
+    "Feature",
     "ObsidianCLIError",
     "ObsidianClient",
     "ObsidianError",
