@@ -326,3 +326,43 @@ def test_supported_lang_enum_and_methods(monkeypatch):
     # tool_title returns None when missing in both zh_CN and en_US
     assert SupportedLang.ZH_CN.tool_title("note", "completely_unknown") is None
     assert SupportedLang.EN_US.tool_title("note", "completely_unknown") is None
+
+
+def test_feature_enum_class_and_instance_methods():
+    from mcp.server.mcpserver import MCPServer
+
+    from obsidian_cli_mcp.client import ObsidianClient
+    from obsidian_cli_mcp.tools import Feature
+
+    # 1. Feature.resolve
+    assert Feature.resolve(Feature.NOTE) == {Feature.NOTE}
+    assert Feature.resolve("note") == {Feature.NOTE}
+    assert Feature.resolve("minimal") == {Feature.NOTE}
+    assert Feature.resolve("standard") == {
+        Feature.NOTE,
+        Feature.PROPERTY,
+        Feature.TAG,
+        Feature.TASK,
+        Feature.GRAPH,
+    }
+    assert Feature.resolve("non_existent_feature") == set()
+
+    # 2. Feature.presets
+    presets = Feature.presets()
+    assert "all" in presets and len(presets["all"]) == 8
+    assert "safe" in presets and Feature.EVAL not in presets["safe"]
+
+    # 3. Instance method: feature.register
+    server = MCPServer("single-feature-server")
+    client = ObsidianClient(cli_path="/mock/obsidian")
+    Feature.TAG.register(server, client)
+    assert len(server._tool_manager._tools) == 2
+    assert "tags" in server._tool_manager._tools
+    assert "tag" in server._tool_manager._tools
+
+    # 4. Class method: Feature.register_tools
+    server_multi = MCPServer("multi-feature-server")
+    Feature.register_tools(server_multi, client, features=["task"])
+    assert len(server_multi._tool_manager._tools) == 2
+    assert "tasks" in server_multi._tool_manager._tools
+    assert "task" in server_multi._tool_manager._tools

@@ -35,8 +35,87 @@ class Feature(str, Enum):
     PLUGIN = "plugin"
     EVAL = "eval"
 
+    def register(
+        self,
+        server: MCPServer,
+        client: ObsidianClient,
+        lang: SupportedLang | str | None = None,
+    ) -> None:
+        """Register all tools associated with this feature to the server."""
+        resolved_lang = (
+            lang if isinstance(lang, SupportedLang) else SupportedLang.detect(lang)
+        )
+        _FEATURE_REGISTRY[self](server, client, resolved_lang)
 
-FEATURE_REGISTRY: dict[
+    @classmethod
+    def presets(cls) -> dict[str, set["Feature"]]:
+        """Return preset combinations of features."""
+        return {
+            "all": set(cls),
+            "standard": {
+                cls.NOTE,
+                cls.PROPERTY,
+                cls.TAG,
+                cls.TASK,
+                cls.GRAPH,
+            },
+            "minimal": {cls.NOTE},
+            "safe": {
+                cls.NOTE,
+                cls.PROPERTY,
+                cls.TAG,
+                cls.TASK,
+                cls.GRAPH,
+                cls.VAULT,
+                cls.PLUGIN,
+            },  # All except eval
+        }
+
+    @classmethod
+    def resolve(cls, val: "Feature | str") -> set["Feature"]:
+        """Resolve a Feature enum, preset name, or string name into a set of Features."""
+        if isinstance(val, cls):
+            return {val}
+
+        s = val.strip().lower()
+        presets = cls.presets()
+        if s in presets:
+            return set(presets[s])
+
+        try:
+            return {cls(s)}
+        except ValueError:
+            return set()
+
+    @classmethod
+    def register_tools(
+        cls,
+        server: MCPServer,
+        client: ObsidianClient,
+        features: Iterable["Feature | str"] | None = None,
+        lang: SupportedLang | str | None = None,
+    ) -> None:
+        """Register tool feature groups to the MCP server.
+
+        If features is None, all tools (all features) are registered by default.
+        """
+        resolved_lang = (
+            lang if isinstance(lang, SupportedLang) else SupportedLang.detect(lang)
+        )
+
+        if features is None:
+            enabled_features = set(cls)
+        else:
+            enabled_features = set()
+            for item in features:
+                enabled_features.update(cls.resolve(item))
+
+        for feature in cls:
+            if feature in enabled_features:
+                feature.register(server, client, resolved_lang)
+
+
+_FEATURE_REGISTRY: dict[
     Feature, Callable[[MCPServer, ObsidianClient, SupportedLang | None], None]
 ] = {
     Feature.NOTE: register_note_tools,
@@ -49,65 +128,9 @@ FEATURE_REGISTRY: dict[
     Feature.EVAL: register_eval_tools,
 }
 
-PRESETS: dict[str, set[Feature]] = {
-    "all": set(Feature),
-    "standard": {
-        Feature.NOTE,
-        Feature.PROPERTY,
-        Feature.TAG,
-        Feature.TASK,
-        Feature.GRAPH,
-    },
-    "minimal": {Feature.NOTE},
-    "safe": {
-        Feature.NOTE,
-        Feature.PROPERTY,
-        Feature.TAG,
-        Feature.TASK,
-        Feature.GRAPH,
-        Feature.VAULT,
-        Feature.PLUGIN,
-    },  # All except eval
-}
-
-
-def _resolve_feature(val: Feature | str) -> set[Feature]:
-    if isinstance(val, Feature):
-        return {val}
-
-    s = val.strip().lower()
-    if s in PRESETS:
-        return set(PRESETS[s])
-
-    try:
-        return {Feature(s)}
-    except ValueError:
-        return set()
-
-
-def register_tools(
-    server: MCPServer,
-    client: ObsidianClient,
-    features: Iterable[Feature | str] | None = None,
-    lang: SupportedLang | str | None = None,
-) -> None:
-    """Register tool feature groups to the MCP server.
-
-    If features is None, all tools (all features) are registered by default.
-    """
-    resolved_lang = SupportedLang.detect(lang)
-
-    if features is None:
-        enabled_features = set(Feature)
-    else:
-        enabled_features = set()
-        for item in features:
-            enabled_features.update(_resolve_feature(item))
-
-    for feature in Feature:
-        if feature in enabled_features:
-            FEATURE_REGISTRY[feature](server, client, resolved_lang)
-
+# Module-level aliases for backwards compatibility
+PRESETS: dict[str, set[Feature]] = Feature.presets()
+register_tools = Feature.register_tools
 
 __all__ = [
     "DESTRUCTIVE_WRITE",
