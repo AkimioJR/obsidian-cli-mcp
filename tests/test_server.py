@@ -366,3 +366,34 @@ def test_feature_enum_class_and_instance_methods():
     assert len(server_multi._tool_manager._tools) == 2
     assert "tasks" in server_multi._tool_manager._tools
     assert "task" in server_multi._tool_manager._tools
+
+
+def test_package_and_server_version():
+    import re
+    from pathlib import Path
+
+    import obsidian_cli_mcp
+    from obsidian_cli_mcp._version import __version__
+
+    # 1. 验证包导出一致性与基本有效性
+    assert obsidian_cli_mcp.__version__ == __version__
+    assert isinstance(__version__, str)
+    assert __version__ not in ("", "0.0.0.dev")
+
+    # 2. 验证符合语义化版本规范 (SemVer / PEP 440)
+    assert re.match(r"^\d+\.\d+\.\d+", __version__) is not None
+
+    # 3. 验证与 pyproject.toml 中的版本号保持动态一致（单一事实来源 SSOT）
+    pyproject_file = Path(__file__).resolve().parent.parent / "pyproject.toml"
+    if pyproject_file.is_file():
+        match = re.search(
+            r'^version\s*=\s*["\']([^"\']+)["\']',
+            pyproject_file.read_text(encoding="utf-8"),
+            re.MULTILINE,
+        )
+        assert match is not None
+        assert __version__ == match.group(1)
+
+    # 4. 验证注入到 MCPServer 实例的 version 字段
+    server = create_server(cli_path="/mock/obsidian")
+    assert server.version == __version__

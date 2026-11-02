@@ -1,6 +1,7 @@
 import asyncio
 import sys
 
+from ._version import __version__
 from .client import ObsidianClient
 from .exceptions import ObsidianCLIError, ObsidianError, ObsidianNotFoundError
 from .server import create_server
@@ -12,6 +13,7 @@ __all__ = [
     "ObsidianClient",
     "ObsidianError",
     "ObsidianNotFoundError",
+    "__version__",
     "create_server",
     "main",
 ]

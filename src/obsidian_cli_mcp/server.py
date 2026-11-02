@@ -3,6 +3,7 @@ from collections.abc import Iterable
 
 from mcp.server.mcpserver import MCPServer
 
+from ._version import __version__
 from .client import ObsidianClient
 from .tools import Feature
 
@@ -18,7 +19,7 @@ def create_server(
     client = ObsidianClient(vault=vault, cli_path=cli_path, timeout=timeout)
     server = MCPServer(
         name="obsidian-cli-mcp",
-        version="0.1.0",
+        version=__version__,
         instructions="Obsidian CLI MCP server providing full control over Obsidian vaults.",
     )
 
@@ -33,9 +34,6 @@ def create_server(
     resolved_lang = lang or os.getenv("OBSIDIAN_LANG")
 
     Feature.register_tools(
-        server,
-        client,
-        features=resolved_features,
-        lang=resolved_lang,
+        server, client, features=resolved_features, lang=resolved_lang
     )
     return server
