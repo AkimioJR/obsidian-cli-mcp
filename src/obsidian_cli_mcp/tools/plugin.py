@@ -4,13 +4,13 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from ..i18n import SupportedLang, get_tool_title
+from ..i18n import SupportedLang
 from .base import (
     IDEMPOTENT_WRITE,
     NON_IDEMPOTENT_WRITE,
     READ_ONLY,
+    ToolRegistrar,
     call_tool,
-    make_annotations,
 )
 
 
@@ -20,12 +20,12 @@ def register_plugin_tools(
     lang: SupportedLang | None = None,
 ) -> None:
     """Register plugin, command palette, and template tools (Feature: plugin)."""
+    reg = ToolRegistrar(server, "plugin", lang)
 
-    @server.tool(
+    @reg.tool(
         name="command",
-        title=get_tool_title("plugin", "command", lang),
+        annotations=NON_IDEMPOTENT_WRITE,
         description="Execute an Obsidian internal or plugin command by its command ID.",
-        annotations=make_annotations(NON_IDEMPOTENT_WRITE, "plugin", "command", lang),
     )
     async def execute_command(
         id: str = Field(
@@ -38,11 +38,10 @@ def register_plugin_tools(
     ) -> Any:
         return await call_tool(client, "command", {"id": id}, vault=vault)
 
-    @server.tool(
+    @reg.tool(
         name="commands",
-        title=get_tool_title("plugin", "commands", lang),
+        annotations=READ_ONLY,
         description="List all available Obsidian commands and their command IDs.",
-        annotations=make_annotations(READ_ONLY, "plugin", "commands", lang),
     )
     async def list_commands(
         filter: str | None = Field(
@@ -56,11 +55,10 @@ def register_plugin_tools(
     ) -> Any:
         return await call_tool(client, "commands", {"filter": filter}, vault=vault)
 
-    @server.tool(
+    @reg.tool(
         name="template_read",
-        title=get_tool_title("plugin", "template_read", lang),
+        annotations=READ_ONLY,
         description="Read a template file's content, with optional resolution of template variables.",
-        annotations=make_annotations(READ_ONLY, "plugin", "template_read", lang),
     )
     async def template_read(
         name: str = Field(
@@ -86,13 +84,10 @@ def register_plugin_tools(
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="template_insert",
-        title=get_tool_title("plugin", "template_insert", lang),
+        annotations=NON_IDEMPOTENT_WRITE,
         description="Insert a template into the currently active note.",
-        annotations=make_annotations(
-            NON_IDEMPOTENT_WRITE, "plugin", "template_insert", lang
-        ),
     )
     async def template_insert(
         name: str = Field(
@@ -105,11 +100,10 @@ def register_plugin_tools(
     ) -> Any:
         return await call_tool(client, "template:insert", {"name": name}, vault=vault)
 
-    @server.tool(
+    @reg.tool(
         name="plugins",
-        title=get_tool_title("plugin", "plugins", lang),
+        annotations=READ_ONLY,
         description="List installed community or core plugins (returns JSON).",
-        annotations=make_annotations(READ_ONLY, "plugin", "plugins", lang),
     )
     async def plugins(
         filter: Literal["core", "community"] | None = Field(
@@ -133,11 +127,10 @@ def register_plugin_tools(
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="plugins_enabled",
-        title=get_tool_title("plugin", "plugins_enabled", lang),
+        annotations=READ_ONLY,
         description="List enabled community or core plugins (returns JSON).",
-        annotations=make_annotations(READ_ONLY, "plugin", "plugins_enabled", lang),
     )
     async def plugins_enabled(
         filter: Literal["core", "community"] | None = Field(
@@ -161,11 +154,10 @@ def register_plugin_tools(
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="plugin_enable",
-        title=get_tool_title("plugin", "plugin_enable", lang),
+        annotations=IDEMPOTENT_WRITE,
         description="Enable a specified community or core plugin.",
-        annotations=make_annotations(IDEMPOTENT_WRITE, "plugin", "plugin_enable", lang),
     )
     async def plugin_enable(
         id: str = Field(
@@ -184,13 +176,10 @@ def register_plugin_tools(
             client, "plugin:enable", {"id": id, "filter": filter}, vault=vault
         )
 
-    @server.tool(
+    @reg.tool(
         name="plugin_disable",
-        title=get_tool_title("plugin", "plugin_disable", lang),
+        annotations=IDEMPOTENT_WRITE,
         description="Disable a specified plugin.",
-        annotations=make_annotations(
-            IDEMPOTENT_WRITE, "plugin", "plugin_disable", lang
-        ),
     )
     async def plugin_disable(
         id: str = Field(

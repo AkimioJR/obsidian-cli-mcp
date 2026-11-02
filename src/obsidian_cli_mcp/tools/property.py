@@ -4,8 +4,8 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from ..i18n import SupportedLang, get_tool_title
-from .base import IDEMPOTENT_WRITE, READ_ONLY, call_tool, make_annotations
+from ..i18n import SupportedLang
+from .base import IDEMPOTENT_WRITE, READ_ONLY, ToolRegistrar, call_tool
 
 
 def register_property_tools(
@@ -14,12 +14,12 @@ def register_property_tools(
     lang: SupportedLang | None = None,
 ) -> None:
     """Register frontmatter property tools (Feature: property)."""
+    reg = ToolRegistrar(server, "property", lang)
 
-    @server.tool(
+    @reg.tool(
         name="properties",
-        title=get_tool_title("property", "properties", lang),
+        annotations=READ_ONLY,
         description="List all frontmatter properties in the vault or for a specific file (returns JSON).",
-        annotations=make_annotations(READ_ONLY, "property", "properties", lang),
     )
     async def properties(
         file: str | None = Field(
@@ -72,11 +72,10 @@ def register_property_tools(
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="property_read",
-        title=get_tool_title("property", "property_read", lang),
+        annotations=READ_ONLY,
         description="Read the value of a specific property from a file.",
-        annotations=make_annotations(READ_ONLY, "property", "property_read", lang),
     )
     async def property_read(
         name: str = Field(
@@ -102,13 +101,10 @@ def register_property_tools(
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="property_set",
-        title=get_tool_title("property", "property_set", lang),
+        annotations=IDEMPOTENT_WRITE,
         description="Set a property on a file with optional type (text, list, number, checkbox, date, datetime).",
-        annotations=make_annotations(
-            IDEMPOTENT_WRITE, "property", "property_set", lang
-        ),
     )
     async def property_set(
         name: str = Field(
@@ -143,13 +139,10 @@ def register_property_tools(
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="property_remove",
-        title=get_tool_title("property", "property_remove", lang),
+        annotations=IDEMPOTENT_WRITE,
         description="Remove a property from a file.",
-        annotations=make_annotations(
-            IDEMPOTENT_WRITE, "property", "property_remove", lang
-        ),
     )
     async def property_remove(
         name: str = Field(

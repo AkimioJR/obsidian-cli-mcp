@@ -4,14 +4,14 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from ..i18n import SupportedLang, get_tool_title
+from ..i18n import SupportedLang
 from .base import (
     DESTRUCTIVE_WRITE,
     IDEMPOTENT_WRITE,
     NON_IDEMPOTENT_WRITE,
     READ_ONLY,
+    ToolRegistrar,
     call_tool,
-    make_annotations,
 )
 
 
@@ -21,12 +21,12 @@ def register_note_tools(
     lang: SupportedLang | None = None,
 ) -> None:
     """Register note content & file manipulation tools (Feature: note)."""
+    reg = ToolRegistrar(server, "note", lang)
 
-    @server.tool(
+    @reg.tool(
         name="read",
-        title=get_tool_title("note", "read", lang),
+        annotations=READ_ONLY,
         description="Read the complete content of a note by file name or vault-relative path.",
-        annotations=make_annotations(READ_ONLY, "note", "read", lang),
     )
     async def read(
         file: str | None = Field(
@@ -46,11 +46,10 @@ def register_note_tools(
             client, "read", {"file": file, "path": path}, vault=vault
         )
 
-    @server.tool(
+    @reg.tool(
         name="create",
-        title=get_tool_title("note", "create", lang),
+        annotations=NON_IDEMPOTENT_WRITE,
         description="Create a new note file with optional content, template, overwriting, and opening in app.",
-        annotations=make_annotations(NON_IDEMPOTENT_WRITE, "note", "create", lang),
     )
     async def create(
         name: str | None = Field(
@@ -101,11 +100,10 @@ def register_note_tools(
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="append",
-        title=get_tool_title("note", "append", lang),
+        annotations=NON_IDEMPOTENT_WRITE,
         description="Append content to the end of a specified note file.",
-        annotations=make_annotations(NON_IDEMPOTENT_WRITE, "note", "append", lang),
     )
     async def append(
         content: str = Field(
@@ -135,11 +133,10 @@ def register_note_tools(
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="prepend",
-        title=get_tool_title("note", "prepend", lang),
+        annotations=NON_IDEMPOTENT_WRITE,
         description="Prepend content to the beginning of a specified note file.",
-        annotations=make_annotations(NON_IDEMPOTENT_WRITE, "note", "prepend", lang),
     )
     async def prepend(
         content: str = Field(
@@ -169,11 +166,10 @@ def register_note_tools(
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="delete",
-        title=get_tool_title("note", "delete", lang),
+        annotations=DESTRUCTIVE_WRITE,
         description="Delete a note file. Moves to trash by default, or permanently deletes if permanent=True.",
-        annotations=make_annotations(DESTRUCTIVE_WRITE, "note", "delete", lang),
     )
     async def delete(
         file: str | None = Field(
@@ -200,11 +196,10 @@ def register_note_tools(
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="move",
-        title=get_tool_title("note", "move", lang),
+        annotations=IDEMPOTENT_WRITE,
         description="Move or rename a note file to a destination folder or path.",
-        annotations=make_annotations(IDEMPOTENT_WRITE, "note", "move", lang),
     )
     async def move(
         to: str = Field(
@@ -227,11 +222,10 @@ def register_note_tools(
             client, "move", {"to": to, "file": file, "path": path}, vault=vault
         )
 
-    @server.tool(
+    @reg.tool(
         name="rename",
-        title=get_tool_title("note", "rename", lang),
+        annotations=IDEMPOTENT_WRITE,
         description="Rename a note file.",
-        annotations=make_annotations(IDEMPOTENT_WRITE, "note", "rename", lang),
     )
     async def rename(
         name: str = Field(
@@ -254,11 +248,10 @@ def register_note_tools(
             client, "rename", {"name": name, "file": file, "path": path}, vault=vault
         )
 
-    @server.tool(
+    @reg.tool(
         name="open",
-        title=get_tool_title("note", "open", lang),
+        annotations=READ_ONLY,
         description="Open and focus a note file in the Obsidian workspace.",
-        annotations=make_annotations(READ_ONLY, "note", "open", lang),
     )
     async def open_file(
         file: str | None = Field(
@@ -282,11 +275,10 @@ def register_note_tools(
             client, "open", {"file": file, "path": path, "newtab": newtab}, vault=vault
         )
 
-    @server.tool(
+    @reg.tool(
         name="random_read",
-        title=get_tool_title("note", "random_read", lang),
+        annotations=READ_ONLY,
         description="Read a random note from the vault or a specified folder.",
-        annotations=make_annotations(READ_ONLY, "note", "random_read", lang),
     )
     async def random_read(
         folder: str | None = Field(

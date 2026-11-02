@@ -4,8 +4,8 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from ..i18n import SupportedLang, get_tool_title
-from .base import IDEMPOTENT_WRITE, READ_ONLY, call_tool, make_annotations
+from ..i18n import SupportedLang
+from .base import IDEMPOTENT_WRITE, READ_ONLY, ToolRegistrar, call_tool
 
 
 def register_vault_tools(
@@ -14,12 +14,12 @@ def register_vault_tools(
     lang: SupportedLang | None = None,
 ) -> None:
     """Register vault status and workspace navigation tools (Feature: vault)."""
+    reg = ToolRegistrar(server, "vault", lang)
 
-    @server.tool(
+    @reg.tool(
         name="vault",
-        title=get_tool_title("vault", "vault", lang),
+        annotations=READ_ONLY,
         description="Show vault information such as name, path, file count, folder count, or total size.",
-        annotations=make_annotations(READ_ONLY, "vault", "vault", lang),
     )
     async def vault_info(
         info: Literal["name", "path", "files", "folders", "size"] | None = Field(
@@ -33,11 +33,10 @@ def register_vault_tools(
     ) -> Any:
         return await call_tool(client, "vault", {"info": info}, vault=vault)
 
-    @server.tool(
+    @reg.tool(
         name="vaults",
-        title=get_tool_title("vault", "vaults", lang),
+        annotations=READ_ONLY,
         description="List all known Obsidian vaults and their local absolute paths.",
-        annotations=make_annotations(READ_ONLY, "vault", "vaults", lang),
     )
     async def vaults(
         total: bool = Field(
@@ -51,11 +50,10 @@ def register_vault_tools(
     ) -> Any:
         return await call_tool(client, "vaults", {"total": total, "verbose": verbose})
 
-    @server.tool(
+    @reg.tool(
         name="files",
-        title=get_tool_title("vault", "files", lang),
+        annotations=READ_ONLY,
         description="List files in the vault, with optional filtering by folder or file extension.",
-        annotations=make_annotations(READ_ONLY, "vault", "files", lang),
     )
     async def files(
         folder: str | None = Field(
@@ -79,11 +77,10 @@ def register_vault_tools(
             client, "files", {"folder": folder, "ext": ext, "total": total}, vault=vault
         )
 
-    @server.tool(
+    @reg.tool(
         name="folders",
-        title=get_tool_title("vault", "folders", lang),
+        annotations=READ_ONLY,
         description="List folders in the vault.",
-        annotations=make_annotations(READ_ONLY, "vault", "folders", lang),
     )
     async def folders(
         folder: str | None = Field(
@@ -103,11 +100,10 @@ def register_vault_tools(
             client, "folders", {"folder": folder, "total": total}, vault=vault
         )
 
-    @server.tool(
+    @reg.tool(
         name="folder",
-        title=get_tool_title("vault", "folder", lang),
+        annotations=READ_ONLY,
         description="Show information about a specific folder.",
-        annotations=make_annotations(READ_ONLY, "vault", "folder", lang),
     )
     async def folder_info(
         path: str = Field(
@@ -126,11 +122,10 @@ def register_vault_tools(
             client, "folder", {"path": path, "info": info}, vault=vault
         )
 
-    @server.tool(
+    @reg.tool(
         name="recents",
-        title=get_tool_title("vault", "recents", lang),
+        annotations=READ_ONLY,
         description="List recently opened files in the vault.",
-        annotations=make_annotations(READ_ONLY, "vault", "recents", lang),
     )
     async def recents(
         total: bool = Field(
@@ -144,11 +139,10 @@ def register_vault_tools(
     ) -> Any:
         return await call_tool(client, "recents", {"total": total}, vault=vault)
 
-    @server.tool(
+    @reg.tool(
         name="bookmarks",
-        title=get_tool_title("vault", "bookmarks", lang),
+        annotations=READ_ONLY,
         description="List all bookmarks in the vault (returns JSON).",
-        annotations=make_annotations(READ_ONLY, "vault", "bookmarks", lang),
     )
     async def bookmarks(
         total: bool = Field(
@@ -172,11 +166,10 @@ def register_vault_tools(
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="workspace",
-        title=get_tool_title("vault", "workspace", lang),
+        annotations=READ_ONLY,
         description="Get the current workspace window layout tree.",
-        annotations=make_annotations(READ_ONLY, "vault", "workspace", lang),
     )
     async def workspace(
         ids: bool = Field(
@@ -190,11 +183,10 @@ def register_vault_tools(
     ) -> Any:
         return await call_tool(client, "workspace", {"ids": ids}, vault=vault)
 
-    @server.tool(
+    @reg.tool(
         name="reload",
-        title=get_tool_title("vault", "reload", lang),
+        annotations=IDEMPOTENT_WRITE,
         description="Reload the vault interface and re-index notes.",
-        annotations=make_annotations(IDEMPOTENT_WRITE, "vault", "reload", lang),
     )
     async def reload_vault(
         vault: str | None = Field(
@@ -204,20 +196,18 @@ def register_vault_tools(
     ) -> Any:
         return await call_tool(client, "reload", vault=vault)
 
-    @server.tool(
+    @reg.tool(
         name="restart",
-        title=get_tool_title("vault", "restart", lang),
+        annotations=IDEMPOTENT_WRITE,
         description="Restart the Obsidian desktop application.",
-        annotations=make_annotations(IDEMPOTENT_WRITE, "vault", "restart", lang),
     )
     async def restart_app() -> Any:
         return await call_tool(client, "restart")
 
-    @server.tool(
+    @reg.tool(
         name="version",
-        title=get_tool_title("vault", "version", lang),
+        annotations=READ_ONLY,
         description="Show the installed Obsidian desktop application version.",
-        annotations=make_annotations(READ_ONLY, "vault", "version", lang),
     )
     async def version() -> Any:
         return await call_tool(client, "version")

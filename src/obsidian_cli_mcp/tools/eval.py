@@ -4,8 +4,8 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from ..i18n import SupportedLang, get_tool_title
-from .base import DYNAMIC_EVAL, call_tool, make_annotations
+from ..i18n import SupportedLang
+from .base import DYNAMIC_EVAL, ToolRegistrar, call_tool
 
 
 def register_eval_tools(
@@ -14,12 +14,12 @@ def register_eval_tools(
     lang: SupportedLang | None = None,
 ) -> None:
     """Register JavaScript runtime execution tool (Feature: eval)."""
+    reg = ToolRegistrar(server, "eval", lang)
 
-    @server.tool(
+    @reg.tool(
         name="eval",
-        title=get_tool_title("eval", "eval", lang),
+        annotations=DYNAMIC_EVAL,
         description="Execute JavaScript code inside the Obsidian Electron runtime and return the result.",
-        annotations=make_annotations(DYNAMIC_EVAL, "eval", "eval", lang),
     )
     async def eval_js(
         code: str = Field(

@@ -4,8 +4,8 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from ..i18n import SupportedLang, get_tool_title
-from .base import READ_ONLY, call_tool, make_annotations
+from ..i18n import SupportedLang
+from .base import READ_ONLY, ToolRegistrar, call_tool
 
 
 def register_tag_tools(
@@ -14,12 +14,12 @@ def register_tag_tools(
     lang: SupportedLang | None = None,
 ) -> None:
     """Register tag management tools (Feature: tag)."""
+    reg = ToolRegistrar(server, "tag", lang)
 
-    @server.tool(
+    @reg.tool(
         name="tags",
-        title=get_tool_title("tag", "tags", lang),
+        annotations=READ_ONLY,
         description="List all tags and their occurrence counts in the vault or note (returns JSON).",
-        annotations=make_annotations(READ_ONLY, "tag", "tags", lang),
     )
     async def tags(
         file: str | None = Field(
@@ -67,11 +67,10 @@ def register_tag_tools(
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="tag",
-        title=get_tool_title("tag", "tag", lang),
+        annotations=READ_ONLY,
         description="Get details and file occurrences for a specific tag.",
-        annotations=make_annotations(READ_ONLY, "tag", "tag", lang),
     )
     async def tag(
         name: str = Field(

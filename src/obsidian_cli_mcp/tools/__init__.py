@@ -11,6 +11,7 @@ from .base import (
     IDEMPOTENT_WRITE,
     NON_IDEMPOTENT_WRITE,
     READ_ONLY,
+    ToolRegistrar,
 )
 from .eval import register_eval_tools
 from .graph import register_graph_tools
@@ -116,6 +117,7 @@ __all__ = [
     "PRESETS",
     "READ_ONLY",
     "Feature",
+    "ToolRegistrar",
     "register_eval_tools",
     "register_graph_tools",
     "register_note_tools",

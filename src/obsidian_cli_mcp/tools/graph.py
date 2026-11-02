@@ -4,8 +4,8 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from ..client import ObsidianClient
-from ..i18n import SupportedLang, get_tool_title
-from .base import READ_ONLY, call_tool, make_annotations
+from ..i18n import SupportedLang
+from .base import READ_ONLY, ToolRegistrar, call_tool
 
 
 def register_graph_tools(
@@ -14,11 +14,11 @@ def register_graph_tools(
     lang: SupportedLang | None = None,
 ) -> None:
     """Register graph, links, and structure tools (Feature: graph)."""
+    reg = ToolRegistrar(server, "graph", lang)
 
-    @server.tool(
+    @reg.tool(
         name="backlinks",
-        title=get_tool_title("graph", "backlinks", lang),
-        annotations=make_annotations(READ_ONLY, "graph", "backlinks", lang),
+        annotations=READ_ONLY,
         description="List backlinks pointing to a specified note (returns JSON).",
     )
     async def backlinks(
@@ -30,13 +30,17 @@ def register_graph_tools(
             default=None,
             description="Target file path.",
         ),
-        counts: bool = Field(
-            default=False,
-            description="Include link counts.",
-        ),
         total: bool = Field(
             default=False,
             description="Return backlink count.",
+        ),
+        counts: bool = Field(
+            default=False,
+            description="Include link counts per file.",
+        ),
+        active: bool = Field(
+            default=False,
+            description="Target currently active file.",
         ),
         vault: str | None = Field(
             default=None,
@@ -49,32 +53,36 @@ def register_graph_tools(
             {
                 "file": file,
                 "path": path,
-                "counts": counts,
                 "total": total,
+                "counts": counts,
+                "active": active,
                 "format": "json",
             },
             parse_json=True,
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="links",
-        title=get_tool_title("graph", "links", lang),
-        annotations=make_annotations(READ_ONLY, "graph", "links", lang),
+        annotations=READ_ONLY,
         description="List outgoing links from a specified note.",
     )
     async def links(
         file: str | None = Field(
             default=None,
-            description="File name.",
+            description="Source file name.",
         ),
         path: str | None = Field(
             default=None,
-            description="File path.",
+            description="Source file path.",
         ),
         total: bool = Field(
             default=False,
             description="Return link count.",
+        ),
+        active: bool = Field(
+            default=False,
+            description="Target currently active file.",
         ),
         vault: str | None = Field(
             default=None,
@@ -84,17 +92,20 @@ def register_graph_tools(
         return await call_tool(
             client,
             "links",
-            {"file": file, "path": path, "total": total},
+            {"file": file, "path": path, "total": total, "active": active},
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="unresolved",
-        title=get_tool_title("graph", "unresolved", lang),
-        annotations=make_annotations(READ_ONLY, "graph", "unresolved", lang),
+        annotations=READ_ONLY,
         description="List unresolved links in the vault pointing to non-existent notes (returns JSON).",
     )
     async def unresolved(
+        total: bool = Field(
+            default=False,
+            description="Return unresolved link count.",
+        ),
         counts: bool = Field(
             default=False,
             description="Include link counts.",
@@ -102,10 +113,6 @@ def register_graph_tools(
         verbose: bool = Field(
             default=False,
             description="Include source files.",
-        ),
-        total: bool = Field(
-            default=False,
-            description="Return unresolved link count.",
         ),
         vault: str | None = Field(
             default=None,
@@ -115,15 +122,19 @@ def register_graph_tools(
         return await call_tool(
             client,
             "unresolved",
-            {"counts": counts, "verbose": verbose, "total": total, "format": "json"},
+            {
+                "total": total,
+                "counts": counts,
+                "verbose": verbose,
+                "format": "json",
+            },
             parse_json=True,
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="orphans",
-        title=get_tool_title("graph", "orphans", lang),
-        annotations=make_annotations(READ_ONLY, "graph", "orphans", lang),
+        annotations=READ_ONLY,
         description="List orphan notes that have no incoming links from other notes.",
     )
     async def orphans(
@@ -138,34 +149,26 @@ def register_graph_tools(
     ) -> Any:
         return await call_tool(client, "orphans", {"total": total}, vault=vault)
 
-    @server.tool(
+    @reg.tool(
         name="deadends",
-        title=get_tool_title("graph", "deadends", lang),
-        annotations=make_annotations(READ_ONLY, "graph", "deadends", lang),
+        annotations=READ_ONLY,
         description="List dead-end notes that contain no outgoing links to other notes.",
     )
     async def deadends(
         total: bool = Field(
             default=False,
-            description="Return dead-end count.",
-        ),
-        all: bool = Field(
-            default=False,
-            description="Include non-markdown files.",
+            description="Return dead-end file count.",
         ),
         vault: str | None = Field(
             default=None,
             description="Target a specific vault by name.",
         ),
     ) -> Any:
-        return await call_tool(
-            client, "deadends", {"total": total, "all": all}, vault=vault
-        )
+        return await call_tool(client, "deadends", {"total": total}, vault=vault)
 
-    @server.tool(
+    @reg.tool(
         name="outline",
-        title=get_tool_title("graph", "outline", lang),
-        annotations=make_annotations(READ_ONLY, "graph", "outline", lang),
+        annotations=READ_ONLY,
         description="Get the heading outline hierarchy of a note (returns JSON).",
     )
     async def outline(
@@ -177,9 +180,9 @@ def register_graph_tools(
             default=None,
             description="File path.",
         ),
-        total: bool = Field(
+        active: bool = Field(
             default=False,
-            description="Return heading count.",
+            description="Show outline for active file.",
         ),
         vault: str | None = Field(
             default=None,
@@ -189,33 +192,32 @@ def register_graph_tools(
         return await call_tool(
             client,
             "outline",
-            {"file": file, "path": path, "total": total, "format": "json"},
+            {"file": file, "path": path, "active": active, "format": "json"},
             parse_json=True,
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="aliases",
-        title=get_tool_title("graph", "aliases", lang),
-        annotations=make_annotations(READ_ONLY, "graph", "aliases", lang),
+        annotations=READ_ONLY,
         description="List aliases in the vault or for a specified note.",
     )
     async def aliases(
         file: str | None = Field(
             default=None,
-            description="File name.",
+            description="Show aliases for file.",
         ),
         path: str | None = Field(
             default=None,
-            description="File path.",
+            description="Show aliases for path.",
         ),
         total: bool = Field(
             default=False,
             description="Return alias count.",
         ),
-        verbose: bool = Field(
+        counts: bool = Field(
             default=False,
-            description="Include file paths.",
+            description="Include occurrence counts.",
         ),
         active: bool = Field(
             default=False,
@@ -233,34 +235,29 @@ def register_graph_tools(
                 "file": file,
                 "path": path,
                 "total": total,
-                "verbose": verbose,
+                "counts": counts,
                 "active": active,
             },
             vault=vault,
         )
 
-    @server.tool(
+    @reg.tool(
         name="wordcount",
-        title=get_tool_title("graph", "wordcount", lang),
-        annotations=make_annotations(READ_ONLY, "graph", "wordcount", lang),
+        annotations=READ_ONLY,
         description="Count words and characters in a note or the active note.",
     )
     async def wordcount(
         file: str | None = Field(
             default=None,
-            description="File name.",
+            description="Target file name.",
         ),
         path: str | None = Field(
             default=None,
-            description="File path.",
+            description="Target file path.",
         ),
-        words: bool = Field(
+        active: bool = Field(
             default=False,
-            description="Return word count only.",
-        ),
-        characters: bool = Field(
-            default=False,
-            description="Return character count only.",
+            description="Count in active file.",
         ),
         vault: str | None = Field(
             default=None,
@@ -270,6 +267,6 @@ def register_graph_tools(
         return await call_tool(
             client,
             "wordcount",
-            {"file": file, "path": path, "words": words, "characters": characters},
+            {"file": file, "path": path, "active": active},
             vault=vault,
         )
