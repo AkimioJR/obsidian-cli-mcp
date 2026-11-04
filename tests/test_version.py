@@ -156,3 +156,81 @@ def test_create_server_with_obsidian_version(monkeypatch):
         obsidian_version="1.14.5",
     )
     assert server is not None
+
+
+def test_server_version_evolution_v1_12_0():
+    # 在 1.12.0 版本下：
+    # 1. rename 尚未引入，不应被注册 (min_version="1.12.1")
+    # 2. base 相关工具尚未引入，不应被注册 (min_version="1.14.0")
+    # 3. append/prepend 应初始化为无 heading 参数的历史版本
+    server = create_server(
+        cli_path="/mock/obsidian",
+        obsidian_version="1.12.0",
+        features=["all"],
+    )
+    tools = server._tool_manager._tools
+
+    assert "rename" not in tools
+    assert "bases" not in tools
+    assert "base_query" not in tools
+    assert "append" in tools
+    assert "prepend" in tools
+
+    append_params = tools["append"].parameters["properties"]
+    assert "heading" not in append_params
+    assert "content" in append_params
+    assert "file" in append_params
+
+
+def test_server_version_evolution_v1_12_1():
+    # 在 1.12.1 版本下：
+    # 1. rename 已引入，应该被成功注册
+    # 2. base 相关工具尚未引入，不应被注册
+    # 3. append/prepend 仍为无 heading 的历史版本
+    server = create_server(
+        cli_path="/mock/obsidian",
+        obsidian_version="1.12.1",
+        features=["all"],
+    )
+    tools = server._tool_manager._tools
+
+    assert "rename" in tools
+    assert "bases" not in tools
+    assert "heading" not in tools["append"].parameters["properties"]
+
+
+def test_server_version_evolution_v1_14_5():
+    # 在 1.14.5 版本下：
+    # 1. rename 正常注册
+    # 2. base 全部 4 个工具正常注册
+    # 3. append/prepend 自动升级为支持 heading 参数的新版本
+    server = create_server(
+        cli_path="/mock/obsidian",
+        obsidian_version="1.14.5",
+        features=["all"],
+    )
+    tools = server._tool_manager._tools
+
+    assert "rename" in tools
+    assert "bases" in tools
+    assert "base_views" in tools
+    assert "base_query" in tools
+    assert "base_create" in tools
+
+    append_params = tools["append"].parameters["properties"]
+    assert "heading" in append_params
+    assert "Obsidian 1.14+" in append_params["heading"]["description"]
+
+
+def test_server_version_evolution_default_fallback():
+    # 未指定版本（或无法获取版本）时，默认假定最新版本，加载最新的工具模式
+    server = create_server(
+        cli_path="/mock/obsidian",
+        obsidian_version=None,
+        features=["all"],
+    )
+    tools = server._tool_manager._tools
+
+    assert "rename" in tools
+    assert "bases" in tools
+    assert "heading" in tools["append"].parameters["properties"]
