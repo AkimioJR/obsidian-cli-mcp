@@ -167,7 +167,7 @@ Client configuration:
 | `OBSIDIAN_CLI_PATH` | Absolute path to Obsidian CLI binary                                                                                        | Auto-detected in system `PATH` (`which obsidian`)      |
 | `OBSIDIAN_TIMEOUT`  | CLI subprocess execution timeout in seconds (supports floats, `none`/`null` to disable)                                     | `30.0`                                                 |
 | `OBSIDIAN_VERSION`  | Manually specify/override Obsidian client version (e.g. `1.14.5` for headless/container environments)                       | Auto-detected from `obsidian version` at startup       |
-| `OBSIDIAN_FEATURES` | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,vault,plugin,eval` or presets `standard,safe,all`) | `standard` (default: core tools plus standard features) |
+| `OBSIDIAN_FEATURES` | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,vault,plugin,base,eval` or presets `standard,safe,all`) | `standard` (default: core tools plus standard features) |
 | `OBSIDIAN_LANG`     | Localization language for human-readable tool titles (supports `zh_CN`, `en_US`)                                            | Auto-detected from system locale (fallback to `en_US`) |
 
 ---
@@ -191,11 +191,11 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 ### 1. Notes & Content (Feature: `note` · 9 tools)
 - `read`: Read raw Markdown content by note name or relative path.
 - `create`: Create a new note with optional template, pre-filled content, overwrite, and auto-open.
-- `append`: Append content to the end of a note.
-- `prepend`: Prepend content to the beginning of a note.
+- `append`: Append content to the end of a note or under a target heading section (`heading=`, Obsidian 1.14+).
+- `prepend`: Prepend content to the beginning of a note or under a target heading section (`heading=`, Obsidian 1.14+).
 - `delete`: Delete a note (defaults to system trash, supports permanent deletion).
 - `move`: Move or rename note path.
-- `rename`: Rename a note file.
+- `rename`: Rename a note file (requires Obsidian 1.12.1+).
 - `open`: Focus and open note in the Obsidian GUI.
 - `random_read`: Randomly read a note from the vault.
 
@@ -240,7 +240,13 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `plugins` / `plugins_enabled`: List installed / active community and core plugins.
 - `plugin_enable` / `plugin_disable`: Dynamically enable or disable plugins.
 
-### 8. Dynamic Scripting (Feature: `eval` · 1 tool)
+### 8. Database Views & Bases (Feature: `base` · 4 tools, requires Obsidian 1.14+)
+- `bases`: List all `.base` database view files in the vault.
+- `base_views`: List all views configured in a `.base` file.
+- `base_query`: Query structured records from a Base file (JSON, CSV, Markdown, etc.).
+- `base_create`: Create a new entry in a Base file.
+
+### 9. Dynamic Scripting (Feature: `eval` · 1 tool)
 - `eval`: Execute JavaScript code inside Obsidian runtime (advanced escape hatch).
 
 </details>

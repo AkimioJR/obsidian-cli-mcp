@@ -78,6 +78,23 @@
 
 ---
 
+
+---
+
+## ⚙️ obsidian-cli-mcp 的多版本自适应演进机制
+
+本项目通过 `@dataclass Version` 与 `ToolRegistrar` 实现了针对不同 Obsidian 桌面版本的动态自适应模式：
+
+1. **版本自动感知**：服务启动时通过 `obsidian version` 探针（或 `OBSIDIAN_VERSION` 环境变量）自动识别运行中的客户端版本；
+2. **命令门禁过滤**：
+   - 当 Obsidian 版本 `< 1.12.1` 时，自动跳过 `rename` 命令注册（因该版本尚未拆分 `rename`，引导 Agent 使用 `move`）；
+   - 当 Obsidian 版本 `< 1.14.0` 时，自动跳过 `bases`, `base_views`, `base_query`, `base_create` 等 Bases 关联命令；
+3. **参数模式演进（Schema Adaptation）**：
+   - 对于 `append` 和 `prepend`：
+     - 若版本 `< 1.14.0`：对外暴露不包含 `heading` 参数的基础 Schema，防止 Agent 产生参数幻觉；
+     - 若版本 `>= 1.14.0`：自动升级为支持 `heading` 定向插入的扩展 Schema；
+4. **无缝向前兼容**：未检测到版本（无头环境或 CLI 未运行）时，默认装载最新功能，保障开发者与生产环境的最高可用性。
+
 ## 🧭 官方参考来源
 
 - [Obsidian CLI 官方使用指南 (Obsidian Help)](https://obsidian.md/help/cli)

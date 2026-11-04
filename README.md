@@ -167,7 +167,7 @@ pip install obsidian-cli-mcp
 | `OBSIDIAN_CLI_PATH` | Obsidian CLI 可执行文件的绝对路径                                                                  | 自动在系统 PATH 中探测（如 `which obsidian`） |
 | `OBSIDIAN_TIMEOUT`  | CLI 子进程命令执行超时时间（秒，支持小数浮点或 `none`/`null` 禁用超时）                            | `30.0`                                        |
 | `OBSIDIAN_VERSION`  | 手动指定或覆盖 Obsidian 客户端版本号（用于无头/容器环境兼容性校验，如 `1.14.5`）                   | 启动时自动从 `obsidian version` 探针探测      |
-| `OBSIDIAN_FEATURES` | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,eval` 或预设 `standard,safe,all`） | `standard`（默认启用核心工具及日常笔记与图谱特性） |
+| `OBSIDIAN_FEATURES` | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,base,eval` 或预设 `standard,safe,all`） | `standard`（默认启用核心工具及日常笔记与图谱特性） |
 | `OBSIDIAN_LANG`     | 人类可读界面与工具标题的本地化语言（支持 `zh_CN`, `en_US` 等）                                     | 自动探测系统环境（未匹配时回退至 `en_US`）    |
 
 ---
@@ -191,11 +191,11 @@ pip install obsidian-cli-mcp
 ### 1. 笔记与内容 (Feature: `note` · 9 项)
 - `read`: 按文件名或相对路径读取笔记 Markdown 原文。
 - `create`: 创建新笔记，支持指定模板、预填充内容、静默覆盖与默认打开。
-- `append`: 向指定笔记末尾追加内容。
-- `prepend`: 向指定笔记开头前置插入内容。
+- `append`: 向指定笔记末尾或特定标题区域下方（`heading=`，Obsidian 1.14+）追加内容。
+- `prepend`: 向指定笔记开头或特定标题区域下方（`heading=`，Obsidian 1.14+）前置插入内容。
 - `delete`: 删除笔记文件（默认安全移入回收站，支持永久物理删除）。
 - `move`: 移动或重命名笔记路径。
-- `rename`: 重命名指定笔记文件。
+- `rename`: 重命名指定笔记文件（需 Obsidian 1.12.1+）。
 - `open`: 在 Obsidian 桌面端图形界面中聚焦打开笔记。
 - `random_read`: 随机读取库内的一篇笔记（漫游探索）。
 
@@ -240,7 +240,13 @@ pip install obsidian-cli-mcp
 - `plugins` / `plugins_enabled`: 列出已安装 / 已启用的社区与核心插件。
 - `plugin_enable` / `plugin_disable`: 动态启用或禁用指定插件。
 
-### 8. 动态脚本执行 (Feature: `eval` · 1 项)
+### 8. 数据库表格与看板 (Feature: `base` · 4 项，需 Obsidian 1.14+)
+- `bases`: 列出笔记库内所有的 `.base` 表格视图文件。
+- `base_views`: 获取指定 Base 文件中已配置的视图清单。
+- `base_query`: 对 Base 数据表格执行结构化查询并导出（支持 JSON、CSV、Markdown 等）。
+- `base_create`: 在指定 Base 视图中快速创建新条目。
+
+### 9. 动态脚本执行 (Feature: `eval` · 1 项)
 - `eval`: 在 Obsidian 运行时环境中直接执行 JavaScript 代码（高级逃生通道）。
 
 </details>
