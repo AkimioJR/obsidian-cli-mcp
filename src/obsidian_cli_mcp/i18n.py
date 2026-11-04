@@ -154,6 +154,12 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "plugin_enable": "启用插件",
             "plugin_disable": "禁用插件",
         },
+        "base": {
+            "bases": "列出所有Bases文件",
+            "base_views": "获取Bases视图列表",
+            "base_query": "查询Bases表格数据",
+            "base_create": "新建Bases条目",
+        },
         "eval": {
             "eval": "执行 JavaScript 代码",
         },
@@ -218,6 +224,12 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "plugins_enabled": "List Enabled Plugins",
             "plugin_enable": "Enable Plugin",
             "plugin_disable": "Disable Plugin",
+        },
+        "base": {
+            "bases": "List Base Files",
+            "base_views": "List Base Views",
+            "base_query": "Query Base Records",
+            "base_create": "Create Base Item",
         },
         "eval": {
             "eval": "Execute JavaScript",

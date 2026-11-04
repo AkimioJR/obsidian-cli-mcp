@@ -14,6 +14,7 @@ from .base import (
     READ_ONLY,
     ToolRegistrar,
 )
+from .bases import register_base_tools
 from .core import register_core_tools
 from .eval import register_eval_tools
 from .graph import register_graph_tools
@@ -35,6 +36,7 @@ class Feature(str, Enum):
     GRAPH = "graph"
     VAULT = "vault"
     PLUGIN = "plugin"
+    BASE = "base"
     EVAL = "eval"
 
     def register(
@@ -71,6 +73,7 @@ class Feature(str, Enum):
                 cls.GRAPH,
                 cls.VAULT,
                 cls.PLUGIN,
+                cls.BASE,
             },  # All except eval
         }
 
@@ -130,6 +133,7 @@ _FEATURE_REGISTRY: dict[
     Feature.GRAPH: register_graph_tools,
     Feature.VAULT: register_vault_tools,
     Feature.PLUGIN: register_plugin_tools,
+    Feature.BASE: register_base_tools,
     Feature.EVAL: register_eval_tools,
 }
 
@@ -141,6 +145,7 @@ __all__ = [
     "READ_ONLY",
     "Feature",
     "ToolRegistrar",
+    "register_base_tools",
     "register_core_tools",
     "register_eval_tools",
     "register_graph_tools",

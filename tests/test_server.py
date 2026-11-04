@@ -20,7 +20,7 @@ def test_server_tools_registered():
 
     # 显式指定 all 预设时启用全量 45 项工具
     server_all = create_server(cli_path="/mock/obsidian", features=["all"])
-    assert len(server_all._tool_manager._tools) == 45
+    assert len(server_all._tool_manager._tools) == 49
 
 
 @pytest.mark.asyncio
@@ -111,7 +111,7 @@ async def test_tool_call_json_result():
 def test_all_tools_have_description_and_schema():
     server = create_server(cli_path="/mock/obsidian", features=["all"])
     tools = server._tool_manager._tools
-    assert len(tools) == 45
+    assert len(tools) == 49
     for tool in tools.values():
         assert tool.description and len(tool.description.strip()) > 0
         assert "properties" in tool.parameters
@@ -223,7 +223,7 @@ def test_feature_preset_standard():
 def test_tool_annotations_all_present():
     server = create_server(cli_path="/mock/obsidian", features=["all"])
     tools = server._tool_manager._tools
-    assert len(tools) == 45
+    assert len(tools) == 49
     for name, tool in tools.items():
         assert tool.annotations is not None, f"Tool {name} is missing annotations"
 
@@ -237,13 +237,14 @@ def test_tool_annotations_hints_classification():
         for name, t in tools.items()
         if t.annotations and t.annotations.read_only_hint
     }
-    assert len(read_only_tools) == 29
+    assert len(read_only_tools) == 32
     assert "read" in read_only_tools
     assert "tags" in read_only_tools
     assert "tasks" in read_only_tools
     assert "backlinks" in read_only_tools
     assert "properties" in read_only_tools
     assert "vaults" in read_only_tools
+    assert "base_query" in read_only_tools
 
     destructive_tools = {
         name
@@ -263,6 +264,7 @@ def test_tool_annotations_hints_classification():
         "create",
         "eval",
         "prepend",
+        "base_create",
         "task",
         "template_insert",
     }
@@ -379,7 +381,7 @@ def test_feature_enum_class_and_instance_methods():
 
     # 2. Feature.presets
     presets = Feature.presets()
-    assert "all" in presets and len(presets["all"]) == 8
+    assert "all" in presets and len(presets["all"]) == 9
     assert "safe" in presets and Feature.EVAL not in presets["safe"]
 
     # 3. Instance method: feature.register
