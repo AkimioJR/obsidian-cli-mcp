@@ -40,6 +40,26 @@
 - **[CI]**: 分离静态类型与代码风格检查，优化流水线触发路径，避免无意义的 CI 资源浪费。
 - **[Packaging]**: 完善 PyPI 官方 Trove Classifiers，覆盖 Python 3.10 至 3.14 及操作系统环境标记。
 
+## [0.2.0] - 2026-11-04
+
+### ✨ 新增
+- **[Core]**: 实现 `@dataclass(frozen=True) Version` 版本号解析器，支持版本号比较魔术方法与富语义校验，启动时自动探测本地 Obsidian 客户端版本。
+- **[Core]**: 提取 `version`、`vaults` 与 `vault` 为系统内置的核心基础工具（Core Tools），无论启用何种 Feature 预设均默认无条件加载，便于安全感知与自检运行环境。
+- **[Tools]**: 新增 `base`（Bases）Feature 特性组，为 Obsidian v1.14+ 实验性数据库视图提供 `bases`、`base_views`、`base_query`、`base_create` 4 项结构化数据操控工具。
+- **[Tools]**: 支持按 Obsidian 运行版本动态自适应工具参数 Schema（例如 `append` 与 `prepend` 在 Obsidian >= 1.14 时自动暴露 `heading` 指定层级追加参数，低版本自动省略以保证向下兼容）。
+- **[Client]**: 统一超时参数类型为 `float | None`，并新增 `OBSIDIAN_TIMEOUT` 环境变量支持，允许用户灵活配置子进程执行超时时限（默认 30.0s，设为 `"none"` 或 `"null"` 可禁用超时）。
+- **[Docs]**: 在 `docs/obsidian-cli-changelog.md` 中整理 Obsidian 官方 CLI 各版本演进记录与参数变迁。
+- **[Docs]**: 规范化 `docs/CHANGELOG.md`，并在发布工作流中集成基于更新日志的自动化 Release 说明提取与注入。
+
+### ⚡ 优化
+- **[Tools]**: 将默认加载的 Feature 预设优化为 `standard`（覆盖 NOTE、PROPERTY、TAG、TASK、GRAPH 核心场景，默认加载 28 项常用工具），减少冗余的高级工具对 Agent 上下文的占用。
+- **[Docs]**: 澄清 Obsidian CLI 启用前置条件与系统要求（需 Obsidian v1.12.7+ 桌面客户端，并在“设置 -> 关于”中开启命令行界面支持），移除原文档中硬编码的“45项全量”表述。
+
+### 🔧 工程与维护
+- **[Packaging]**: 在 `pyproject.toml` 的 Trove Classifiers 中补充 Python 3.15 分类器。
+- **[Test]**: 扩充版本解析、比较以及多版本下的工具 Schema 动态过滤单元测试（43/43 测试全量通过）。
+
 <!-- ==================== 底部版本比对链接 (Reference Links) ==================== -->
 [0.1.0]: https://github.com/AkimioJR/obsidian-cli-mcp/releases/tag/v0.1.0
 [0.1.1]: https://github.com/AkimioJR/obsidian-cli-mcp/compare/v0.1.0...v0.1.1
+[0.2.0]: https://github.com/AkimioJR/obsidian-cli-mcp/compare/v0.1.1...v0.2.0
