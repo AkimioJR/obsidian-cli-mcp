@@ -87,12 +87,14 @@ class ToolRegistrar:
         max_version: Version | str | None = None,
     ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """Register a tool, checking version compatibility and binding localized title."""
-        # 检查版本兼容性：如果指定了 min_version / max_version 且当前已知版本不满足，则跳过注册
-        if self.version is not None:
-            if min_version is not None and self.version < min_version:
-                return lambda fn: fn
-            if max_version is not None and self.version > max_version:
-                return lambda fn: fn
+        # 检查版本兼容性：未指定版本时假定最新版本 (Version(999, 999, 999))，过滤掉历史遗留版本
+        check_version = (
+            self.version if self.version is not None else Version(999, 999, 999)
+        )
+        if min_version is not None and check_version < min_version:
+            return lambda fn: fn
+        if max_version is not None and check_version > max_version:
+            return lambda fn: fn
 
         title = self.lang.tool_title(self.feature, name)
         ann = annotations.model_copy(update={"title": title}) if title else annotations

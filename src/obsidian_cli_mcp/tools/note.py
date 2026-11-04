@@ -102,22 +102,24 @@ def register_note_tools(
             vault=vault,
         )
 
+    # Version < 1.14.0: append without heading parameter
     @reg.tool(
         name="append",
         annotations=NON_IDEMPOTENT_WRITE,
         description="Append content to the end of a specified note file.",
+        max_version="1.13.99",
     )
-    async def append(
+    async def append_legacy(
         content: str = Field(
             description="Content to append (required).",
         ),
         file: str | None = Field(
             default=None,
-            description="File name.",
+            description="File name (resolves like wikilinks).",
         ),
         path: str | None = Field(
             default=None,
-            description="File path.",
+            description="File path (exact relative path).",
         ),
         inline: bool = Field(
             default=False,
@@ -135,22 +137,69 @@ def register_note_tools(
             vault=vault,
         )
 
+    # Version >= 1.14.0: append with heading section support
+    @reg.tool(
+        name="append",
+        annotations=NON_IDEMPOTENT_WRITE,
+        description="Append content to the end of a note file or under a target heading section.",
+        min_version="1.14.0",
+    )
+    async def append(
+        content: str = Field(
+            description="Content to append (required).",
+        ),
+        file: str | None = Field(
+            default=None,
+            description="File name (resolves like wikilinks).",
+        ),
+        path: str | None = Field(
+            default=None,
+            description="File path (exact relative path).",
+        ),
+        heading: str | None = Field(
+            default=None,
+            description="Target heading section to append under (Obsidian 1.14+).",
+        ),
+        inline: bool = Field(
+            default=False,
+            description="Append without newline.",
+        ),
+        vault: str | None = Field(
+            default=None,
+            description="Target a specific vault by name.",
+        ),
+    ) -> Any:
+        return await call_tool(
+            client,
+            "append",
+            {
+                "content": content,
+                "file": file,
+                "path": path,
+                "heading": heading,
+                "inline": inline,
+            },
+            vault=vault,
+        )
+
+    # Version < 1.14.0: prepend without heading parameter
     @reg.tool(
         name="prepend",
         annotations=NON_IDEMPOTENT_WRITE,
         description="Prepend content to the beginning of a specified note file.",
+        max_version="1.13.99",
     )
-    async def prepend(
+    async def prepend_legacy(
         content: str = Field(
             description="Content to prepend (required).",
         ),
         file: str | None = Field(
             default=None,
-            description="File name.",
+            description="File name (resolves like wikilinks).",
         ),
         path: str | None = Field(
             default=None,
-            description="File path.",
+            description="File path (exact relative path).",
         ),
         inline: bool = Field(
             default=False,
@@ -165,6 +214,51 @@ def register_note_tools(
             client,
             "prepend",
             {"content": content, "file": file, "path": path, "inline": inline},
+            vault=vault,
+        )
+
+    # Version >= 1.14.0: prepend with heading section support
+    @reg.tool(
+        name="prepend",
+        annotations=NON_IDEMPOTENT_WRITE,
+        description="Prepend content to the beginning of a note file or under a target heading section.",
+        min_version="1.14.0",
+    )
+    async def prepend(
+        content: str = Field(
+            description="Content to prepend (required).",
+        ),
+        file: str | None = Field(
+            default=None,
+            description="File name (resolves like wikilinks).",
+        ),
+        path: str | None = Field(
+            default=None,
+            description="File path (exact relative path).",
+        ),
+        heading: str | None = Field(
+            default=None,
+            description="Target heading section to prepend under (Obsidian 1.14+).",
+        ),
+        inline: bool = Field(
+            default=False,
+            description="Prepend without newline.",
+        ),
+        vault: str | None = Field(
+            default=None,
+            description="Target a specific vault by name.",
+        ),
+    ) -> Any:
+        return await call_tool(
+            client,
+            "prepend",
+            {
+                "content": content,
+                "file": file,
+                "path": path,
+                "heading": heading,
+                "inline": inline,
+            },
             vault=vault,
         )
 
@@ -228,6 +322,7 @@ def register_note_tools(
         name="rename",
         annotations=IDEMPOTENT_WRITE,
         description="Rename a note file.",
+        min_version="1.12.1",
     )
     async def rename(
         name: str = Field(
