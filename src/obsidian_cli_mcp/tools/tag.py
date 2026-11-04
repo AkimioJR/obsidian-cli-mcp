@@ -12,6 +12,7 @@ from .base import READ_ONLY, ToolRegistrar, call_tool
 def register_tag_tools(
     server: MCPServer,
     client: ObsidianClient,
+    *,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
     enable_extensions: bool = False,

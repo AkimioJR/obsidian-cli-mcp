@@ -12,6 +12,7 @@ from .base import IDEMPOTENT_WRITE, READ_ONLY, ToolRegistrar, call_tool
 def register_vault_tools(
     server: MCPServer,
     client: ObsidianClient,
+    *,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
     enable_extensions: bool = False,

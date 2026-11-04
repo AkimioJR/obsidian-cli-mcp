@@ -19,6 +19,7 @@ from .base import (
 def register_note_tools(
     server: MCPServer,
     client: ObsidianClient,
+    *,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
     enable_extensions: bool = False,

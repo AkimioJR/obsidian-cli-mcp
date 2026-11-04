@@ -531,3 +531,55 @@ async def test_server_enable_extensions_env_and_param(monkeypatch):
         create_server(cli_path="/mock/obsidian")
         mock_reg.assert_called_once()
         assert mock_reg.call_args.kwargs["enable_extensions"] is False
+
+
+def test_register_tools_enforces_keyword_only_parameters():
+    import inspect
+
+    from obsidian_cli_mcp.tools import (
+        register_base_tools,
+        register_core_tools,
+        register_eval_tools,
+        register_graph_tools,
+        register_note_tools,
+        register_plugin_tools,
+        register_property_tools,
+        register_tag_tools,
+        register_task_tools,
+        register_vault_tools,
+    )
+
+    all_reg_funcs = [
+        register_base_tools,
+        register_core_tools,
+        register_eval_tools,
+        register_graph_tools,
+        register_note_tools,
+        register_plugin_tools,
+        register_property_tools,
+        register_tag_tools,
+        register_task_tools,
+        register_vault_tools,
+    ]
+
+    for fn in all_reg_funcs:
+        sig = inspect.signature(fn)
+        params = list(sig.parameters.values())
+
+        # 前两个参数必须是位置参数 (server, client)
+        assert params[0].name == "server"
+        assert params[0].kind in (
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.POSITIONAL_ONLY,
+        )
+        assert params[1].name == "client"
+        assert params[1].kind in (
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.POSITIONAL_ONLY,
+        )
+
+        # lang, version, enable_extensions 必须是 KEYWORD_ONLY
+        for p in params[2:]:
+            assert p.kind == inspect.Parameter.KEYWORD_ONLY, (
+                f"{fn.__name__} parameter '{p.name}' is not KEYWORD_ONLY (got {p.kind})"
+            )

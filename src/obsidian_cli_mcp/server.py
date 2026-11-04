@@ -63,7 +63,13 @@ def create_server(
         resolved_extensions = bool(enable_extensions)
 
     # 1. 始终注册基础核心工具（Core Tools: version, vaults, vault）
-    register_core_tools(server, client, lang=resolved_lang, version=current_version)
+    register_core_tools(
+        server,
+        client,
+        lang=resolved_lang,
+        version=current_version,
+        enable_extensions=resolved_extensions,
+    )
 
     # 2. 按需注册各业务特性工具集（Feature Tools，附带版本约束检查与扩展工具开关）
     Feature.register_tools(

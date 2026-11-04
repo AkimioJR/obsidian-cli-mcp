@@ -18,6 +18,7 @@ from .base import (
 def register_plugin_tools(
     server: MCPServer,
     client: ObsidianClient,
+    *,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
     enable_extensions: bool = False,

@@ -12,6 +12,7 @@ from .base import NON_IDEMPOTENT_WRITE, READ_ONLY, ToolRegistrar, call_tool
 def register_base_tools(
     server: MCPServer,
     client: ObsidianClient,
+    *,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
     enable_extensions: bool = False,

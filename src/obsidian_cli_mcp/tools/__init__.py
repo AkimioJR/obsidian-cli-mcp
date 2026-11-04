@@ -43,6 +43,7 @@ class Feature(str, Enum):
         self,
         server: MCPServer,
         client: ObsidianClient,
+        *,
         lang: SupportedLang | str | None = None,
         version: Version | None = None,
         enable_extensions: bool = False,
@@ -52,7 +53,11 @@ class Feature(str, Enum):
             lang if isinstance(lang, SupportedLang) else SupportedLang.detect(lang)
         )
         _FEATURE_REGISTRY[self](
-            server, client, resolved_lang, version, enable_extensions
+            server,
+            client,
+            lang=resolved_lang,
+            version=version,
+            enable_extensions=enable_extensions,
         )
 
     @classmethod
@@ -101,6 +106,7 @@ class Feature(str, Enum):
         cls,
         server: MCPServer,
         client: ObsidianClient,
+        *,
         features: Iterable["Feature | str"] | None = None,
         lang: SupportedLang | str | None = None,
         version: Version | None = None,
@@ -126,7 +132,7 @@ class Feature(str, Enum):
                 feature.register(
                     server,
                     client,
-                    resolved_lang,
+                    lang=resolved_lang,
                     version=version,
                     enable_extensions=enable_extensions,
                 )
@@ -134,9 +140,7 @@ class Feature(str, Enum):
 
 _FEATURE_REGISTRY: dict[
     Feature,
-    Callable[
-        [MCPServer, ObsidianClient, SupportedLang | None, Version | None, bool], None
-    ],
+    Callable[..., None],
 ] = {
     Feature.NOTE: register_note_tools,
     Feature.PROPERTY: register_property_tools,
