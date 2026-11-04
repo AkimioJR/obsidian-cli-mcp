@@ -312,6 +312,12 @@ uv run ruff check .
 
 ---
 
+## 📝 更新日志 (Changelog)
+
+详细的版本演进与变更记录请参阅 [CHANGELOG.md](docs/CHANGELOG.md)。
+
+---
+
 ## 📄 开源协议 (License)
 
 本项目基于 [MIT 协议](LICENSE) 开源。欢迎提交 Issue 与 Pull Request 共同完善！

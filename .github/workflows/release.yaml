@@ -27,6 +27,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v10.3.3
@@ -44,10 +46,68 @@ jobs:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         run: uv publish
 
+      - name: Extract release notes from CHANGELOG
+        id: release_notes
+        run: |
+          set -euo pipefail
+
+          TAG_NAME="${GITHUB_REF_NAME}"
+          CHANGELOG_FILE="docs/CHANGELOG.md"
+          CHANGELOG=""
+
+          if [ -f "$CHANGELOG_FILE" ]; then
+            RAW_CHANGELOG=$(awk -v ver="${TAG_NAME#v}" '
+              BEGIN { in_section = 0; n = 0 }
+              $0 ~ "^## \\[" {
+                if (in_section) exit
+                if ($0 ~ "^## \\[" ver "\\]") {
+                  in_section = 1
+                  next
+                }
+              }
+              in_section {
+                if ($0 ~ "^---+" || $0 ~ "^<!--" || $0 ~ "^\\[[^\\]]+\\]:") exit
+                lines[++n] = $0
+              }
+              END {
+                start = 1
+                while (start <= n && lines[start] ~ /^[[:space:]]*$/) start++
+                end = n
+                while (end >= start && lines[end] ~ /^[[:space:]]*$/) end--
+                for (i = start; i <= end; i++) print lines[i]
+              }
+            ' "$CHANGELOG_FILE" || true)
+
+            if [ -n "$RAW_CHANGELOG" ]; then
+              CHANGELOG="$RAW_CHANGELOG"
+            fi
+          fi
+
+          if [ -n "$CHANGELOG" ]; then
+            echo "Successfully extracted release notes for ${TAG_NAME} from ${CHANGELOG_FILE}."
+
+            PREVIOUS_TAG=$(git tag -l 'v*' --sort=-v:refname 2>/dev/null | grep -v "^${TAG_NAME}$" | head -n 1 || true)
+            if [ -n "$PREVIOUS_TAG" ]; then
+              CHANGELOG="${CHANGELOG}"$'\n\n'"**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREVIOUS_TAG}...${TAG_NAME}"
+            fi
+
+            {
+              echo "body<<EOF"
+              echo "$CHANGELOG"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "has_custom_notes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No custom release notes found for ${TAG_NAME} in ${CHANGELOG_FILE}; falling back to auto-generated."
+            echo "body=" >> "$GITHUB_OUTPUT"
+            echo "has_custom_notes=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*
-          generate_release_notes: true
+          body: ${{ steps.release_notes.outputs.body }}
+          generate_release_notes: ${{ steps.release_notes.outputs.has_custom_notes != 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

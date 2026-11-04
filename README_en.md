@@ -312,6 +312,12 @@ uv run ruff check .
 
 ---
 
+## 📝 Changelog
+
+For detailed release history and changes, please refer to [CHANGELOG.md](docs/CHANGELOG.md).
+
+---
+
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE). Contributions, bug reports, and PRs are welcome!
