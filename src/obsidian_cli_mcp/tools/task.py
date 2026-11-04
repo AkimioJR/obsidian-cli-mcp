@@ -14,9 +14,12 @@ def register_task_tools(
     client: ObsidianClient,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
+    enable_extensions: bool = False,
 ) -> None:
     """Register task management tools (Feature: task)."""
-    reg = ToolRegistrar(server, "task", lang, version=version)
+    reg = ToolRegistrar(
+        server, "task", lang, version=version, enable_extensions=enable_extensions
+    )
 
     @reg.tool(
         name="tasks",

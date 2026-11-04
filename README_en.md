@@ -169,6 +169,7 @@ Client configuration:
 | `OBSIDIAN_VERSION`  | Manually specify/override Obsidian client version (e.g. `1.14.5` for headless/container environments)                       | Auto-detected from `obsidian version` at startup       |
 | `OBSIDIAN_FEATURES` | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,vault,plugin,base,eval` or presets `standard,safe,all`) | `standard` (default: core tools plus standard features) |
 | `OBSIDIAN_LANG`     | Localization language for human-readable tool titles (supports `zh_CN`, `en_US`)                                            | Auto-detected from system locale (fallback to `en_US`) |
+| `OBSIDIAN_EXTENSIONS` | Whether to enable non-native composite extension tools (only accepts `true` case-insensitively; any other value is `false`) | `false` (defaults to pure official CLI tools only)     |
 
 ---
 

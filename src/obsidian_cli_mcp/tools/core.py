@@ -14,13 +14,16 @@ def register_core_tools(
     client: ObsidianClient,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
+    enable_extensions: bool = False,
 ) -> None:
     """Register essential runtime discovery and preflight tools.
 
     Core tools (version, vaults, vault) are always registered by default,
     providing fundamental environment introspection and context building.
     """
-    reg = ToolRegistrar(server, "core", lang, version=version)
+    reg = ToolRegistrar(
+        server, "core", lang, version=version, enable_extensions=enable_extensions
+    )
 
     @reg.tool(
         name="version",

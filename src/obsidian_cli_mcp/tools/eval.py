@@ -14,9 +14,12 @@ def register_eval_tools(
     client: ObsidianClient,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
+    enable_extensions: bool = False,
 ) -> None:
     """Register JavaScript runtime execution tool (Feature: eval)."""
-    reg = ToolRegistrar(server, "eval", lang, version=version)
+    reg = ToolRegistrar(
+        server, "eval", lang, version=version, enable_extensions=enable_extensions
+    )
 
     @reg.tool(
         name="eval",

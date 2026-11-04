@@ -14,9 +14,12 @@ def register_graph_tools(
     client: ObsidianClient,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
+    enable_extensions: bool = False,
 ) -> None:
     """Register graph, links, and structure tools (Feature: graph)."""
-    reg = ToolRegistrar(server, "graph", lang, version=version)
+    reg = ToolRegistrar(
+        server, "graph", lang, version=version, enable_extensions=enable_extensions
+    )
 
     @reg.tool(
         name="backlinks",

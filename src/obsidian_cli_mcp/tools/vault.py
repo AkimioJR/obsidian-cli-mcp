@@ -14,9 +14,12 @@ def register_vault_tools(
     client: ObsidianClient,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
+    enable_extensions: bool = False,
 ) -> None:
     """Register vault file navigation, workspace and lifecycle tools (Feature: vault)."""
-    reg = ToolRegistrar(server, "vault", lang, version=version)
+    reg = ToolRegistrar(
+        server, "vault", lang, version=version, enable_extensions=enable_extensions
+    )
 
     @reg.tool(
         name="files",

@@ -61,7 +61,7 @@ def make_annotations(
 
 
 class ToolRegistrar:
-    """Helper that binds feature context, language, and version to register MCP tools with localized titles."""
+    """Helper that binds feature context, language, version and extension flag to register MCP tools with localized titles."""
 
     def __init__(
         self,
@@ -69,6 +69,7 @@ class ToolRegistrar:
         feature: str,
         lang: SupportedLang | str | None = None,
         version: Version | None = None,
+        enable_extensions: bool = False,
     ) -> None:
         self.server = server
         self.feature = feature
@@ -76,6 +77,7 @@ class ToolRegistrar:
             lang if isinstance(lang, SupportedLang) else SupportedLang.detect(lang)
         )
         self.version = version
+        self.enable_extensions = enable_extensions
 
     def tool(
         self,
@@ -85,9 +87,14 @@ class ToolRegistrar:
         *,
         min_version: Version | str | None = None,
         max_version: Version | str | None = None,
+        extension: bool = False,
     ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-        """Register a tool, checking version compatibility and binding localized title."""
-        # 检查版本兼容性：未指定版本时假定最新版本 (Version(999, 999, 999))，过滤掉历史遗留版本
+        """Register a tool, checking extension flag, version compatibility and binding localized title."""
+        # 1. 检查扩展功能开关：若工具标记为扩展工具但未开启扩展功能，直接跳过注册
+        if extension and not self.enable_extensions:
+            return lambda fn: fn
+
+        # 2. 检查版本兼容性：未指定版本时假定最新版本 (Version(999, 999, 999))，过滤掉历史遗留版本
         check_version = (
             self.version if self.version is not None else Version(999, 999, 999)
         )

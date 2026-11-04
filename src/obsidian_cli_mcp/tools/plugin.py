@@ -20,9 +20,12 @@ def register_plugin_tools(
     client: ObsidianClient,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
+    enable_extensions: bool = False,
 ) -> None:
     """Register plugin, command palette, and template tools (Feature: plugin)."""
-    reg = ToolRegistrar(server, "plugin", lang, version=version)
+    reg = ToolRegistrar(
+        server, "plugin", lang, version=version, enable_extensions=enable_extensions
+    )
 
     @reg.tool(
         name="command",

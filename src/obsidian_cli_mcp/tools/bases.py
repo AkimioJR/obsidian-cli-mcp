@@ -14,9 +14,12 @@ def register_base_tools(
     client: ObsidianClient,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
+    enable_extensions: bool = False,
 ) -> None:
     """Register Obsidian Bases database views tools (Feature: base, requires Obsidian 1.14+)."""
-    reg = ToolRegistrar(server, "base", lang, version=version)
+    reg = ToolRegistrar(
+        server, "base", lang, version=version, enable_extensions=enable_extensions
+    )
 
     @reg.tool(
         name="bases",

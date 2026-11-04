@@ -45,12 +45,15 @@ class Feature(str, Enum):
         client: ObsidianClient,
         lang: SupportedLang | str | None = None,
         version: Version | None = None,
+        enable_extensions: bool = False,
     ) -> None:
         """Register all tools associated with this feature to the server."""
         resolved_lang = (
             lang if isinstance(lang, SupportedLang) else SupportedLang.detect(lang)
         )
-        _FEATURE_REGISTRY[self](server, client, resolved_lang, version)
+        _FEATURE_REGISTRY[self](
+            server, client, resolved_lang, version, enable_extensions
+        )
 
     @classmethod
     def presets(cls) -> dict[str, set["Feature"]]:
@@ -101,6 +104,7 @@ class Feature(str, Enum):
         features: Iterable["Feature | str"] | None = None,
         lang: SupportedLang | str | None = None,
         version: Version | None = None,
+        enable_extensions: bool = False,
     ) -> None:
         """Register tool feature groups to the MCP server.
 
@@ -119,12 +123,20 @@ class Feature(str, Enum):
 
         for feature in cls:
             if feature in enabled_features:
-                feature.register(server, client, resolved_lang, version=version)
+                feature.register(
+                    server,
+                    client,
+                    resolved_lang,
+                    version=version,
+                    enable_extensions=enable_extensions,
+                )
 
 
 _FEATURE_REGISTRY: dict[
     Feature,
-    Callable[[MCPServer, ObsidianClient, SupportedLang | None, Version | None], None],
+    Callable[
+        [MCPServer, ObsidianClient, SupportedLang | None, Version | None, bool], None
+    ],
 ] = {
     Feature.NOTE: register_note_tools,
     Feature.PROPERTY: register_property_tools,

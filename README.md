@@ -169,6 +169,7 @@ pip install obsidian-cli-mcp
 | `OBSIDIAN_VERSION`  | 手动指定或覆盖 Obsidian 客户端版本号（用于无头/容器环境兼容性校验，如 `1.14.5`）                   | 启动时自动从 `obsidian version` 探针探测      |
 | `OBSIDIAN_FEATURES` | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,base,eval` 或预设 `standard,safe,all`） | `standard`（默认启用核心工具及日常笔记与图谱特性） |
 | `OBSIDIAN_LANG`     | 人类可读界面与工具标题的本地化语言（支持 `zh_CN`, `en_US` 等）                                     | 自动探测系统环境（未匹配时回退至 `en_US`）    |
+| `OBSIDIAN_EXTENSIONS` | 是否启用非原生 CLI 的扩展复合工具（仅当为 `true`（不区分大小写）时开启，其余情况均为 `false`）       | `false`（默认保持纯粹的官方 CLI 命令映射）    |
 
 ---
 

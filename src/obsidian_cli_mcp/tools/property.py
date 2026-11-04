@@ -14,9 +14,12 @@ def register_property_tools(
     client: ObsidianClient,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
+    enable_extensions: bool = False,
 ) -> None:
     """Register frontmatter property tools (Feature: property)."""
-    reg = ToolRegistrar(server, "property", lang, version=version)
+    reg = ToolRegistrar(
+        server, "property", lang, version=version, enable_extensions=enable_extensions
+    )
 
     @reg.tool(
         name="properties",

@@ -14,9 +14,12 @@ def register_tag_tools(
     client: ObsidianClient,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
+    enable_extensions: bool = False,
 ) -> None:
     """Register tag management tools (Feature: tag)."""
-    reg = ToolRegistrar(server, "tag", lang, version=version)
+    reg = ToolRegistrar(
+        server, "tag", lang, version=version, enable_extensions=enable_extensions
+    )
 
     @reg.tool(
         name="tags",

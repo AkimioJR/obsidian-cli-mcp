@@ -440,3 +440,94 @@ def test_server_timeout_configuration(monkeypatch):
     monkeypatch.setenv("OBSIDIAN_TIMEOUT", "45.0")
     server_env = create_server(cli_path="/mock/obsidian")
     assert server_env is not None
+
+
+@pytest.mark.asyncio
+async def test_tool_registrar_extension_guard():
+    from mcp.server.mcpserver import MCPServer
+
+    from obsidian_cli_mcp.tools.base import READ_ONLY, ToolRegistrar
+
+    # 1. enable_extensions=False 时，标记为 extension=True 的工具跳过注册
+    srv_disabled = MCPServer(name="test_disabled")
+    reg_disabled = ToolRegistrar(srv_disabled, "note", enable_extensions=False)
+
+    @reg_disabled.tool(name="custom_ext_tool", annotations=READ_ONLY, extension=True)
+    async def disabled_fn():
+        return "ok"
+
+    tools_disabled = await srv_disabled.list_tools()
+    assert "custom_ext_tool" not in {t.name for t in tools_disabled}
+
+    # 2. enable_extensions=True 时，标记为 extension=True 的工具正常注册
+    srv_enabled = MCPServer(name="test_enabled")
+    reg_enabled = ToolRegistrar(srv_enabled, "note", enable_extensions=True)
+
+    @reg_enabled.tool(name="custom_ext_tool", annotations=READ_ONLY, extension=True)
+    async def enabled_fn():
+        return "ok"
+
+    tools_enabled = await srv_enabled.list_tools()
+    assert "custom_ext_tool" in {t.name for t in tools_enabled}
+
+
+@pytest.mark.asyncio
+async def test_server_enable_extensions_env_and_param(monkeypatch):
+    from unittest.mock import patch as mock_patch
+
+    # 1. 默认环境下（未设置环境变量），enable_extensions 为 False
+    monkeypatch.delenv("OBSIDIAN_EXTENSIONS", raising=False)
+
+    with mock_patch("obsidian_cli_mcp.tools.Feature.register_tools") as mock_reg:
+        create_server(cli_path="/mock/obsidian")
+        mock_reg.assert_called_once()
+        assert mock_reg.call_args.kwargs["enable_extensions"] is False
+
+    # 2. 显式参数 enable_extensions 覆盖
+    with mock_patch("obsidian_cli_mcp.tools.Feature.register_tools") as mock_reg:
+        create_server(cli_path="/mock/obsidian", enable_extensions=True)
+        mock_reg.assert_called_once()
+        assert mock_reg.call_args.kwargs["enable_extensions"] is True
+
+    with mock_patch("obsidian_cli_mcp.tools.Feature.register_tools") as mock_reg:
+        create_server(cli_path="/mock/obsidian", enable_extensions=False)
+        mock_reg.assert_called_once()
+        assert mock_reg.call_args.kwargs["enable_extensions"] is False
+
+    # 3. 严格仅支持 "true"（不区分大小写）
+    for val in ("true", "True", "TRUE", "TrUe", "  true  "):
+        monkeypatch.setenv("OBSIDIAN_EXTENSIONS", val)
+        with mock_patch("obsidian_cli_mcp.tools.Feature.register_tools") as mock_reg:
+            create_server(cli_path="/mock/obsidian")
+            mock_reg.assert_called_once()
+            assert mock_reg.call_args.kwargs["enable_extensions"] is True
+
+    # 4. 其余任何值（如 1, yes, on, false, 0 等）均严格为 False
+    for val in (
+        "1",
+        "yes",
+        "on",
+        "enable",
+        "false",
+        "False",
+        "0",
+        "no",
+        "off",
+        "",
+        "none",
+        "random",
+    ):
+        monkeypatch.setenv("OBSIDIAN_EXTENSIONS", val)
+        with mock_patch("obsidian_cli_mcp.tools.Feature.register_tools") as mock_reg:
+            create_server(cli_path="/mock/obsidian")
+            mock_reg.assert_called_once()
+            assert mock_reg.call_args.kwargs["enable_extensions"] is False
+
+    # 5. 严格仅识别 OBSIDIAN_EXTENSIONS，不识别其他别名
+    monkeypatch.delenv("OBSIDIAN_EXTENSIONS", raising=False)
+    monkeypatch.setenv("OBSIDIAN_ENABLE_EXTENSIONS", "true")
+    monkeypatch.setenv("OBSIDIAN_EXTRA_TOOLS", "true")
+    with mock_patch("obsidian_cli_mcp.tools.Feature.register_tools") as mock_reg:
+        create_server(cli_path="/mock/obsidian")
+        mock_reg.assert_called_once()
+        assert mock_reg.call_args.kwargs["enable_extensions"] is False

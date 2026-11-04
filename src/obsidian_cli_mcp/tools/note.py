@@ -21,9 +21,12 @@ def register_note_tools(
     client: ObsidianClient,
     lang: SupportedLang | str | None = None,
     version: Version | None = None,
+    enable_extensions: bool = False,
 ) -> None:
     """Register note content & file manipulation tools (Feature: note)."""
-    reg = ToolRegistrar(server, "note", lang, version=version)
+    reg = ToolRegistrar(
+        server, "note", lang, version=version, enable_extensions=enable_extensions
+    )
 
     @reg.tool(
         name="read",
