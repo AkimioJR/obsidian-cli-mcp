@@ -192,7 +192,7 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `restart`: Restart Obsidian desktop application.
 - `set_default_vault`: Dynamically switch default target vault for the session (requires `OBSIDIAN_EXTENSIONS=true`).
 
-### 1. Notes & Content (Feature: `note` · 11 native + 2 extensions)
+### 1. Notes & Content (Feature: `note` · 11 native + 1 extension)
 - `read`: Read raw Markdown content by note name or relative path.
 - `create`: Create a new note with optional template, pre-filled content, overwrite, and auto-open.
 - `append`: Append content to the end of a note or under a target heading section (`heading=`, Obsidian 1.14+).
@@ -205,7 +205,6 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `random`: Open and focus a randomly chosen note in Obsidian GUI.
 - `diff`: List or diff local history and Obsidian Sync versions for a file.
 - `edit`: Precise in-place note editing via literal search-and-replace (requires `OBSIDIAN_EXTENSIONS=true`).
-- `import_file`: Import external local file directly into vault (zero token overhead, avoids JSON escaping, requires `OBSIDIAN_EXTENSIONS=true`).
 
 ### 2. Properties & Frontmatter (Feature: `property` · 4 tools)
 - `properties`: List all property keys across vault or for a specific file.
@@ -231,11 +230,12 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `tasks`: Filter tasks by status (completed/todo), tag, or file.
 - `task`: Toggle checkbox state or mark task completed.
 
-### 6. File Explorer & Resources (Feature: `explorer` · 5 tools)
+### 6. File Explorer & Resources (Feature: `explorer` · 5 native + 1 extension)
 - `files`: List files in vault (supports folder/extension filters).
 - `file`: Show metadata and system details for a specific file.
 - `folders` / `folder`: Inspect directory tree structure and metadata.
 - `recents`: List recently accessed files.
+- `import_file`: Import external local file directly into vault (zero token overhead, avoids JSON escaping, requires `OBSIDIAN_EXTENSIONS=true`).
 
 ### 7. Workspace & Navigation (Feature: `workspace` · 3 tools)
 - `workspace`: Query workspace window layout tree.

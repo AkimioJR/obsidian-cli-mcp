@@ -192,7 +192,7 @@ pip install obsidian-cli-mcp
 - `restart`: 重启 Obsidian 桌面客户端进程。
 - `set_default_vault`: 动态切换当前会话默认目标笔记库（需 `OBSIDIAN_EXTENSIONS=true`）。
 
-### 1. 笔记与内容 (Feature: `note` · 11 项原生 + 2 项扩展)
+### 1. 笔记与内容 (Feature: `note` · 11 项原生 + 1 项扩展)
 - `read`: 按文件名或相对路径读取笔记 Markdown 原文。
 - `create`: 创建新笔记，支持指定模板、预填充内容、静默覆盖与默认打开。
 - `append`: 向指定笔记末尾或特定标题区域下方（`heading=`，Obsidian 1.14+）追加内容。
@@ -205,7 +205,6 @@ pip install obsidian-cli-mcp
 - `random`: 在 Obsidian 界面中随机打开并聚焦一篇笔记。
 - `diff`: 对比文件的本地历史版本或 Obsidian Sync 云端同步版本差异。
 - `edit`: 局部精细编辑笔记（字面搜索替换，需 `OBSIDIAN_EXTENSIONS=true`）。
-- `import_file`: 导入外部本地文件至笔记库（文件流直拷，零 Token 消耗免 JSON 转义，需 `OBSIDIAN_EXTENSIONS=true`）。
 
 ### 2. 元数据与属性 (Feature: `property` · 4 项)
 - `properties`: 列出库中或指定笔记的全部属性概览。
@@ -231,11 +230,12 @@ pip install obsidian-cli-mcp
 - `tasks`: 按状态（已完成/待办）、标签或所在文件多维筛选任务。
 - `task`: 切换任务的勾选完成状态。
 
-### 6. 文件与目录资源 (Feature: `explorer` · 5 项)
+### 6. 文件与目录资源 (Feature: `explorer` · 5 项原生 + 1 项扩展)
 - `files`: 列出库内文件清单（支持按文件夹与后缀筛选）。
 - `file`: 查询单个文件的元数据与系统详细信息（绝对路径、大小、创建与修改时间等）。
 - `folders` / `folder`: 浏览文件夹目录树与结构详情。
 - `recents`: 列出最近访问的历史文件。
+- `import_file`: 导入外部本地文件至笔记库（文件流直拷，零 Token 消耗免 JSON 转义，需 `OBSIDIAN_EXTENSIONS=true`）。
 
 ### 7. 工作区与布局导航 (Feature: `workspace` · 3 项)
 - `workspace`: 查询当前工作区窗口布局树。
