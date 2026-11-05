@@ -127,7 +127,7 @@
         <text x="14" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="700" fill="#F5F3FF">obsidian-cli-mcp</text>
         <text x="14" y="42" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11" fill="#DDD6FE">Fast Python Server</text>
         <rect x="14" y="52" width="152" height="20" rx="4" fill="#1E0A33"/>
-        <text x="20" y="66" font-family="'SF Mono', monospace" font-size="9.5" fill="#C084FC">45 Tools · Schema 校验</text>
+        <text x="20" y="66" font-family="'SF Mono', monospace" font-size="9.5" fill="#C084FC">13 Features · 动态 Schema</text>
       </g>
 
       <!-- Node 3: Obsidian Electron Runtime (width 175, starts at 495) -->

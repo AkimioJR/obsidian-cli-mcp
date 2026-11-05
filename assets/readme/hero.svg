@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="hero-title hero-desc">
   <title id="hero-title">obsidian-cli-mcp - Model Context Protocol Server for Obsidian</title>
-  <desc id="hero-desc">通过 Obsidian 官方 CLI 操控笔记库的 45 项全能 MCP 服务器，保障运行时图谱协同并绕过 macOS TCC 权限限制。</desc>
+  <desc id="hero-desc">基于官方 Obsidian CLI 操控笔记库的全功能专业级 MCP 服务器，保障运行时图谱协同并绕过 macOS TCC 权限限制。</desc>
 
   <defs>
     <!-- Background Gradients -->
@@ -65,15 +65,15 @@
       <circle cx="16" cy="15" r="8" fill="#10B981" fill-opacity="0.25"/>
       <text x="32" y="19.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#C7D2FE" letter-spacing="0.6">MODEL CONTEXT PROTOCOL</text>
       
-      <!-- Pill 2: 45 Tools (Width 104) -->
+      <!-- Pill 2: 13 Features (Width 114) -->
       <g transform="translate(238, 0)">
-        <rect width="104" height="30" rx="15" fill="#3B0764" stroke="#7E22CE" stroke-width="1.2"/>
-        <text x="52" y="19.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#E9D5FF" letter-spacing="0.5">45 TOOLS</text>
+        <rect width="114" height="30" rx="15" fill="#3B0764" stroke="#7E22CE" stroke-width="1.2"/>
+        <text x="57" y="19.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#E9D5FF" letter-spacing="0.5">13 FEATURES</text>
       </g>
 
-      <!-- Pill 3: Python 3.10+ with Authentic Python Dual-Snake Icon (Width 154) -->
-      <g transform="translate(352, 0)">
-        <rect width="154" height="30" rx="15" fill="#0F172A" stroke="#334155" stroke-width="1.2"/>
+      <!-- Pill 3: Python 3.10 – 3.15 with Authentic Python Dual-Snake Icon (Width 180) -->
+      <g transform="translate(362, 0)">
+        <rect width="180" height="30" rx="15" fill="#0F172A" stroke="#334155" stroke-width="1.2"/>
         
         <!-- Authentic Python Vector Icon (dual snake) -->
         <g transform="translate(13, 6) scale(0.145)">
@@ -84,7 +84,7 @@
         </g>
         
         <!-- Text Label -->
-        <text x="88" y="19.5" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" font-weight="700" fill="#E2E8F0">Python 3.10+</text>
+        <text x="100" y="19.5" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" font-weight="700" fill="#E2E8F0">Python 3.10 – 3.15</text>
       </g>
     </g>
 
@@ -125,11 +125,11 @@
 
     <!-- Highlights Badges Row (3 Spacious, Uncrowded Cards totaling 520px) -->
     <g transform="translate(0, 276)">
-      <!-- Badge 1: 1:1 Mapping (width 160) -->
+      <!-- Badge 1: Official CLI Driven (width 160) -->
       <g transform="translate(0, 0)">
         <rect width="160" height="30" rx="8" fill="#1E2333" stroke="#333E5A" stroke-width="1"/>
         <path d="M 18,9 L 13,17 L 18,17 L 16,23 L 22,14 L 17,14 Z" fill="#FBBF24" />
-        <text x="32" y="19.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="12.5" font-weight="600" fill="#E2E8F0">1:1 CLI 映射</text>
+        <text x="32" y="19.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="12.5" font-weight="600" fill="#E2E8F0">官方 CLI 驱动</text>
       </g>
       <!-- Badge 2: Bypass TCC (width 172) -->
       <g transform="translate(172, 0)">

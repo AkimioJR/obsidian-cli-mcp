@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="430" viewBox="0 0 1200 430" role="img" aria-labelledby="tm-title tm-desc">
-  <title id="tm-title">obsidian-cli-mcp 45 Tools Matrix</title>
-  <desc id="tm-desc">obsidian-cli-mcp 全量 1:1 映射的 45 项 MCP 工具矩阵全景图，划分为 7 大核心功能域。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="456" viewBox="0 0 1200 456" role="img" aria-labelledby="tm-title tm-desc">
+  <title id="tm-title">Obsidian CLI MCP Tools Matrix</title>
+  <desc id="tm-desc">Obsidian CLI MCP 模块化工具矩阵全景图，划分为 13 大核心功能域与扩展工具。</desc>
 
   <defs>
     <!-- Background Gradients -->
@@ -22,32 +22,29 @@
   </defs>
 
   <!-- Background Base Canvas -->
-  <rect width="1200" height="430" rx="24" fill="#0D0F17" stroke="#232B3E" stroke-width="2"/>
-  <rect width="1200" height="430" rx="24" fill="url(#tm-glow-purple)"/>
-  <rect width="1200" height="430" rx="24" fill="url(#tm-glow-cyan)"/>
+  <rect width="1200" height="456" rx="24" fill="#0D0F17" stroke="#232B3E" stroke-width="2"/>
+  <rect width="1200" height="456" rx="24" fill="url(#tm-glow-purple)"/>
+  <rect width="1200" height="456" rx="24" fill="url(#tm-glow-cyan)"/>
 
   <!-- Header Block -->
-  <g transform="translate(64, 36)">
-    <!-- Top Pill: Generous width 248, height 28, plenty of breathing room -->
-    <rect width="248" height="28" rx="14" fill="#1E1B4B" stroke="#4338CA" stroke-width="1.2"/>
-    <text x="124" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="700" fill="#C7D2FE" letter-spacing="0.6">CAPABILITY MATRIX · 45 TOOLS</text>
+  <g transform="translate(64, 32)">
+    <!-- Top Pill -->
+    <rect width="256" height="26" rx="13" fill="#1E1B4B" stroke="#4338CA" stroke-width="1.2"/>
+    <text x="128" y="17" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="700" fill="#C7D2FE" letter-spacing="0.6">OBSIDIAN MCP · 13 FEATURE DOMAINS</text>
     
-    <text x="0" y="54" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="24" font-weight="800" fill="#FFFFFF">45 项全量 1:1 映射 MCP 工具矩阵</text>
-    <text x="0" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="14" font-weight="400" fill="#94A3B8">覆盖 Obsidian 原生能力全生命周期，支持可选 vault 参数、自动附带类型约束与精准 JSON Schema</text>
+    <text x="0" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="23" font-weight="800" fill="#FFFFFF">Obsidian CLI 模块化工具矩阵全景</text>
+    <text x="0" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="13.5" font-weight="400" fill="#94A3B8">覆盖 Obsidian 核心能力全生命周期，按需装载独立 Feature，支持动态 Schema 自适应与上下文隔离</text>
   </g>
 
-  <!-- Top Row: 4 Cards (y: 130, height: 132, width: 254) -->
-  <!-- Card 1: Notes & Content (9) -->
-  <g transform="translate(64, 130)">
-    <rect width="254" height="132" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
-    <!-- Card Header -->
+  <!-- ==================== Row 1: 4 Cards (y: 122, height: 144, width: 254) ==================== -->
+  
+  <!-- Card 1: Notes & Content -->
+  <g transform="translate(64, 122)">
+    <rect width="254" height="144" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
     <rect x="14" y="14" width="22" height="22" rx="6" fill="#3B0764"/>
     <text x="25" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="11" font-weight="700" fill="#E9D5FF">1</text>
-    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">笔记与内容</text>
-    <rect x="200" y="15" width="40" height="20" rx="10" fill="#2E1065"/>
-    <text x="220" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" font-weight="700" fill="#C084FC">9</text>
-    <!-- Tool Badges -->
-    <g transform="translate(14, 48)">
+    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">笔记与内容 (Note)</text>
+    <g transform="translate(14, 46)">
       <!-- Line 1 -->
       <rect x="0" y="0" width="42" height="22" rx="5" fill="#131722" stroke="#252E42"/>
       <text x="21" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#A78BFA">read</text>
@@ -67,175 +64,196 @@
       <rect x="172" y="28" width="44" height="22" rx="5" fill="#131722" stroke="#252E42"/>
       <text x="194" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#A78BFA">open</text>
       <!-- Line 3 -->
-      <rect x="0" y="56" width="94" height="20" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="47" y="70" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#94A3B8">random_read</text>
+      <rect x="0" y="56" width="54" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="27" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#94A3B8">random</text>
+      <rect x="60" y="56" width="42" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="81" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#94A3B8">diff</text>
+      <rect x="108" y="56" width="50" height="22" rx="5" fill="#064E3B" stroke="#059669"/>
+      <text x="133" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" font-weight="700" fill="#6EE7B7">edit*</text>
     </g>
   </g>
 
-  <!-- Card 2: Properties & Frontmatter (4) -->
-  <g transform="translate(336, 130)">
-    <rect width="254" height="132" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
-    <!-- Card Header -->
+  <!-- Card 2: Property & Graph -->
+  <g transform="translate(336, 122)">
+    <rect width="254" height="144" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
     <rect x="14" y="14" width="22" height="22" rx="6" fill="#0C4A6E"/>
     <text x="25" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="11" font-weight="700" fill="#BAE6FD">2</text>
-    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">属性与元数据</text>
-    <rect x="200" y="15" width="40" height="20" rx="10" fill="#075985"/>
-    <text x="220" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" font-weight="700" fill="#38BDF8">4</text>
-    <!-- Tool Badges -->
-    <g transform="translate(14, 48)">
-      <rect x="0" y="0" width="80" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="40" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#38BDF8">properties</text>
-      <rect x="88" y="0" width="102" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="139" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#38BDF8">property_read</text>
-      
-      <rect x="0" y="28" width="94" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="47" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#38BDF8">property_set</text>
-      <rect x="100" y="28" width="118" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="159" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#38BDF8">property_remove</text>
-    </g>
-  </g>
-
-  <!-- Card 3: Graph & Links (8) -->
-  <g transform="translate(608, 130)">
-    <rect width="254" height="132" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
-    <!-- Card Header -->
-    <rect x="14" y="14" width="22" height="22" rx="6" fill="#064E3B"/>
-    <text x="25" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="11" font-weight="700" fill="#A7F3D0">3</text>
-    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">图谱与双链</text>
-    <rect x="200" y="15" width="40" height="20" rx="10" fill="#065F46"/>
-    <text x="220" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" font-weight="700" fill="#34D399">8</text>
-    <!-- Tool Badges -->
-    <g transform="translate(14, 48)">
-      <!-- Line 1 -->
-      <rect x="0" y="0" width="70" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="35" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#34D399">backlinks</text>
-      <rect x="76" y="0" width="46" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="99" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#34D399">links</text>
-      <rect x="128" y="0" width="82" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="169" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#34D399">unresolved</text>
-      <!-- Line 2 -->
-      <rect x="0" y="28" width="58" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="29" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#34D399">orphans</text>
-      <rect x="64" y="28" width="66" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="97" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#34D399">deadends</text>
-      <rect x="136" y="28" width="58" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="165" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#34D399">outline</text>
-      <!-- Line 3 -->
-      <rect x="0" y="56" width="58" height="20" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="29" y="70" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#94A3B8">aliases</text>
-      <rect x="64" y="56" width="76" height="20" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="102" y="70" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#94A3B8">wordcount</text>
-    </g>
-  </g>
-
-  <!-- Card 4: Tags & Tasks (4) -->
-  <g transform="translate(880, 130)">
-    <rect width="254" height="132" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
-    <!-- Card Header -->
-    <rect x="14" y="14" width="22" height="22" rx="6" fill="#451A03"/>
-    <text x="25" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="11" font-weight="700" fill="#FDE68A">4</text>
-    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">标签与任务</text>
-    <rect x="200" y="15" width="40" height="20" rx="10" fill="#78350F"/>
-    <text x="220" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" font-weight="700" fill="#FBBF24">4</text>
-    <!-- Tool Badges -->
-    <g transform="translate(14, 48)">
-      <rect x="0" y="0" width="44" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="22" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FBBF24">tags</text>
-      <rect x="52" y="0" width="40" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="72" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FBBF24">tag</text>
-      <rect x="100" y="0" width="48" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="124" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FBBF24">tasks</text>
-      <rect x="156" y="0" width="42" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="177" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FBBF24">task</text>
-    </g>
-  </g>
-
-  <!-- Bottom Row: 3 Cards (y: 278, height: 124, width: 345) -->
-  <!-- Card 5: Vault & Workspace (8) -->
-  <g transform="translate(64, 278)">
-    <rect width="345" height="124" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
-    <!-- Card Header -->
-    <rect x="14" y="14" width="22" height="22" rx="6" fill="#164E63"/>
-    <text x="25" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="11" font-weight="700" fill="#A5F3FC">5</text>
-    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">库与工作区</text>
-    <rect x="290" y="15" width="40" height="20" rx="10" fill="#0E7490"/>
-    <text x="310" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" font-weight="700" fill="#22D3EE">8</text>
-    <!-- Tool Badges -->
+    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">属性与双链 (Property/Graph)</text>
     <g transform="translate(14, 46)">
       <!-- Line 1 -->
-      <rect x="0" y="0" width="48" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="24" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#22D3EE">vault</text>
-      <rect x="54" y="0" width="56" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="82" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#22D3EE">vaults</text>
-      <rect x="116" y="0" width="46" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="139" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#22D3EE">files</text>
-      <rect x="168" y="0" width="58" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="197" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#22D3EE">folders</text>
-      <rect x="232" y="0" width="52" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="258" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#22D3EE">folder</text>
+      <rect x="0" y="0" width="76" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="38" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#38BDF8">properties</text>
+      <rect x="82" y="0" width="94" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="129" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#38BDF8">property_read</text>
       <!-- Line 2 -->
-      <rect x="0" y="28" width="58" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="29" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#94A3B8">recents</text>
-      <rect x="64" y="28" width="76" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="102" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#94A3B8">bookmarks</text>
-      <rect x="146" y="28" width="78" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="185" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#94A3B8">workspace</text>
+      <rect x="0" y="28" width="66" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="33" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#34D399">backlinks</text>
+      <rect x="72" y="28" width="44" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="94" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#34D399">links</text>
+      <rect x="122" y="28" width="76" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="160" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#34D399">unresolved</text>
+      <!-- Line 3 -->
+      <rect x="0" y="56" width="56" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="28" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#94A3B8">outline</text>
+      <rect x="62" y="56" width="56" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="90" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#94A3B8">aliases</text>
+      <rect x="124" y="56" width="74" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="161" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#94A3B8">wordcount</text>
     </g>
   </g>
 
-  <!-- Card 6: Commands & Extensions (5) -->
-  <g transform="translate(427, 278)">
-    <rect width="345" height="124" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
-    <!-- Card Header -->
+  <!-- Card 3: Tag, Task & Bookmark -->
+  <g transform="translate(608, 122)">
+    <rect width="254" height="144" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
+    <rect x="14" y="14" width="22" height="22" rx="6" fill="#451A03"/>
+    <text x="25" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="11" font-weight="700" fill="#FDE68A">3</text>
+    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">标签/任务/书签 (Index)</text>
+    <g transform="translate(14, 46)">
+      <!-- Line 1 -->
+      <rect x="0" y="0" width="40" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="20" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FBBF24">tags</text>
+      <rect x="46" y="0" width="36" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="64" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FBBF24">tag</text>
+      <rect x="88" y="0" width="46" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="111" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FBBF24">tasks</text>
+      <rect x="140" y="0" width="40" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="160" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FBBF24">task</text>
+      <!-- Line 2 -->
+      <rect x="0" y="28" width="76" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="38" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#A7F3D0">bookmarks</text>
+      <rect x="82" y="28" width="68" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="116" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#A7F3D0">bookmark</text>
+      <!-- Line 3 -->
+      <rect x="0" y="56" width="56" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="28" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#94A3B8">orphans</text>
+      <rect x="62" y="56" width="64" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="94" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#94A3B8">deadends</text>
+    </g>
+  </g>
+
+  <!-- Card 4: Explorer -->
+  <g transform="translate(880, 122)">
+    <rect width="254" height="144" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
+    <rect x="14" y="14" width="22" height="22" rx="6" fill="#164E63"/>
+    <text x="25" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="11" font-weight="700" fill="#A5F3FC">4</text>
+    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">文件资源管理 (Explorer)</text>
+    <g transform="translate(14, 46)">
+      <!-- Line 1 -->
+      <rect x="0" y="0" width="44" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="22" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#22D3EE">files</text>
+      <rect x="50" y="0" width="38" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="69" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#22D3EE">file</text>
+      <rect x="94" y="0" width="56" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="122" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#22D3EE">folders</text>
+      <rect x="156" y="0" width="50" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="181" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#22D3EE">folder</text>
+      <!-- Line 2 -->
+      <rect x="0" y="28" width="56" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="28" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#22D3EE">recents</text>
+      <!-- Line 3: import_file -->
+      <rect x="0" y="56" width="102" height="22" rx="5" fill="#064E3B" stroke="#059669"/>
+      <text x="51" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" font-weight="700" fill="#6EE7B7">import_file*</text>
+    </g>
+  </g>
+
+  <!-- ==================== Row 2: 4 Cards (y: 280, height: 144, width: 254) ==================== -->
+
+  <!-- Card 5: Workspace -->
+  <g transform="translate(64, 280)">
+    <rect width="254" height="144" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
+    <rect x="14" y="14" width="22" height="22" rx="6" fill="#064E3B"/>
+    <text x="25" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="11" font-weight="700" fill="#A7F3D0">5</text>
+    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">工作区与窗口 (Workspace)</text>
+    <g transform="translate(14, 46)">
+      <!-- Line 1 -->
+      <rect x="0" y="0" width="76" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="38" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#34D399">workspace</text>
+      <rect x="82" y="0" width="42" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="103" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#34D399">tabs</text>
+      <rect x="130" y="0" width="66" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="163" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#34D399">tab_open</text>
+      <!-- Description line -->
+      <text x="0" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11" fill="#64748B">布局树分析 · 标签组精准索引</text>
+      <text x="0" y="70" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11" fill="#64748B">支持分屏 ID 定向打开笔记视图</text>
+    </g>
+  </g>
+
+  <!-- Card 6: Command & Template -->
+  <g transform="translate(336, 280)">
+    <rect width="254" height="144" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
     <rect x="14" y="14" width="22" height="22" rx="6" fill="#4C0519"/>
     <text x="25" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="11" font-weight="700" fill="#FECDD3">6</text>
-    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">命令与模板扩展</text>
-    <rect x="290" y="15" width="40" height="20" rx="10" fill="#9F1239"/>
-    <text x="310" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" font-weight="700" fill="#FB7185">5</text>
-    <!-- Tool Badges -->
+    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">指令与模板 (Command/Tpl)</text>
     <g transform="translate(14, 46)">
       <!-- Line 1 -->
-      <rect x="0" y="0" width="68" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="34" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FB7185">command</text>
-      <rect x="74" y="0" width="76" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="112" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FB7185">commands</text>
-      <rect x="156" y="0" width="70" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="191" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FB7185">eval (JS)</text>
+      <rect x="0" y="0" width="62" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="31" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FB7185">command</text>
+      <rect x="68" y="0" width="70" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="103" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FB7185">commands</text>
       <!-- Line 2 -->
-      <rect x="0" y="28" width="102" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="51" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#94A3B8">template_read</text>
-      <rect x="108" y="28" width="112" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="164" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#94A3B8">template_insert</text>
+      <rect x="0" y="28" width="68" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="34" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FB7185">templates</text>
+      <rect x="74" y="28" width="94" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="121" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#FB7185">template_read</text>
+      <!-- Line 3 -->
+      <rect x="0" y="56" width="104" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="52" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#94A3B8">template_insert</text>
     </g>
   </g>
 
-  <!-- Card 7: Plugins & App Lifecycle (7) -->
-  <g transform="translate(790, 278)">
-    <rect width="345" height="124" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
-    <!-- Card Header -->
+  <!-- Card 7: Plugin & Base -->
+  <g transform="translate(608, 280)">
+    <rect width="254" height="144" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
     <rect x="14" y="14" width="22" height="22" rx="6" fill="#3B0764"/>
     <text x="25" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="11" font-weight="700" fill="#E9D5FF">7</text>
-    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">插件与生命周期</text>
-    <rect x="290" y="15" width="40" height="20" rx="10" fill="#6B21A8"/>
-    <text x="310" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" font-weight="700" fill="#C084FC">7</text>
-    <!-- Tool Badges -->
+    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">插件与数据库 (Plugin/Base)</text>
     <g transform="translate(14, 46)">
       <!-- Line 1 -->
-      <rect x="0" y="0" width="60" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="30" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#C084FC">plugins</text>
-      <rect x="66" y="0" width="118" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="125" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#C084FC">plugins_enabled</text>
-      <rect x="190" y="0" width="56" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="218" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#C084FC">reload</text>
-      <rect x="252" y="0" width="62" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="283" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#C084FC">restart</text>
+      <rect x="0" y="0" width="56" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="28" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#C084FC">plugins</text>
+      <rect x="62" y="0" width="96" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="110" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#C084FC">plugin_enable</text>
       <!-- Line 2 -->
-      <rect x="0" y="28" width="98" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="49" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#94A3B8">plugin_enable</text>
-      <rect x="104" y="28" width="104" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="156" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#94A3B8">plugin_disable</text>
-      <rect x="214" y="28" width="60" height="22" rx="5" fill="#131722" stroke="#252E42"/>
-      <text x="244" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#94A3B8">version</text>
+      <rect x="0" y="28" width="46" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="23" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#DDD6FE">bases</text>
+      <rect x="52" y="28" width="76" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="90" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#DDD6FE">base_views</text>
+      <rect x="134" y="28" width="76" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="172" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#DDD6FE">base_query</text>
+      <!-- Line 3 -->
+      <rect x="0" y="56" width="82" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="41" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#94A3B8">base_create</text>
+    </g>
+  </g>
+
+  <!-- Card 8: Core & Developer -->
+  <g transform="translate(880, 280)">
+    <rect width="254" height="144" rx="14" fill="url(#tm-card-bg)" stroke="#2C354C" stroke-width="1.2"/>
+    <rect x="14" y="14" width="22" height="22" rx="6" fill="#0F172A"/>
+    <text x="25" y="29" text-anchor="middle" font-family="'SF Mono', monospace" font-size="11" font-weight="700" fill="#E2E8F0">8</text>
+    <text x="44" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="13.5" font-weight="700" fill="#E2E8F0">系统核心与调试 (Core/Dev)</text>
+    <g transform="translate(14, 46)">
+      <!-- Line 1 -->
+      <rect x="0" y="0" width="54" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="27" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#E2E8F0">version</text>
+      <rect x="60" y="0" width="50" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="85" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#E2E8F0">vaults</text>
+      <rect x="116" y="0" width="44" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="138" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#E2E8F0">vault</text>
+      <rect x="166" y="0" width="52" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="192" y="15" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#E2E8F0">reload</text>
+      <!-- Line 2 -->
+      <rect x="0" y="28" width="54" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="27" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#E2E8F0">restart</text>
+      <rect x="60" y="28" width="40" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="80" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#38BDF8">eval</text>
+      <rect x="106" y="28" width="60" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="136" y="43" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10.5" fill="#38BDF8">dev_dom</text>
+      <!-- Line 3 -->
+      <rect x="0" y="56" width="98" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="49" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#38BDF8">dev_screenshot</text>
+      <rect x="104" y="56" width="62" height="22" rx="5" fill="#131722" stroke="#252E42"/>
+      <text x="135" y="71" text-anchor="middle" font-family="'SF Mono', monospace" font-size="10" fill="#38BDF8">dev_cdp</text>
     </g>
   </g>
 </svg>
