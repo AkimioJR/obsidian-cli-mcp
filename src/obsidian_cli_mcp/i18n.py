@@ -163,7 +163,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "base_query": "查询Bases表格数据",
             "base_create": "新建Bases条目",
         },
-        "eval": {
+        "developer": {
             "eval": "执行 JavaScript 代码",
         },
     },
@@ -237,7 +237,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "base_query": "Query Base Records",
             "base_create": "Create Base Item",
         },
-        "eval": {
+        "developer": {
             "eval": "Execute JavaScript",
         },
     },

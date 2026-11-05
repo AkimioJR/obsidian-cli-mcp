@@ -9,7 +9,7 @@ from ..version import Version
 from .base import DYNAMIC_EVAL, ToolRegistrar, call_tool
 
 
-def register_eval_tools(
+def register_developer_tools(
     server: MCPServer,
     client: ObsidianClient,
     *,
@@ -17,9 +17,9 @@ def register_eval_tools(
     version: Version | None = None,
     enable_extensions: bool = False,
 ) -> None:
-    """Register JavaScript runtime execution tool (Feature: eval)."""
+    """Register developer tools (Feature: developer)."""
     reg = ToolRegistrar(
-        server, "eval", lang, version=version, enable_extensions=enable_extensions
+        server, "developer", lang, version=version, enable_extensions=enable_extensions
     )
 
     @reg.tool(
@@ -37,3 +37,8 @@ def register_eval_tools(
         ),
     ) -> Any:
         return await call_tool(client, "eval", {"code": code}, vault=vault)
+
+
+__all__ = [
+    "register_developer_tools",
+]

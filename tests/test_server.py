@@ -173,7 +173,7 @@ def test_feature_filtering_by_string_and_env(monkeypatch):
     assert "read" not in tools
 
     # 环境变量方式指定
-    monkeypatch.setenv("OBSIDIAN_FEATURES", "eval,graph")
+    monkeypatch.setenv("OBSIDIAN_FEATURES", "developer,graph")
     server_env = create_server(cli_path="/mock/obsidian")
     tools_env = server_env._tool_manager._tools
     assert len(tools_env) == 12  # 3 core + 8 graph + 1 eval
@@ -370,6 +370,9 @@ def test_feature_enum_class_and_instance_methods():
     # 1. Feature.resolve
     assert Feature.resolve(Feature.NOTE) == {Feature.NOTE}
     assert Feature.resolve("note") == {Feature.NOTE}
+    assert Feature.resolve(Feature.DEVELOPER) == {Feature.DEVELOPER}
+    assert Feature.resolve("developer") == {Feature.DEVELOPER}
+    assert Feature.resolve("eval") == set()
     assert Feature.resolve("minimal") == {Feature.NOTE}
     assert Feature.resolve("standard") == {
         Feature.NOTE,
@@ -383,7 +386,7 @@ def test_feature_enum_class_and_instance_methods():
     # 2. Feature.presets
     presets = Feature.presets()
     assert "all" in presets and len(presets["all"]) == 9
-    assert "safe" in presets and Feature.EVAL not in presets["safe"]
+    assert "safe" in presets and Feature.DEVELOPER not in presets["safe"]
 
     # 3. Instance method: feature.register
     server = MCPServer("single-feature-server")
@@ -540,7 +543,7 @@ def test_register_tools_enforces_keyword_only_parameters():
     from obsidian_cli_mcp.tools import (
         register_base_tools,
         register_core_tools,
-        register_eval_tools,
+        register_developer_tools,
         register_graph_tools,
         register_note_tools,
         register_plugin_tools,
@@ -553,7 +556,7 @@ def test_register_tools_enforces_keyword_only_parameters():
     all_reg_funcs = [
         register_base_tools,
         register_core_tools,
-        register_eval_tools,
+        register_developer_tools,
         register_graph_tools,
         register_note_tools,
         register_plugin_tools,
