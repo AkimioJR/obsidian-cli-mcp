@@ -398,10 +398,13 @@ def test_feature_enum_class_and_instance_methods():
 
     # 2. Feature.presets
     presets = Feature.presets()
-    assert "all" in presets and len(presets["all"]) == 10
+    assert "all" in presets and len(presets["all"]) == 12
     assert "safe" in presets and Feature.DEVELOPER not in presets["safe"]
     assert Feature.EXPLORER in presets["safe"]
     assert Feature.WORKSPACE in presets["safe"]
+    assert Feature.COMMAND in presets["safe"]
+    assert Feature.TEMPLATE in presets["safe"]
+    assert Feature.PLUGIN in presets["safe"]
 
     # 3. Instance method: feature.register
     server = MCPServer("single-feature-server")
@@ -557,6 +560,7 @@ def test_register_tools_enforces_keyword_only_parameters():
 
     from obsidian_cli_mcp.tools import (
         register_base_tools,
+        register_command_tools,
         register_core_tools,
         register_developer_tools,
         register_explorer_tools,
@@ -566,11 +570,13 @@ def test_register_tools_enforces_keyword_only_parameters():
         register_property_tools,
         register_tag_tools,
         register_task_tools,
+        register_template_tools,
         register_workspace_tools,
     )
 
     all_reg_funcs = [
         register_base_tools,
+        register_command_tools,
         register_core_tools,
         register_developer_tools,
         register_graph_tools,
@@ -580,6 +586,7 @@ def test_register_tools_enforces_keyword_only_parameters():
         register_property_tools,
         register_tag_tools,
         register_task_tools,
+        register_template_tools,
         register_workspace_tools,
     ]
 
@@ -1199,7 +1206,7 @@ async def test_note_diff_random_and_plugin_templates():
     from obsidian_cli_mcp.tools import Feature
 
     server = create_server(
-        cli_path="/mock/obsidian", features=[Feature.NOTE, Feature.PLUGIN]
+        cli_path="/mock/obsidian", features=[Feature.NOTE, Feature.TEMPLATE]
     )
     mock_run = AsyncMock(
         return_value=CommandExecutionResult(
@@ -1240,7 +1247,7 @@ async def test_note_diff_random_and_plugin_templates():
             "newtab",
         ]
 
-        # 3. templates in plugin
+        # 3. templates in template
         res_tpl = await server.call_tool(
             "templates", {"total": True, "vault": "WorkVault"}
         )
@@ -1248,5 +1255,191 @@ async def test_note_diff_random_and_plugin_templates():
         assert mock_run.call_args_list[2][0][1] == [
             "templates",
             "total",
+            "vault=WorkVault",
+        ]
+
+
+@pytest.mark.asyncio
+async def test_feature_command_template_plugin_registration_and_titles():
+    from obsidian_cli_mcp.tools import Feature
+
+    # 1. Feature.COMMAND (5 core + 2 command = 7)
+    server_cmd = create_server(cli_path="/mock/obsidian", features=[Feature.COMMAND])
+    cmd_tools = server_cmd._tool_manager._tools
+    assert len(cmd_tools) == 7
+    expected_cmd = {"command", "commands"}
+    assert expected_cmd.issubset(cmd_tools.keys())
+    assert "templates" not in cmd_tools
+    assert "plugins" not in cmd_tools
+
+    # 2. Feature.TEMPLATE (5 core + 3 template = 8)
+    server_tpl = create_server(cli_path="/mock/obsidian", features=[Feature.TEMPLATE])
+    tpl_tools = server_tpl._tool_manager._tools
+    assert len(tpl_tools) == 8
+    expected_tpl = {"templates", "template_read", "template_insert"}
+    assert expected_tpl.issubset(tpl_tools.keys())
+    assert "command" not in tpl_tools
+    assert "plugins" not in tpl_tools
+
+    # 3. Feature.PLUGIN (5 core + 4 plugin = 9)
+    server_plg = create_server(cli_path="/mock/obsidian", features=[Feature.PLUGIN])
+    plg_tools = server_plg._tool_manager._tools
+    assert len(plg_tools) == 9
+    expected_plg = {"plugins", "plugins_enabled", "plugin_enable", "plugin_disable"}
+    assert expected_plg.issubset(plg_tools.keys())
+    assert "command" not in plg_tools
+    assert "commands" not in plg_tools
+    assert "templates" not in plg_tools
+    assert "template_read" not in plg_tools
+    assert "template_insert" not in plg_tools
+
+    # 4. Localized titles in zh_CN
+    server_zh = create_server(
+        cli_path="/mock/obsidian",
+        lang="zh_CN",
+        features=[Feature.COMMAND, Feature.TEMPLATE, Feature.PLUGIN],
+    )
+    tools_zh = server_zh._tool_manager._tools
+    assert tools_zh["command"].title == "执行命令"
+    assert tools_zh["commands"].title == "列出可用命令"
+    assert tools_zh["templates"].title == "列出模板清单"
+    assert tools_zh["template_read"].title == "读取模板内容"
+    assert tools_zh["template_insert"].title == "插入模板到当前笔记"
+    assert tools_zh["plugins"].title == "列出已安装插件"
+    assert tools_zh["plugins_enabled"].title == "列出已启用插件"
+    assert tools_zh["plugin_enable"].title == "启用插件"
+    assert tools_zh["plugin_disable"].title == "禁用插件"
+
+    # 5. Localized titles in en_US
+    server_en = create_server(
+        cli_path="/mock/obsidian",
+        lang="en_US",
+        features=[Feature.COMMAND, Feature.TEMPLATE, Feature.PLUGIN],
+    )
+    tools_en = server_en._tool_manager._tools
+    assert tools_en["command"].title == "Execute Command"
+    assert tools_en["commands"].title == "List Commands"
+    assert tools_en["templates"].title == "List Templates"
+    assert tools_en["template_read"].title == "Read Template"
+    assert tools_en["template_insert"].title == "Insert Template to Note"
+    assert tools_en["plugins"].title == "List Installed Plugins"
+    assert tools_en["plugins_enabled"].title == "List Enabled Plugins"
+    assert tools_en["plugin_enable"].title == "Enable Plugin"
+    assert tools_en["plugin_disable"].title == "Disable Plugin"
+
+
+@pytest.mark.asyncio
+async def test_feature_command_template_plugin_tool_executions():
+    from unittest.mock import AsyncMock, patch
+
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(
+        cli_path="/mock/obsidian",
+        features=[Feature.COMMAND, Feature.TEMPLATE, Feature.PLUGIN],
+    )
+    mock_run = AsyncMock(
+        return_value=CommandExecutionResult(
+            returncode=0, stdout="mock_output", stderr=""
+        )
+    )
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", new=mock_run):
+        # 1. command in Feature.COMMAND
+        res_cmd = await server.call_tool(
+            "command", {"id": "app:toggle-left-sidebar", "vault": "WorkVault"}
+        )
+        assert _extract_tool_text(res_cmd) == "mock_output"
+        assert mock_run.call_args_list[0][0][1] == [
+            "command",
+            "id=app:toggle-left-sidebar",
+            "vault=WorkVault",
+        ]
+
+        # 2. commands in Feature.COMMAND
+        res_cmds = await server.call_tool("commands", {"filter": "editor:"})
+        assert _extract_tool_text(res_cmds) == "mock_output"
+        assert mock_run.call_args_list[1][0][1] == ["commands", "filter=editor:"]
+
+        # 3. templates in Feature.TEMPLATE
+        res_tpls = await server.call_tool("templates", {"total": False})
+        assert _extract_tool_text(res_tpls) == "mock_output"
+        assert mock_run.call_args_list[2][0][1] == ["templates"]
+
+        # 4. template_read in Feature.TEMPLATE
+        res_read = await server.call_tool(
+            "template_read",
+            {
+                "name": "Meeting",
+                "resolve": True,
+                "title": "Weekly Sync",
+                "vault": "WorkVault",
+            },
+        )
+        assert _extract_tool_text(res_read) == "mock_output"
+        assert mock_run.call_args_list[3][0][1] == [
+            "template:read",
+            "name=Meeting",
+            "resolve",
+            "title=Weekly Sync",
+            "vault=WorkVault",
+        ]
+
+        # 5. template_insert in Feature.TEMPLATE
+        res_ins = await server.call_tool(
+            "template_insert", {"name": "Daily Note", "vault": "WorkVault"}
+        )
+        assert _extract_tool_text(res_ins) == "mock_output"
+        assert mock_run.call_args_list[4][0][1] == [
+            "template:insert",
+            "name=Daily Note",
+            "vault=WorkVault",
+        ]
+
+        # 6. plugins in Feature.PLUGIN
+        res_plg = await server.call_tool(
+            "plugins", {"filter": "community", "versions": True, "vault": "WorkVault"}
+        )
+        assert _extract_tool_text(res_plg) == "mock_output"
+        assert mock_run.call_args_list[5][0][1] == [
+            "plugins",
+            "filter=community",
+            "versions",
+            "format=json",
+            "vault=WorkVault",
+        ]
+
+        # 7. plugins_enabled in Feature.PLUGIN
+        res_plge = await server.call_tool(
+            "plugins_enabled", {"filter": "core", "versions": False}
+        )
+        assert _extract_tool_text(res_plge) == "mock_output"
+        assert mock_run.call_args_list[6][0][1] == [
+            "plugins:enabled",
+            "filter=core",
+            "format=json",
+        ]
+
+        # 8. plugin_enable in Feature.PLUGIN
+        res_en = await server.call_tool(
+            "plugin_enable",
+            {"id": "dataview", "filter": "community", "vault": "WorkVault"},
+        )
+        assert _extract_tool_text(res_en) == "mock_output"
+        assert mock_run.call_args_list[7][0][1] == [
+            "plugin:enable",
+            "id=dataview",
+            "filter=community",
+            "vault=WorkVault",
+        ]
+
+        # 9. plugin_disable in Feature.PLUGIN
+        res_dis = await server.call_tool(
+            "plugin_disable", {"id": "dataview", "vault": "WorkVault"}
+        )
+        assert _extract_tool_text(res_dis) == "mock_output"
+        assert mock_run.call_args_list[8][0][1] == [
+            "plugin:disable",
+            "id=dataview",
             "vault=WorkVault",
         ]

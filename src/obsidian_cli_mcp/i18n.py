@@ -155,12 +155,16 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "bookmarks": "查看书签星标",
             "bookmark": "添加书签",
         },
-        "plugin": {
+        "command": {
             "command": "执行命令",
             "commands": "列出可用命令",
+        },
+        "template": {
             "templates": "列出模板清单",
             "template_read": "读取模板内容",
             "template_insert": "插入模板到当前笔记",
+        },
+        "plugin": {
             "plugins": "列出已安装插件",
             "plugins_enabled": "列出已启用插件",
             "plugin_enable": "启用插件",
@@ -238,12 +242,16 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "bookmarks": "List Bookmarks",
             "bookmark": "Add Bookmark",
         },
-        "plugin": {
+        "command": {
             "command": "Execute Command",
             "commands": "List Commands",
+        },
+        "template": {
             "templates": "List Templates",
             "template_read": "Read Template",
             "template_insert": "Insert Template to Note",
+        },
+        "plugin": {
             "plugins": "List Installed Plugins",
             "plugins_enabled": "List Enabled Plugins",
             "plugin_enable": "Enable Plugin",
