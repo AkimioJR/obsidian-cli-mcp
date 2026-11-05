@@ -263,8 +263,18 @@ pip install obsidian-cli-mcp
 - `base_query`: 对 Base 数据表格执行结构化查询并导出（支持 JSON、CSV、Markdown 等）。
 - `base_create`: 在指定 Base 视图中快速创建新条目。
 
-### 12. 开发者工具 (Feature: `developer` · 1 项)
+### 12. 开发者工具 (Feature: `developer` · 11 项)
 - `eval`: 在 Obsidian 运行时环境中直接执行 JavaScript 代码（高级逃生通道）。
+- `dev_dom`: 使用 CSS 选择器查询、过滤与提取已渲染的 DOM 元素（文本、HTML、属性、CSS 等）。
+- `dev_css`: 审查匹配指定选择器的 CSS 样式规则与源定位。
+- `dev_console`: 查看或清空捕获的控制台消息（Log/Warn/Error/Info/Debug）。
+- `dev_errors`: 查看或清空未处理的运行时异常与崩溃日志。
+- `dev_debug`: 挂载或断开 Chrome DevTools Protocol 调试器连接（`state=on|off`）。
+- `dev_startup`: 输出应用冷启动各阶段的耗时分解 breakdown（支持自动解析为结构化 JSON）。
+- `dev_screenshot`: 对当前 Obsidian 应用窗口进行截屏并保存为图片。
+- `dev_mobile`: 开启或关闭移动端模拟视图模式（`state=on|off`）。
+- `devtools`: 打开或关闭 Electron 原生开发者工具窗口（F12）。
+- `dev_cdp`: 直接向底层 Electron 实例发送 Chrome DevTools Protocol 指令。
 
 </details>
 

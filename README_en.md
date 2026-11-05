@@ -263,8 +263,18 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `base_query`: Query structured records from a Base file (JSON, CSV, Markdown, etc.).
 - `base_create`: Create a new entry in a Base file.
 
-### 12. Developer Tools (Feature: `developer` · 1 tool)
+### 12. Developer Tools (Feature: `developer` · 11 tools)
 - `eval`: Execute JavaScript code inside Obsidian runtime (advanced escape hatch).
+- `dev_dom`: Query, filter, and extract rendered DOM elements via CSS selectors (text, HTML, attributes, CSS).
+- `dev_css`: Inspect CSS rules and source locations for matching selectors.
+- `dev_console`: View or clear captured console messages (Log/Warn/Error/Info/Debug).
+- `dev_errors`: View or clear uncaught runtime exceptions and error logs.
+- `dev_debug`: Attach or detach the Chrome DevTools Protocol debugger channel (`state=on|off`).
+- `dev_startup`: Inspect startup performance breakdown (parsed as structured JSON).
+- `dev_screenshot`: Capture an application window screenshot and save to disk.
+- `dev_mobile`: Toggle mobile emulation mode (`state=on|off`).
+- `devtools`: Toggle the Electron native developer tools window (F12).
+- `dev_cdp`: Directly execute Chrome DevTools Protocol (CDP) commands.
 
 </details>
 
