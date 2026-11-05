@@ -9,15 +9,17 @@ from obsidian_cli_mcp.server import create_server
 
 
 def test_server_tools_registered():
-    # 默认加载 standard 预设 (3 core + 25 standard = 28)
+    # 默认加载 standard 预设 (5 core + 25 standard = 30)
     server = create_server(cli_path="/mock/obsidian")
     tools = server._tool_manager._tools
-    assert len(tools) == 28
+    assert len(tools) == 30
     assert "read" in tools
     assert "create" in tools
     assert "tags" in tools
     assert "vaults" in tools
     assert "version" in tools
+    assert "reload" in tools
+    assert "restart" in tools
 
     # 显式指定 all 预设时启用全量 56 项工具
     server_all = create_server(cli_path="/mock/obsidian", features=["all"])
@@ -123,11 +125,13 @@ def test_feature_filtering_single():
 
     server = create_server(cli_path="/mock/obsidian", features=[Feature.NOTE])
     tools = server._tool_manager._tools
-    # 3 core tools (version, vaults, vault) + 9 note tools = 12
-    assert len(tools) == 12
+    # 5 core tools (version, vaults, vault, reload, restart) + 9 note tools = 14
+    assert len(tools) == 14
     assert "version" in tools
     assert "vaults" in tools
     assert "vault" in tools
+    assert "reload" in tools
+    assert "restart" in tools
     assert "read" in tools
     assert "create" in tools
     assert "delete" in tools
@@ -143,7 +147,7 @@ def test_feature_tag_and_task_split():
     # Test Feature.TAG
     server_tag = create_server(cli_path="/mock/obsidian", features=[Feature.TAG])
     tag_tools = server_tag._tool_manager._tools
-    assert len(tag_tools) == 5  # 3 core + 2 tag
+    assert len(tag_tools) == 7  # 5 core + 2 tag
     assert "version" in tag_tools
     assert "tags" in tag_tools
     assert "tag" in tag_tools
@@ -153,7 +157,7 @@ def test_feature_tag_and_task_split():
     # Test Feature.TASK
     server_task = create_server(cli_path="/mock/obsidian", features=[Feature.TASK])
     task_tools = server_task._tool_manager._tools
-    assert len(task_tools) == 5  # 3 core + 2 task
+    assert len(task_tools) == 7  # 5 core + 2 task
     assert "version" in task_tools
     assert "tasks" in task_tools
     assert "task" in task_tools
@@ -165,7 +169,7 @@ def test_feature_filtering_by_string_and_env(monkeypatch):
     # 字符串列表方式指定
     server = create_server(cli_path="/mock/obsidian", features=["property", "task"])
     tools = server._tool_manager._tools
-    assert len(tools) == 9  # 3 core + 4 property + 2 task
+    assert len(tools) == 11  # 5 core + 4 property + 2 task
     assert "version" in tools
     assert "properties" in tools
     assert "tasks" in tools
@@ -176,7 +180,7 @@ def test_feature_filtering_by_string_and_env(monkeypatch):
     monkeypatch.setenv("OBSIDIAN_FEATURES", "developer,graph")
     server_env = create_server(cli_path="/mock/obsidian")
     tools_env = server_env._tool_manager._tools
-    assert len(tools_env) == 12  # 3 core + 8 graph + 1 eval
+    assert len(tools_env) == 14  # 5 core + 8 graph + 1 eval
     assert "version" in tools_env
     assert "eval" in tools_env
     assert "backlinks" in tools_env
@@ -184,13 +188,15 @@ def test_feature_filtering_by_string_and_env(monkeypatch):
 
 
 def test_feature_plural_not_supported():
-    # 复数形式已被移除，不再支持；仅保留 3 个必须的基础核心工具
+    # 复数形式已被移除，不再支持；仅保留 5 个必须的基础核心工具
     server = create_server(cli_path="/mock/obsidian", features=["notes", "tasks"])
     tools = server._tool_manager._tools
-    assert len(tools) == 3
+    assert len(tools) == 5
     assert "version" in tools
     assert "vaults" in tools
     assert "vault" in tools
+    assert "reload" in tools
+    assert "restart" in tools
     assert "read" not in tools
 
 
@@ -198,20 +204,24 @@ def test_core_tools_always_registered():
     # 即使 features 显式设置为空列表，核心探测工具也必须默认注册
     server = create_server(cli_path="/mock/obsidian", features=[])
     tools = server._tool_manager._tools
-    assert len(tools) == 3
+    assert len(tools) == 5
     assert "version" in tools
     assert "vaults" in tools
     assert "vault" in tools
+    assert "reload" in tools
+    assert "restart" in tools
     assert tools["version"].title == "Show Obsidian Version"
     assert tools["vaults"].title == "List All Vaults"
     assert tools["vault"].title == "Show Vault Info"
+    assert tools["reload"].title == "Reload Vault"
+    assert tools["restart"].title == "Restart Obsidian"
 
 
 def test_feature_preset_standard():
     server = create_server(cli_path="/mock/obsidian", features=["standard"])
     tools = server._tool_manager._tools
-    # standard: 3 core + 25 standard (note 9 + property 4 + tag 2 + task 2 + graph 8) = 28
-    assert len(tools) == 28
+    # standard: 5 core + 25 standard (note 9 + property 4 + tag 2 + task 2 + graph 8) = 30
+    assert len(tools) == 30
     assert "read" in tools
     assert "property_read" in tools
     assert "tags" in tools
@@ -1035,7 +1045,7 @@ async def test_feature_other_registration_and_titles():
     # 1. Registration
     server = create_server(cli_path="/mock/obsidian", features=[Feature.OTHER])
     tools = server._tool_manager._tools
-    assert len(tools) == 10  # 3 core + 7 other
+    assert len(tools) == 12  # 5 core + 7 other
     expected_tools = {
         "bookmark",
         "templates",
@@ -1176,3 +1186,29 @@ async def test_feature_other_tool_executions():
         assert _extract_tool_text(res) == "mock_output"
         args = mock_run.call_args[0][1]
         assert args == ["random", "folder=Articles", "newtab"]
+
+
+@pytest.mark.asyncio
+async def test_core_reload_and_restart_execution():
+    server = create_server(cli_path="/mock/obsidian", features=[])
+    mock_run = AsyncMock(
+        return_value=CommandExecutionResult(
+            returncode=0, stdout="mock_output", stderr=""
+        )
+    )
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", new=mock_run):
+        # 1. reload without vault
+        res1 = await server.call_tool("reload", {})
+        assert _extract_tool_text(res1) == "mock_output"
+        assert mock_run.call_args_list[0][0][1] == ["reload"]
+
+        # 2. reload with vault
+        res2 = await server.call_tool("reload", {"vault": "MyVault"})
+        assert _extract_tool_text(res2) == "mock_output"
+        assert mock_run.call_args_list[1][0][1] == ["reload", "vault=MyVault"]
+
+        # 3. restart
+        res3 = await server.call_tool("restart", {})
+        assert _extract_tool_text(res3) == "mock_output"
+        assert mock_run.call_args_list[2][0][1] == ["restart"]

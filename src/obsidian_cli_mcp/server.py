@@ -20,7 +20,7 @@ def create_server(
 ) -> MCPServer:
     """创建并配置 Obsidian MCP 服务器实例。
 
-    无条件注册基础核心工具（Core Tools: version, vaults, vault），
+    无条件注册基础核心工具（Core Tools: version, vaults, vault, reload, restart），
     启动时检测 Obsidian 客户端版本并根据各工具版本要求动态检查与注册。
     当 enable_extensions=True 或环境变量 OBSIDIAN_EXTENSIONS=true 时，
     在各 Feature 注册时启用额外的非原生 CLI 扩展工具（如 note 模块中的 patch）。
@@ -62,7 +62,7 @@ def create_server(
     else:
         resolved_extensions = bool(enable_extensions)
 
-    # 1. 始终注册基础核心工具（Core Tools: version, vaults, vault）
+    # 1. 始终注册基础核心工具（Core Tools: version, vaults, vault, reload, restart）
     register_core_tools(
         server,
         client,

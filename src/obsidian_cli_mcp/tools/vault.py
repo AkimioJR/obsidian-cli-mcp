@@ -6,7 +6,7 @@ from pydantic import Field
 from ..client import ObsidianClient
 from ..i18n import SupportedLang
 from ..version import Version
-from .base import IDEMPOTENT_WRITE, READ_ONLY, ToolRegistrar, call_tool
+from .base import READ_ONLY, ToolRegistrar, call_tool
 
 
 def register_vault_tools(
@@ -17,7 +17,7 @@ def register_vault_tools(
     version: Version | None = None,
     enable_extensions: bool = False,
 ) -> None:
-    """Register vault file navigation, workspace and lifecycle tools (Feature: vault)."""
+    """Register vault file navigation and workspace tools (Feature: vault)."""
     reg = ToolRegistrar(
         server, "vault", lang, version=version, enable_extensions=enable_extensions
     )
@@ -154,24 +154,3 @@ def register_vault_tools(
         ),
     ) -> Any:
         return await call_tool(client, "workspace", {"ids": ids}, vault=vault)
-
-    @reg.tool(
-        name="reload",
-        annotations=IDEMPOTENT_WRITE,
-        description="Reload the vault interface and re-index notes.",
-    )
-    async def reload_vault(
-        vault: str | None = Field(
-            default=None,
-            description="Target a specific vault by name.",
-        ),
-    ) -> Any:
-        return await call_tool(client, "reload", vault=vault)
-
-    @reg.tool(
-        name="restart",
-        annotations=IDEMPOTENT_WRITE,
-        description="Restart the Obsidian desktop application.",
-    )
-    async def restart_app() -> Any:
-        return await call_tool(client, "restart")

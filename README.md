@@ -184,10 +184,12 @@ pip install obsidian-cli-mcp
 <details open>
 <summary><b>展开查看详细工具功能清单</b></summary>
 
-### 🌟 基础核心工具 (Core Tools · 3 项原生 + 1 项扩展，默认无条件加载)
+### 🌟 基础核心工具 (Core Tools · 5 项原生 + 1 项扩展，默认无条件加载)
 - `version`: 查询当前运行的 Obsidian 桌面客户端版本。
 - `vaults`: 列出本机已知的所有 Vault 笔记库及绝对路径。
 - `vault`: 查询当前 Vault 基本状态（名称、物理路径、文件数、体积等）。
+- `reload`: 重新加载当前笔记库界面与重建索引。
+- `restart`: 重启 Obsidian 桌面客户端进程。
 - `set_default_vault`: 动态切换当前会话默认目标笔记库（需 `OBSIDIAN_EXTENSIONS=true`）。
 
 ### 1. 笔记与内容 (Feature: `note` · 9 项原生 + 2 项扩展)
@@ -227,14 +229,12 @@ pip install obsidian-cli-mcp
 - `tasks`: 按状态（已完成/待办）、标签或所在文件多维筛选任务。
 - `task`: 切换任务的勾选完成状态。
 
-### 6. 笔记库与工作区 (Feature: `vault` · 8 项)
+### 6. 笔记库与工作区 (Feature: `vault` · 5 项)
 - `files`: 列出库内文件清单（支持按文件夹与后缀筛选）。
 - `folders` / `folder`: 浏览文件夹目录树与结构详情。
 - `recents`: 列出最近访问的历史文件。
 - `bookmarks`: 查看书签与星标项目列表。
 - `workspace`: 查询当前工作区窗口布局树。
-- `reload`: 重新加载当前笔记库界面。
-- `restart`: 重启 Obsidian 桌面客户端。
 
 ### 7. 命令与模板自动化 (Feature: `plugin` · 8 项)
 - `command`: 触发执行 Obsidian 内置或第三方插件命令。

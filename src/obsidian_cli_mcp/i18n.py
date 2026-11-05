@@ -98,6 +98,8 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "version": "查看 Obsidian 版本",
             "vaults": "列出已知所有库",
             "vault": "查询当前库信息",
+            "reload": "重新加载笔记库",
+            "restart": "重启 Obsidian",
             "set_default_vault": "切换默认笔记库",
         },
         "note": {
@@ -144,8 +146,6 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "recents": "列出最近访问文件",
             "bookmarks": "查看书签星标",
             "workspace": "查询工作区布局",
-            "reload": "重新加载笔记库",
-            "restart": "重启 Obsidian",
         },
         "plugin": {
             "command": "执行命令",
@@ -181,6 +181,8 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "version": "Show Obsidian Version",
             "vaults": "List All Vaults",
             "vault": "Show Vault Info",
+            "reload": "Reload Vault",
+            "restart": "Restart Obsidian",
             "set_default_vault": "Set Default Vault",
         },
         "note": {
@@ -227,8 +229,6 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "recents": "List Recent Files",
             "bookmarks": "List Bookmarks",
             "workspace": "Get Workspace Layout",
-            "reload": "Reload Vault",
-            "restart": "Restart Obsidian",
         },
         "plugin": {
             "command": "Execute Command",

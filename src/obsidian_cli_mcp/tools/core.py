@@ -19,7 +19,7 @@ def register_core_tools(
 ) -> None:
     """Register essential runtime discovery and preflight tools.
 
-    Core tools (version, vaults, vault) are always registered by default,
+    Core tools (version, vaults, vault, reload, restart) are always registered by default,
     providing fundamental environment introspection and context building.
     """
     reg = ToolRegistrar(
@@ -67,6 +67,27 @@ def register_core_tools(
         ),
     ) -> Any:
         return await call_tool(client, "vault", {"info": info}, vault=vault)
+
+    @reg.tool(
+        name="reload",
+        annotations=IDEMPOTENT_WRITE,
+        description="Reload the vault interface and re-index notes.",
+    )
+    async def reload_vault(
+        vault: str | None = Field(
+            default=None,
+            description="Target a specific vault by name.",
+        ),
+    ) -> Any:
+        return await call_tool(client, "reload", vault=vault)
+
+    @reg.tool(
+        name="restart",
+        annotations=IDEMPOTENT_WRITE,
+        description="Restart the Obsidian desktop application.",
+    )
+    async def restart_app() -> Any:
+        return await call_tool(client, "restart")
 
     @reg.tool(
         name="set_default_vault",

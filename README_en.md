@@ -184,10 +184,12 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 <details open>
 <summary><b>Expand to view detailed tool catalog</b></summary>
 
-### 🌟 Core Tools (Core · 3 native + 1 extension, always loaded by default)
+### 🌟 Core Tools (Core · 5 native + 1 extension, always loaded by default)
 - `version`: Query installed Obsidian desktop application version.
 - `vaults`: List all known Obsidian vaults and their local absolute paths.
 - `vault`: Query current Vault stats (name, path, total files, size, etc.).
+- `reload`: Reload current vault interface and re-index notes.
+- `restart`: Restart Obsidian desktop application.
 - `set_default_vault`: Dynamically switch default target vault for the session (requires `OBSIDIAN_EXTENSIONS=true`).
 
 ### 1. Notes & Content (Feature: `note` · 9 native + 2 extensions)
@@ -227,14 +229,12 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `tasks`: Filter tasks by status (completed/todo), tag, or file.
 - `task`: Toggle checkbox state or mark task completed.
 
-### 6. Vault & Workspace (Feature: `vault` · 8 tools)
+### 6. Vault & Workspace (Feature: `vault` · 5 tools)
 - `files`: List files in vault (supports folder/extension filters).
 - `folders` / `folder`: Inspect directory tree structure and metadata.
 - `recents`: List recently accessed files.
 - `bookmarks`: Read bookmarked and starred items.
 - `workspace`: Query workspace window layout tree.
-- `reload`: Reload current vault interface.
-- `restart`: Restart Obsidian desktop application.
 
 ### 7. Commands & Templates (Feature: `plugin` · 8 tools)
 - `command`: Trigger internal Obsidian or plugin commands.
