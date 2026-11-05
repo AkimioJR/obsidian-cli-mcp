@@ -189,7 +189,7 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `vaults`: List all known Obsidian vaults and their local absolute paths.
 - `vault`: Query current Vault stats (name, path, total files, size, etc.).
 
-### 1. Notes & Content (Feature: `note` · 9 native + 1 extension)
+### 1. Notes & Content (Feature: `note` · 9 native + 2 extensions)
 - `read`: Read raw Markdown content by note name or relative path.
 - `create`: Create a new note with optional template, pre-filled content, overwrite, and auto-open.
 - `append`: Append content to the end of a note or under a target heading section (`heading=`, Obsidian 1.14+).
@@ -200,6 +200,7 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `open`: Focus and open note in the Obsidian GUI.
 - `random_read`: Randomly read a note from the vault.
 - `edit`: Precise in-place note editing via literal search-and-replace (requires `OBSIDIAN_EXTENSIONS=true`).
+- `import_file`: Import external local file directly into vault (zero token overhead, avoids JSON escaping, requires `OBSIDIAN_EXTENSIONS=true`).
 
 ### 2. Properties & Frontmatter (Feature: `property` · 4 tools)
 - `properties`: List all property keys across vault or for a specific file.

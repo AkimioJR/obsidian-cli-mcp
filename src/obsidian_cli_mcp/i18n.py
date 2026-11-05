@@ -110,6 +110,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "open": "聚焦打开笔记",
             "random_read": "随机漫游笔记",
             "edit": "编辑修改笔记",
+            "import_file": "导入外部文件",
         },
         "property": {
             "properties": "查看属性概览",
@@ -182,6 +183,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "open": "Open & Focus Note",
             "random_read": "Read Random Note",
             "edit": "Edit Note Content",
+            "import_file": "Import External File",
         },
         "property": {
             "properties": "List Properties",

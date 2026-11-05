@@ -777,3 +777,149 @@ async def test_edit_tool_validation_and_errors():
         )
         create_args = mock_del.call_args_list[1][0][1]
         assert any("content=delete please" in arg for arg in create_args)
+
+
+@pytest.mark.asyncio
+async def test_import_file_tool_registration(monkeypatch):
+    # 1. 默认未开启扩展时，import_file 不注册
+    monkeypatch.delenv("OBSIDIAN_EXTENSIONS", raising=False)
+    server_default = create_server(cli_path="/mock/obsidian")
+    tools_default = await server_default.list_tools()
+    assert "import_file" not in {t.name for t in tools_default}
+
+    # 2. 显式开启 enable_extensions 时，import_file 作为 note 的扩展工具注册
+    server_ext = create_server(cli_path="/mock/obsidian", enable_extensions=True)
+    tools_ext = await server_ext.list_tools()
+    tool_map = {t.name: t for t in tools_ext}
+    assert "import_file" in tool_map
+    import_tool = tool_map["import_file"]
+    assert import_tool.annotations is not None
+    assert import_tool.annotations.read_only_hint is False
+    assert import_tool.title in ("导入外部文件", "Import External File")
+
+
+@pytest.mark.asyncio
+async def test_import_file_validation_and_errors(tmp_path):
+    from unittest.mock import AsyncMock, patch
+
+    server = create_server(cli_path="/mock/obsidian", enable_extensions=True)
+
+    # 1. source_path 为空
+    res1 = await server.call_tool("import_file", {"source_path": ""})
+    assert "'source_path' must be provided" in _extract_tool_text(res1)
+
+    # 2. source_path 文件不存在
+    res2 = await server.call_tool(
+        "import_file", {"source_path": str(tmp_path / "nonexistent.md")}
+    )
+    assert "does not exist" in _extract_tool_text(res2)
+
+    # 3. source_path 是目录而非文件
+    test_dir = tmp_path / "somedir"
+    test_dir.mkdir()
+    res3 = await server.call_tool("import_file", {"source_path": str(test_dir)})
+    assert "not a regular file" in _extract_tool_text(res3)
+
+    # 4. 路径遍历跨越库目录 (Path Traversal)
+    valid_file = tmp_path / "test.md"
+    valid_file.write_text("sample content", encoding="utf-8")
+    mock_vault_dir = tmp_path / "mock_vault"
+    mock_vault_dir.mkdir()
+
+    with patch(
+        "obsidian_cli_mcp.client.run_cli_command",
+        new=AsyncMock(
+            return_value=CommandExecutionResult(
+                returncode=0, stdout=str(mock_vault_dir), stderr=""
+            )
+        ),
+    ):
+        res4 = await server.call_tool(
+            "import_file",
+            {"source_path": str(valid_file), "path": "../../escaped.md"},
+        )
+        assert "resolves outside the vault directory" in _extract_tool_text(res4)
+
+    # 5. 目标已存在且 overwrite=False
+    existing_dest = mock_vault_dir / "already_exists.md"
+    existing_dest.write_text("old", encoding="utf-8")
+    with patch(
+        "obsidian_cli_mcp.client.run_cli_command",
+        new=AsyncMock(
+            return_value=CommandExecutionResult(
+                returncode=0, stdout=str(mock_vault_dir), stderr=""
+            )
+        ),
+    ):
+        res5 = await server.call_tool(
+            "import_file",
+            {
+                "source_path": str(valid_file),
+                "path": "already_exists.md",
+                "overwrite": False,
+            },
+        )
+        assert "already exists in vault" in _extract_tool_text(res5)
+
+
+@pytest.mark.asyncio
+async def test_import_file_copy_and_move(tmp_path):
+    from unittest.mock import AsyncMock, patch
+
+    server = create_server(cli_path="/mock/obsidian", enable_extensions=True)
+    mock_vault_dir = tmp_path / "vault_root"
+    mock_vault_dir.mkdir()
+
+    # 1. 测试常规复制 (move=False)
+    src_file1 = tmp_path / "workspace_doc.md"
+    src_file1.write_text("# Hello Obsidian\nZero JSON escaping!", encoding="utf-8")
+
+    with patch(
+        "obsidian_cli_mcp.client.run_cli_command",
+        new=AsyncMock(
+            return_value=CommandExecutionResult(
+                returncode=0, stdout=str(mock_vault_dir), stderr=""
+            )
+        ),
+    ):
+        res1 = await server.call_tool(
+            "import_file",
+            {
+                "source_path": str(src_file1),
+                "path": "Deep/Folder/imported.md",
+                "move": False,
+            },
+        )
+        assert "successfully copied into the vault" in _extract_tool_text(res1)
+        dest1 = mock_vault_dir / "Deep" / "Folder" / "imported.md"
+        assert dest1.is_file()
+        assert dest1.read_text(encoding="utf-8") == src_file1.read_text(
+            encoding="utf-8"
+        )
+        assert src_file1.is_file()  # copy 保持源文件依然存在
+
+    # 2. 测试剪切移动 (move=True)
+    src_file2 = tmp_path / "workspace_moved.md"
+    src_file2.write_text("move me into vault", encoding="utf-8")
+
+    with patch(
+        "obsidian_cli_mcp.client.run_cli_command",
+        new=AsyncMock(
+            return_value=CommandExecutionResult(
+                returncode=0, stdout=str(mock_vault_dir), stderr=""
+            )
+        ),
+    ):
+        res2 = await server.call_tool(
+            "import_file",
+            {
+                "source_path": str(src_file2),
+                "path": "moved.md",
+                "move": True,
+            },
+        )
+        assert "successfully moved into the vault" in _extract_tool_text(res2)
+        dest2 = mock_vault_dir / "moved.md"
+        assert dest2.is_file()
+        assert dest2.read_text(encoding="utf-8") == "move me into vault"
+        assert not src_file2.exists()  # move 剪切后源文件不再存在

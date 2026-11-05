@@ -189,7 +189,7 @@ pip install obsidian-cli-mcp
 - `vaults`: 列出本机已知的所有 Vault 笔记库及绝对路径。
 - `vault`: 查询当前 Vault 基本状态（名称、物理路径、文件数、体积等）。
 
-### 1. 笔记与内容 (Feature: `note` · 9 项原生 + 1 项扩展)
+### 1. 笔记与内容 (Feature: `note` · 9 项原生 + 2 项扩展)
 - `read`: 按文件名或相对路径读取笔记 Markdown 原文。
 - `create`: 创建新笔记，支持指定模板、预填充内容、静默覆盖与默认打开。
 - `append`: 向指定笔记末尾或特定标题区域下方（`heading=`，Obsidian 1.14+）追加内容。
@@ -200,6 +200,7 @@ pip install obsidian-cli-mcp
 - `open`: 在 Obsidian 桌面端图形界面中聚焦打开笔记。
 - `random_read`: 随机读取库内的一篇笔记（漫游探索）。
 - `edit`: 局部精细编辑笔记（字面搜索替换，需 `OBSIDIAN_EXTENSIONS=true`）。
+- `import_file`: 导入外部本地文件至笔记库（文件流直拷，零 Token 消耗免 JSON 转义，需 `OBSIDIAN_EXTENSIONS=true`）。
 
 ### 2. 元数据与属性 (Feature: `property` · 4 项)
 - `properties`: 列出库中或指定笔记的全部属性概览。

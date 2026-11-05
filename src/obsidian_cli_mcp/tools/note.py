@@ -1,3 +1,6 @@
+import os
+import shutil
+from pathlib import Path
 from typing import Any
 
 from mcp.server.mcpserver import MCPServer
@@ -486,3 +489,95 @@ def register_note_tools(
 
         replaced_count = count if replace_all else 1
         return f"The file '{target}' has been updated successfully ({replaced_count} occurrence(s) replaced)."
+
+    @reg.tool(
+        name="import_file",
+        annotations=NON_IDEMPOTENT_WRITE,
+        description=(
+            "Import an external local file (from workspace or host) directly into the Obsidian vault. "
+            "Performs fast, safe direct filesystem copy/move without passing content through JSON arguments. "
+            "Supports markdown notes as well as binary attachments (images, PDFs, audio, etc.). "
+            "(Extension tool; enabled via OBSIDIAN_EXTENSIONS=true)"
+        ),
+        extension=True,
+    )
+    async def import_file(
+        source_path: str = Field(
+            description="Absolute or relative path to the local source file on host (required).",
+        ),
+        path: str | None = Field(
+            default=None,
+            description="Destination relative path in vault (e.g. 'Reports/doc.md'). If omitted, imports to vault root using source filename.",
+        ),
+        overwrite: bool = Field(
+            default=False,
+            description="Whether to overwrite if destination file already exists in vault.",
+        ),
+        move: bool = Field(
+            default=False,
+            description="If True, moves (cuts) the source file into the vault instead of copying.",
+        ),
+        vault: str | None = Field(
+            default=None,
+            description="Target a specific vault by name.",
+        ),
+    ) -> Any:
+        if not source_path or not source_path.strip():
+            return "Error: 'source_path' must be provided."
+
+        src = Path(os.path.expanduser(source_path.strip())).resolve()
+        if not src.exists():
+            return f"Error: Source file '{source_path}' does not exist."
+        if not src.is_file():
+            return f"Error: Source path '{source_path}' is not a regular file."
+
+        # 获取目标 Vault 的物理根目录路径
+        vault_info = await call_tool(client, "vault", {"info": "path"}, vault=vault)
+        if isinstance(vault_info, str) and vault_info.startswith("Error:"):
+            return vault_info
+
+        vault_path_str = str(vault_info).strip()
+        if not vault_path_str:
+            target_vault = vault or "current vault"
+            return (
+                f"Error: Could not determine vault directory path for '{target_vault}'."
+            )
+
+        vault_dir = Path(vault_path_str).resolve()
+        if not vault_dir.exists() or not vault_dir.is_dir():
+            return f"Error: Vault directory '{vault_dir}' does not exist or is not a directory."
+
+        # 确定目标文件路径并做 Path Traversal 防御
+        if path and path.strip():
+            dest_rel = Path(path.strip().lstrip("/"))
+            dest = (vault_dir / dest_rel).resolve()
+        else:
+            dest_rel = Path(src.name)
+            dest = (vault_dir / dest_rel).resolve()
+
+        try:
+            dest.relative_to(vault_dir)
+        except ValueError:
+            return f"Error: Destination path '{path}' resolves outside the vault directory."
+
+        if dest.exists() and not overwrite:
+            return (
+                f"Error: Destination file '{dest_rel}' already exists in vault. "
+                "Set overwrite=True to replace it."
+            )
+
+        try:
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            if move:
+                shutil.move(str(src), str(dest))
+                action_verb = "moved"
+            else:
+                shutil.copy2(str(src), str(dest))
+                action_verb = "copied"
+        except OSError as e:
+            action_name = "move" if move else "copy"
+            return f"Error during file {action_name}: {e}"
+
+        return (
+            f"The file '{dest_rel}' has been successfully {action_verb} into the vault."
+        )
