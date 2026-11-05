@@ -167,7 +167,7 @@ Client configuration:
 | `OBSIDIAN_CLI_PATH`   | Absolute path to Obsidian CLI binary                                                                                                            | Auto-detected in system `PATH` (`which obsidian`)       |
 | `OBSIDIAN_TIMEOUT`    | CLI subprocess execution timeout in seconds (supports floats, `none`/`null` to disable)                                                         | `30.0`                                                  |
 | `OBSIDIAN_VERSION`    | Manually specify/override Obsidian client version (e.g. `1.14.5` for headless/container environments)                                           | Auto-detected from `obsidian version` at startup        |
-| `OBSIDIAN_FEATURES`   | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,vault,plugin,base,developer,other` or presets `standard,safe,all`) | `standard` (default: core tools plus standard features) |
+| `OBSIDIAN_FEATURES`   | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,explorer,workspace,plugin,base,developer` or presets `standard,safe,all`) | `standard` (default: core tools plus standard features) |
 | `OBSIDIAN_LANG`       | Localization language for human-readable tool titles (supports `zh_CN`, `en_US`)                                                                | Auto-detected from system locale (fallback to `en_US`)  |
 | `OBSIDIAN_EXTENSIONS` | Whether to enable non-native composite extension tools (only accepts `true` case-insensitively; any other value is `false`)                     | `false` (defaults to pure official CLI tools only)      |
 
@@ -231,14 +231,20 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `tasks`: Filter tasks by status (completed/todo), tag, or file.
 - `task`: Toggle checkbox state or mark task completed.
 
-### 6. Vault & Workspace (Feature: `vault` · 5 tools)
+### 6. File Explorer & Resources (Feature: `explorer` · 5 tools)
 - `files`: List files in vault (supports folder/extension filters).
+- `file`: Show metadata and system details for a specific file.
 - `folders` / `folder`: Inspect directory tree structure and metadata.
 - `recents`: List recently accessed files.
-- `bookmarks`: Read bookmarked and starred items.
-- `workspace`: Query workspace window layout tree.
 
-### 7. Commands & Templates (Feature: `plugin` · 9 tools)
+### 7. Workspace & Navigation (Feature: `workspace` · 5 tools)
+- `workspace`: Query workspace window layout tree.
+- `tabs`: List all open tabs and workspace splits.
+- `tab_open`: Open a new tab in Obsidian GUI (supports file, tab group ID, or view type).
+- `bookmarks`: Read bookmarked and starred items.
+- `bookmark`: Add a bookmark in the vault (supports file, subpath, folder, search query, or URL).
+
+### 8. Commands & Templates (Feature: `plugin` · 9 tools)
 - `command`: Trigger internal Obsidian or plugin commands.
 - `commands`: List all available command IDs.
 - `templates`: List all template files in the vault.
@@ -247,22 +253,14 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `plugins` / `plugins_enabled`: List installed / active community and core plugins.
 - `plugin_enable` / `plugin_disable`: Dynamically enable or disable plugins.
 
-### 8. Database Views & Bases (Feature: `base` · 4 tools, requires Obsidian 1.14+)
+### 9. Database Views & Bases (Feature: `base` · 4 tools, requires Obsidian 1.14+)
 - `bases`: List all `.base` database view files in the vault.
 - `base_views`: List all views configured in a `.base` file.
 - `base_query`: Query structured records from a Base file (JSON, CSV, Markdown, etc.).
 - `base_create`: Create a new entry in a Base file.
 
-### 9. Developer Tools (Feature: `developer` · 1 tool)
+### 10. Developer Tools (Feature: `developer` · 1 tool)
 - `eval`: Execute JavaScript code inside Obsidian runtime (advanced escape hatch).
-
-### 10. Miscellaneous Tools (Feature: `other` · 4 tools)
-> ⚠️ **Disclaimer & Breaking Changes Warning**: The `other` feature group is merely a temporary holding area for commands that are not yet cleanly categorized into dedicated domains (e.g. `bookmark`, `file`, `tabs`, `tab_open`). In future releases, these tools will be reorganized into dedicated feature groups (such as `THEME`, `HOTKEY`, or more granular modules). Therefore, **no backward compatibility is guaranteed for `other` (breaking changes may occur); do not hard-depend on this feature group**.
-
-- `bookmark`: Add a bookmark in the vault (supports file, subpath, folder, search query, or URL).
-- `file`: Show metadata and system details for a specific file.
-- `tabs`: List all open tabs and workspace splits.
-- `tab_open`: Open a new tab in Obsidian GUI (supports file, tab group ID, or view type).
 
 </details>
 

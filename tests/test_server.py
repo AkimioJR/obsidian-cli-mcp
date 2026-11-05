@@ -400,7 +400,8 @@ def test_feature_enum_class_and_instance_methods():
     presets = Feature.presets()
     assert "all" in presets and len(presets["all"]) == 10
     assert "safe" in presets and Feature.DEVELOPER not in presets["safe"]
-    assert Feature.OTHER in presets["safe"]
+    assert Feature.EXPLORER in presets["safe"]
+    assert Feature.WORKSPACE in presets["safe"]
 
     # 3. Instance method: feature.register
     server = MCPServer("single-feature-server")
@@ -558,14 +559,14 @@ def test_register_tools_enforces_keyword_only_parameters():
         register_base_tools,
         register_core_tools,
         register_developer_tools,
+        register_explorer_tools,
         register_graph_tools,
         register_note_tools,
-        register_other_tools,
         register_plugin_tools,
         register_property_tools,
         register_tag_tools,
         register_task_tools,
-        register_vault_tools,
+        register_workspace_tools,
     )
 
     all_reg_funcs = [
@@ -573,13 +574,13 @@ def test_register_tools_enforces_keyword_only_parameters():
         register_core_tools,
         register_developer_tools,
         register_graph_tools,
+        register_explorer_tools,
         register_note_tools,
-        register_other_tools,
         register_plugin_tools,
         register_property_tools,
         register_tag_tools,
         register_task_tools,
-        register_vault_tools,
+        register_workspace_tools,
     ]
 
     for fn in all_reg_funcs:
@@ -1039,49 +1040,69 @@ async def test_set_default_vault_validation_and_reset():
 
 
 @pytest.mark.asyncio
-async def test_feature_other_registration_and_titles():
+async def test_feature_explorer_and_workspace_registration_and_titles():
     from obsidian_cli_mcp.tools import Feature
 
-    # 1. Registration
-    server = create_server(cli_path="/mock/obsidian", features=[Feature.OTHER])
-    tools = server._tool_manager._tools
-    assert len(tools) == 9  # 5 core + 4 other
-    expected_tools = {
-        "bookmark",
-        "file",
-        "tabs",
-        "tab_open",
-    }
-    assert expected_tools.issubset(tools.keys())
+    # 1. Registration Explorer (5 core + 5 explorer = 10)
+    server_exp = create_server(cli_path="/mock/obsidian", features=[Feature.EXPLORER])
+    exp_tools = server_exp._tool_manager._tools
+    assert len(exp_tools) == 10
+    expected_exp = {"files", "file", "folders", "folder", "recents"}
+    assert expected_exp.issubset(exp_tools.keys())
 
-    # 2. Titles in zh_CN
+    # 2. Registration Workspace (5 core + 5 workspace = 10)
+    server_ws = create_server(cli_path="/mock/obsidian", features=[Feature.WORKSPACE])
+    ws_tools = server_ws._tool_manager._tools
+    assert len(ws_tools) == 10
+    expected_ws = {"workspace", "tabs", "tab_open", "bookmarks", "bookmark"}
+    assert expected_ws.issubset(ws_tools.keys())
+
+    # 3. Titles in zh_CN
     server_zh = create_server(
-        cli_path="/mock/obsidian", lang="zh_CN", features=[Feature.OTHER]
+        cli_path="/mock/obsidian",
+        lang="zh_CN",
+        features=[Feature.EXPLORER, Feature.WORKSPACE],
     )
     tools_zh = server_zh._tool_manager._tools
-    assert tools_zh["bookmark"].title == "添加书签"
     assert tools_zh["file"].title == "查询文件信息"
+    assert tools_zh["files"].title == "检索库内文件"
+    assert tools_zh["folders"].title == "列出文件夹目录"
+    assert tools_zh["folder"].title == "查询文件夹详情"
+    assert tools_zh["recents"].title == "列出最近访问文件"
+    assert tools_zh["workspace"].title == "查询工作区布局"
     assert tools_zh["tabs"].title == "列出打开的标签页"
     assert tools_zh["tab_open"].title == "打开新标签页"
+    assert tools_zh["bookmarks"].title == "查看书签星标"
+    assert tools_zh["bookmark"].title == "添加书签"
 
-    # 3. Titles in en_US
+    # 4. Titles in en_US
     server_en = create_server(
-        cli_path="/mock/obsidian", lang="en_US", features=[Feature.OTHER]
+        cli_path="/mock/obsidian",
+        lang="en_US",
+        features=[Feature.EXPLORER, Feature.WORKSPACE],
     )
     tools_en = server_en._tool_manager._tools
-    assert tools_en["bookmark"].title == "Add Bookmark"
     assert tools_en["file"].title == "Show File Details"
+    assert tools_en["files"].title == "List Files in Vault"
+    assert tools_en["folders"].title == "List Folders"
+    assert tools_en["folder"].title == "Show Folder Details"
+    assert tools_en["recents"].title == "List Recent Files"
+    assert tools_en["workspace"].title == "Get Workspace Layout"
     assert tools_en["tabs"].title == "List Open Tabs"
     assert tools_en["tab_open"].title == "Open New Tab"
+    assert tools_en["bookmarks"].title == "List Bookmarks"
+    assert tools_en["bookmark"].title == "Add Bookmark"
 
 
 @pytest.mark.asyncio
-async def test_feature_other_tool_executions():
+async def test_feature_explorer_and_workspace_tool_executions():
     from unittest.mock import AsyncMock, patch
 
     from obsidian_cli_mcp.tools import Feature
 
-    server = create_server(cli_path="/mock/obsidian", features=[Feature.OTHER])
+    server = create_server(
+        cli_path="/mock/obsidian", features=[Feature.EXPLORER, Feature.WORKSPACE]
+    )
 
     mock_run = AsyncMock(
         return_value=CommandExecutionResult(
@@ -1090,8 +1111,19 @@ async def test_feature_other_tool_executions():
     )
 
     with patch("obsidian_cli_mcp.client.run_cli_command", new=mock_run):
-        # 1. bookmark
-        res = await server.call_tool(
+        # 1. file in explorer
+        res_file = await server.call_tool(
+            "file", {"file": "TestNote", "path": "Docs/TestNote.md"}
+        )
+        assert _extract_tool_text(res_file) == "mock_output"
+        assert mock_run.call_args_list[0][0][1] == [
+            "file",
+            "file=TestNote",
+            "path=Docs/TestNote.md",
+        ]
+
+        # 2. bookmark in workspace
+        res_bm = await server.call_tool(
             "bookmark",
             {
                 "file": "MyNote.md",
@@ -1103,9 +1135,8 @@ async def test_feature_other_tool_executions():
                 "vault": "WorkVault",
             },
         )
-        assert _extract_tool_text(res) == "mock_output"
-        args = mock_run.call_args[0][1]
-        assert args == [
+        assert _extract_tool_text(res_bm) == "mock_output"
+        assert mock_run.call_args_list[1][0][1] == [
             "bookmark",
             "file=MyNote.md",
             "subpath=#Heading",
@@ -1116,28 +1147,18 @@ async def test_feature_other_tool_executions():
             "vault=WorkVault",
         ]
 
-        # 2. file
-        res = await server.call_tool(
-            "file", {"file": "TestNote", "path": "Docs/TestNote.md"}
-        )
-        assert _extract_tool_text(res) == "mock_output"
-        args = mock_run.call_args[0][1]
-        assert args == ["file", "file=TestNote", "path=Docs/TestNote.md"]
+        # 3. tabs in workspace
+        res_tabs = await server.call_tool("tabs", {"ids": True})
+        assert _extract_tool_text(res_tabs) == "mock_output"
+        assert mock_run.call_args_list[2][0][1] == ["tabs", "ids"]
 
-        # 3. tabs
-        res = await server.call_tool("tabs", {"ids": True})
-        assert _extract_tool_text(res) == "mock_output"
-        args = mock_run.call_args[0][1]
-        assert args == ["tabs", "ids"]
-
-        # 4. tab_open
-        res = await server.call_tool(
+        # 4. tab_open in workspace
+        res_to = await server.call_tool(
             "tab_open",
             {"file": "Note.md", "group": "group-1", "view": "markdown"},
         )
-        assert _extract_tool_text(res) == "mock_output"
-        args = mock_run.call_args[0][1]
-        assert args == [
+        assert _extract_tool_text(res_to) == "mock_output"
+        assert mock_run.call_args_list[3][0][1] == [
             "tab:open",
             "file=Note.md",
             "group=group-1",

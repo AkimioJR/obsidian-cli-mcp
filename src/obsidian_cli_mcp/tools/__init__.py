@@ -17,14 +17,14 @@ from .base import (
 from .bases import register_base_tools
 from .core import register_core_tools
 from .developer import register_developer_tools
+from .explorer import register_explorer_tools
 from .graph import register_graph_tools
 from .note import register_note_tools
-from .other import register_other_tools
 from .plugin import register_plugin_tools
 from .property import register_property_tools
 from .tag import register_tag_tools
 from .task import register_task_tools
-from .vault import register_vault_tools
+from .workspace import register_workspace_tools
 
 
 class Feature(str, Enum):
@@ -35,11 +35,11 @@ class Feature(str, Enum):
     TAG = "tag"
     TASK = "task"
     GRAPH = "graph"
-    VAULT = "vault"
+    EXPLORER = "explorer"
+    WORKSPACE = "workspace"
     PLUGIN = "plugin"
     BASE = "base"
     DEVELOPER = "developer"
-    OTHER = "other"  # Temporary holding group for uncategorized commands; breaking changes may occur, do not rely on it
 
     def register(
         self,
@@ -81,10 +81,10 @@ class Feature(str, Enum):
                 cls.TAG,
                 cls.TASK,
                 cls.GRAPH,
-                cls.VAULT,
+                cls.EXPLORER,
+                cls.WORKSPACE,
                 cls.PLUGIN,
                 cls.BASE,
-                cls.OTHER,
             },  # All except developer
         }
 
@@ -150,11 +150,11 @@ _FEATURE_REGISTRY: dict[
     Feature.TAG: register_tag_tools,
     Feature.TASK: register_task_tools,
     Feature.GRAPH: register_graph_tools,
-    Feature.VAULT: register_vault_tools,
+    Feature.EXPLORER: register_explorer_tools,
+    Feature.WORKSPACE: register_workspace_tools,
     Feature.PLUGIN: register_plugin_tools,
     Feature.BASE: register_base_tools,
     Feature.DEVELOPER: register_developer_tools,
-    Feature.OTHER: register_other_tools,
 }
 
 __all__ = [
@@ -168,12 +168,12 @@ __all__ = [
     "register_base_tools",
     "register_core_tools",
     "register_developer_tools",
+    "register_explorer_tools",
     "register_graph_tools",
     "register_note_tools",
-    "register_other_tools",
     "register_plugin_tools",
     "register_property_tools",
     "register_tag_tools",
     "register_task_tools",
-    "register_vault_tools",
+    "register_workspace_tools",
 ]

@@ -9,7 +9,7 @@ from ..version import Version
 from .base import READ_ONLY, ToolRegistrar, call_tool
 
 
-def register_vault_tools(
+def register_explorer_tools(
     server: MCPServer,
     client: ObsidianClient,
     *,
@@ -17,9 +17,9 @@ def register_vault_tools(
     version: Version | None = None,
     enable_extensions: bool = False,
 ) -> None:
-    """Register vault file navigation and workspace tools (Feature: vault)."""
+    """Register file and directory explorer tools (Feature: explorer)."""
     reg = ToolRegistrar(
-        server, "vault", lang, version=version, enable_extensions=enable_extensions
+        server, "explorer", lang, version=version, enable_extensions=enable_extensions
     )
 
     @reg.tool(
@@ -47,6 +47,29 @@ def register_vault_tools(
     ) -> Any:
         return await call_tool(
             client, "files", {"folder": folder, "ext": ext, "total": total}, vault=vault
+        )
+
+    @reg.tool(
+        name="file",
+        annotations=READ_ONLY,
+        description="Show information about a specific file.",
+    )
+    async def file_info(
+        file: str | None = Field(
+            default=None,
+            description="File name.",
+        ),
+        path: str | None = Field(
+            default=None,
+            description="File path.",
+        ),
+        vault: str | None = Field(
+            default=None,
+            description="Target a specific vault by name.",
+        ),
+    ) -> Any:
+        return await call_tool(
+            client, "file", {"file": file, "path": path}, vault=vault
         )
 
     @reg.tool(
@@ -111,46 +134,5 @@ def register_vault_tools(
     ) -> Any:
         return await call_tool(client, "recents", {"total": total}, vault=vault)
 
-    @reg.tool(
-        name="bookmarks",
-        annotations=READ_ONLY,
-        description="List all bookmarks in the vault (returns JSON).",
-    )
-    async def bookmarks(
-        total: bool = Field(
-            default=False,
-            description="Return bookmark count.",
-        ),
-        verbose: bool = Field(
-            default=False,
-            description="Include bookmark types.",
-        ),
-        vault: str | None = Field(
-            default=None,
-            description="Target a specific vault by name.",
-        ),
-    ) -> Any:
-        return await call_tool(
-            client,
-            "bookmarks",
-            {"total": total, "verbose": verbose, "format": "json"},
-            parse_json=True,
-            vault=vault,
-        )
 
-    @reg.tool(
-        name="workspace",
-        annotations=READ_ONLY,
-        description="Get the current workspace window layout tree.",
-    )
-    async def workspace(
-        ids: bool = Field(
-            default=False,
-            description="Include workspace item IDs.",
-        ),
-        vault: str | None = Field(
-            default=None,
-            description="Target a specific vault by name.",
-        ),
-    ) -> Any:
-        return await call_tool(client, "workspace", {"ids": ids}, vault=vault)
+__all__ = ["register_explorer_tools"]

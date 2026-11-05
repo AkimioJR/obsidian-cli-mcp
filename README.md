@@ -167,7 +167,7 @@ pip install obsidian-cli-mcp
 | `OBSIDIAN_CLI_PATH`   | Obsidian CLI 可执行文件的绝对路径                                                                                      | 自动在系统 PATH 中探测（如 `which obsidian`）      |
 | `OBSIDIAN_TIMEOUT`    | CLI 子进程命令执行超时时间（秒，支持小数浮点或 `none`/`null` 禁用超时）                                                | `30.0`                                             |
 | `OBSIDIAN_VERSION`    | 手动指定或覆盖 Obsidian 客户端版本号（用于无头/容器环境兼容性校验，如 `1.14.5`）                                       | 启动时自动从 `obsidian version` 探针探测           |
-| `OBSIDIAN_FEATURES`   | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,base,developer,other` 或预设 `standard,safe,all`） | `standard`（默认启用核心工具及日常笔记与图谱特性） |
+| `OBSIDIAN_FEATURES`   | 按需启用的工具特性组（如 `note,property,tag,task,graph,explorer,workspace,plugin,base,developer` 或预设 `standard,safe,all`） | `standard`（默认启用核心工具及日常笔记与图谱特性） |
 | `OBSIDIAN_LANG`       | 人类可读界面与工具标题的本地化语言（支持 `zh_CN`, `en_US` 等）                                                         | 自动探测系统环境（未匹配时回退至 `en_US`）         |
 | `OBSIDIAN_EXTENSIONS` | 是否启用非原生 CLI 的扩展复合工具（仅当为 `true`（不区分大小写）时开启，其余情况均为 `false`）                         | `false`（默认保持纯粹的官方 CLI 命令映射）         |
 
@@ -231,14 +231,20 @@ pip install obsidian-cli-mcp
 - `tasks`: 按状态（已完成/待办）、标签或所在文件多维筛选任务。
 - `task`: 切换任务的勾选完成状态。
 
-### 6. 笔记库与工作区 (Feature: `vault` · 5 项)
+### 6. 文件与目录资源 (Feature: `explorer` · 5 项)
 - `files`: 列出库内文件清单（支持按文件夹与后缀筛选）。
+- `file`: 查询单个文件的元数据与系统详细信息（绝对路径、大小、创建与修改时间等）。
 - `folders` / `folder`: 浏览文件夹目录树与结构详情。
 - `recents`: 列出最近访问的历史文件。
-- `bookmarks`: 查看书签与星标项目列表。
-- `workspace`: 查询当前工作区窗口布局树。
 
-### 7. 命令与模板自动化 (Feature: `plugin` · 9 项)
+### 7. 工作区与布局导航 (Feature: `workspace` · 5 项)
+- `workspace`: 查询当前工作区窗口布局树。
+- `tabs`: 列出当前工作区中打开的所有标签页与分屏布局。
+- `tab_open`: 在 Obsidian 界面中打开新标签页（支持指定文件、标签组 ID 或视图类型）。
+- `bookmarks`: 查看书签与星标项目列表。
+- `bookmark`: 在当前笔记库中新增书签（支持文件、块/标题子路径、文件夹、搜索查询或 URL）。
+
+### 8. 命令与模板自动化 (Feature: `plugin` · 9 项)
 - `command`: 触发执行 Obsidian 内置或第三方插件命令。
 - `commands`: 列出当前可用的全部命令 ID 清单。
 - `templates`: 列出当前笔记库内所有的模板文件。
@@ -247,22 +253,14 @@ pip install obsidian-cli-mcp
 - `plugins` / `plugins_enabled`: 列出已安装 / 已启用的社区与核心插件。
 - `plugin_enable` / `plugin_disable`: 动态启用或禁用指定插件。
 
-### 8. 数据库表格与看板 (Feature: `base` · 4 项，需 Obsidian 1.14+)
+### 9. 数据库表格与看板 (Feature: `base` · 4 项，需 Obsidian 1.14+)
 - `bases`: 列出笔记库内所有的 `.base` 表格视图文件。
 - `base_views`: 获取指定 Base 文件中已配置的视图清单。
 - `base_query`: 对 Base 数据表格执行结构化查询并导出（支持 JSON、CSV、Markdown 等）。
 - `base_create`: 在指定 Base 视图中快速创建新条目。
 
-### 9. 开发者工具 (Feature: `developer` · 1 项)
+### 10. 开发者工具 (Feature: `developer` · 1 项)
 - `eval`: 在 Obsidian 运行时环境中直接执行 JavaScript 代码（高级逃生通道）。
-
-### 10. 杂项工具 (Feature: `other` · 4 项)
-> ⚠️ **免责与兼容性说明**：`other` 特性组仅作为临时分类收容当前版本中尚不好明确归类的命令（如 `bookmark`、`file`、`tabs`、`tab_open`）。后续版本演进中，这些命令可能会被重新拆分并归入专门的功能域（例如 `THEME`、`HOTKEY` 或更细分的模块）。因此**不保证此特性的向后兼容性（未来可能存在破坏性变更），请勿强依赖此特性**。
-
-- `bookmark`: 在当前笔记库中新增书签（支持文件、块/标题子路径、文件夹、搜索查询或 URL）。
-- `file`: 查询单个文件的元数据与系统详细信息（绝对路径、大小、创建与修改时间等）。
-- `tabs`: 列出当前工作区中打开的所有标签页与分屏布局。
-- `tab_open`: 在 Obsidian 界面中打开新标签页（支持指定文件、标签组 ID 或视图类型）。
 
 </details>
 

@@ -141,13 +141,19 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "aliases": "查看笔记别名",
             "wordcount": "统计字数字符",
         },
-        "vault": {
+        "explorer": {
             "files": "检索库内文件",
+            "file": "查询文件信息",
             "folders": "列出文件夹目录",
             "folder": "查询文件夹详情",
             "recents": "列出最近访问文件",
-            "bookmarks": "查看书签星标",
+        },
+        "workspace": {
             "workspace": "查询工作区布局",
+            "tabs": "列出打开的标签页",
+            "tab_open": "打开新标签页",
+            "bookmarks": "查看书签星标",
+            "bookmark": "添加书签",
         },
         "plugin": {
             "command": "执行命令",
@@ -168,12 +174,6 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
         },
         "developer": {
             "eval": "执行 JavaScript 代码",
-        },
-        "other": {
-            "bookmark": "添加书签",
-            "file": "查询文件信息",
-            "tabs": "列出打开的标签页",
-            "tab_open": "打开新标签页",
         },
     },
     SupportedLang.EN_US: {
@@ -224,13 +224,19 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "aliases": "List Aliases",
             "wordcount": "Count Words & Characters",
         },
-        "vault": {
+        "explorer": {
             "files": "List Files in Vault",
+            "file": "Show File Details",
             "folders": "List Folders",
             "folder": "Show Folder Details",
             "recents": "List Recent Files",
-            "bookmarks": "List Bookmarks",
+        },
+        "workspace": {
             "workspace": "Get Workspace Layout",
+            "tabs": "List Open Tabs",
+            "tab_open": "Open New Tab",
+            "bookmarks": "List Bookmarks",
+            "bookmark": "Add Bookmark",
         },
         "plugin": {
             "command": "Execute Command",
@@ -251,12 +257,6 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
         },
         "developer": {
             "eval": "Execute JavaScript",
-        },
-        "other": {
-            "bookmark": "Add Bookmark",
-            "file": "Show File Details",
-            "tabs": "List Open Tabs",
-            "tab_open": "Open New Tab",
         },
     },
 }
