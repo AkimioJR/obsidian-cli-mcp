@@ -152,6 +152,8 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "workspace": "查询工作区布局",
             "tabs": "列出打开的标签页",
             "tab_open": "打开新标签页",
+        },
+        "bookmark": {
             "bookmarks": "查看书签星标",
             "bookmark": "添加书签",
         },
@@ -249,6 +251,8 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "workspace": "Get Workspace Layout",
             "tabs": "List Open Tabs",
             "tab_open": "Open New Tab",
+        },
+        "bookmark": {
             "bookmarks": "List Bookmarks",
             "bookmark": "Add Bookmark",
         },

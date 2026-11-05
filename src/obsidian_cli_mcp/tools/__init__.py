@@ -15,6 +15,7 @@ from .base import (
     ToolRegistrar,
 )
 from .bases import register_base_tools
+from .bookmark import register_bookmark_tools
 from .command import register_command_tools
 from .core import register_core_tools
 from .developer import register_developer_tools
@@ -39,6 +40,7 @@ class Feature(str, Enum):
     GRAPH = "graph"
     EXPLORER = "explorer"
     WORKSPACE = "workspace"
+    BOOKMARK = "bookmark"
     COMMAND = "command"
     TEMPLATE = "template"
     PLUGIN = "plugin"
@@ -87,6 +89,7 @@ class Feature(str, Enum):
                 cls.GRAPH,
                 cls.EXPLORER,
                 cls.WORKSPACE,
+                cls.BOOKMARK,
                 cls.COMMAND,
                 cls.TEMPLATE,
                 cls.PLUGIN,
@@ -158,6 +161,7 @@ _FEATURE_REGISTRY: dict[
     Feature.GRAPH: register_graph_tools,
     Feature.EXPLORER: register_explorer_tools,
     Feature.WORKSPACE: register_workspace_tools,
+    Feature.BOOKMARK: register_bookmark_tools,
     Feature.COMMAND: register_command_tools,
     Feature.TEMPLATE: register_template_tools,
     Feature.PLUGIN: register_plugin_tools,
@@ -174,6 +178,7 @@ __all__ = [
     "Feature",
     "ToolRegistrar",
     "register_base_tools",
+    "register_bookmark_tools",
     "register_command_tools",
     "register_core_tools",
     "register_developer_tools",

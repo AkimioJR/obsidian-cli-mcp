@@ -417,10 +417,11 @@ def test_feature_enum_class_and_instance_methods():
 
     # 2. Feature.presets
     presets = Feature.presets()
-    assert "all" in presets and len(presets["all"]) == 12
+    assert "all" in presets and len(presets["all"]) == 13
     assert "safe" in presets and Feature.DEVELOPER not in presets["safe"]
     assert Feature.EXPLORER in presets["safe"]
     assert Feature.WORKSPACE in presets["safe"]
+    assert Feature.BOOKMARK in presets["safe"]
     assert Feature.COMMAND in presets["safe"]
     assert Feature.TEMPLATE in presets["safe"]
     assert Feature.PLUGIN in presets["safe"]
@@ -579,6 +580,7 @@ def test_register_tools_enforces_keyword_only_parameters():
 
     from obsidian_cli_mcp.tools import (
         register_base_tools,
+        register_bookmark_tools,
         register_command_tools,
         register_core_tools,
         register_developer_tools,
@@ -595,6 +597,7 @@ def test_register_tools_enforces_keyword_only_parameters():
 
     all_reg_funcs = [
         register_base_tools,
+        register_bookmark_tools,
         register_command_tools,
         register_core_tools,
         register_developer_tools,
@@ -1076,18 +1079,30 @@ async def test_feature_explorer_and_workspace_registration_and_titles():
     expected_exp = {"files", "file", "folders", "folder", "recents"}
     assert expected_exp.issubset(exp_tools.keys())
 
-    # 2. Registration Workspace (5 core + 5 workspace = 10)
+    # 2. Registration Workspace (5 core + 3 workspace = 8)
     server_ws = create_server(cli_path="/mock/obsidian", features=[Feature.WORKSPACE])
     ws_tools = server_ws._tool_manager._tools
-    assert len(ws_tools) == 10
-    expected_ws = {"workspace", "tabs", "tab_open", "bookmarks", "bookmark"}
+    assert len(ws_tools) == 8
+    expected_ws = {"workspace", "tabs", "tab_open"}
     assert expected_ws.issubset(ws_tools.keys())
+    assert "bookmarks" not in ws_tools
+    assert "bookmark" not in ws_tools
 
-    # 3. Titles in zh_CN
+    # 3. Registration Bookmark (5 core + 2 bookmark = 7)
+    server_bm = create_server(cli_path="/mock/obsidian", features=[Feature.BOOKMARK])
+    bm_tools = server_bm._tool_manager._tools
+    assert len(bm_tools) == 7
+    expected_bm = {"bookmarks", "bookmark"}
+    assert expected_bm.issubset(bm_tools.keys())
+    assert "workspace" not in bm_tools
+    assert "tabs" not in bm_tools
+    assert "tab_open" not in bm_tools
+
+    # 4. Titles in zh_CN
     server_zh = create_server(
         cli_path="/mock/obsidian",
         lang="zh_CN",
-        features=[Feature.EXPLORER, Feature.WORKSPACE],
+        features=[Feature.EXPLORER, Feature.WORKSPACE, Feature.BOOKMARK],
     )
     tools_zh = server_zh._tool_manager._tools
     assert tools_zh["file"].title == "查询文件信息"
@@ -1101,11 +1116,11 @@ async def test_feature_explorer_and_workspace_registration_and_titles():
     assert tools_zh["bookmarks"].title == "查看书签星标"
     assert tools_zh["bookmark"].title == "添加书签"
 
-    # 4. Titles in en_US
+    # 5. Titles in en_US
     server_en = create_server(
         cli_path="/mock/obsidian",
         lang="en_US",
-        features=[Feature.EXPLORER, Feature.WORKSPACE],
+        features=[Feature.EXPLORER, Feature.WORKSPACE, Feature.BOOKMARK],
     )
     tools_en = server_en._tool_manager._tools
     assert tools_en["file"].title == "Show File Details"
@@ -1127,7 +1142,8 @@ async def test_feature_explorer_and_workspace_tool_executions():
     from obsidian_cli_mcp.tools import Feature
 
     server = create_server(
-        cli_path="/mock/obsidian", features=[Feature.EXPLORER, Feature.WORKSPACE]
+        cli_path="/mock/obsidian",
+        features=[Feature.EXPLORER, Feature.WORKSPACE, Feature.BOOKMARK],
     )
 
     mock_run = AsyncMock(
@@ -1148,7 +1164,7 @@ async def test_feature_explorer_and_workspace_tool_executions():
             "path=Docs/TestNote.md",
         ]
 
-        # 2. bookmark in workspace
+        # 2. bookmark in bookmark
         res_bm = await server.call_tool(
             "bookmark",
             {
@@ -1173,10 +1189,24 @@ async def test_feature_explorer_and_workspace_tool_executions():
             "vault=WorkVault",
         ]
 
+        # 2b. bookmarks in bookmark
+        res_bms = await server.call_tool(
+            "bookmarks",
+            {"total": True, "verbose": True, "vault": "WorkVault"},
+        )
+        assert _extract_tool_text(res_bms) == "mock_output"
+        assert mock_run.call_args_list[2][0][1] == [
+            "bookmarks",
+            "total",
+            "verbose",
+            "format=json",
+            "vault=WorkVault",
+        ]
+
         # 3. tabs in workspace
         res_tabs = await server.call_tool("tabs", {"ids": True})
         assert _extract_tool_text(res_tabs) == "mock_output"
-        assert mock_run.call_args_list[2][0][1] == ["tabs", "ids"]
+        assert mock_run.call_args_list[3][0][1] == ["tabs", "ids"]
 
         # 4. tab_open in workspace
         res_to = await server.call_tool(
@@ -1184,7 +1214,7 @@ async def test_feature_explorer_and_workspace_tool_executions():
             {"file": "Note.md", "group": "group-1", "view": "markdown"},
         )
         assert _extract_tool_text(res_to) == "mock_output"
-        assert mock_run.call_args_list[3][0][1] == [
+        assert mock_run.call_args_list[4][0][1] == [
             "tab:open",
             "file=Note.md",
             "group=group-1",
