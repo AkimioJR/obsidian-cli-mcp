@@ -21,9 +21,9 @@ def test_server_tools_registered():
     assert "reload" in tools
     assert "restart" in tools
 
-    # 显式指定 all 预设时启用全量 56 项工具
+    # 显式指定 all 预设时启用全量 66 项工具
     server_all = create_server(cli_path="/mock/obsidian", features=["all"])
-    assert len(server_all._tool_manager._tools) == 56
+    assert len(server_all._tool_manager._tools) == 66
 
 
 @pytest.mark.asyncio
@@ -114,7 +114,7 @@ async def test_tool_call_json_result():
 def test_all_tools_have_description_and_schema():
     server = create_server(cli_path="/mock/obsidian", features=["all"])
     tools = server._tool_manager._tools
-    assert len(tools) == 56
+    assert len(tools) == 66
     for tool in tools.values():
         assert tool.description and len(tool.description.strip()) > 0
         assert "properties" in tool.parameters
@@ -180,9 +180,10 @@ def test_feature_filtering_by_string_and_env(monkeypatch):
     monkeypatch.setenv("OBSIDIAN_FEATURES", "developer,graph")
     server_env = create_server(cli_path="/mock/obsidian")
     tools_env = server_env._tool_manager._tools
-    assert len(tools_env) == 14  # 5 core + 8 graph + 1 eval
+    assert len(tools_env) == 24  # 5 core + 8 graph + 11 developer
     assert "version" in tools_env
     assert "eval" in tools_env
+    assert "dev_cdp" in tools_env
     assert "backlinks" in tools_env
     assert "read" not in tools_env
 
@@ -234,7 +235,7 @@ def test_feature_preset_standard():
 def test_tool_annotations_all_present():
     server = create_server(cli_path="/mock/obsidian", features=["all"])
     tools = server._tool_manager._tools
-    assert len(tools) == 56
+    assert len(tools) == 66
     for name, tool in tools.items():
         assert tool.annotations is not None, f"Tool {name} is missing annotations"
 
@@ -248,7 +249,7 @@ def test_tool_annotations_hints_classification():
         for name, t in tools.items()
         if t.annotations and t.annotations.read_only_hint
     }
-    assert len(read_only_tools) == 36
+    assert len(read_only_tools) == 41
     assert "read" in read_only_tools
     assert "tags" in read_only_tools
     assert "tasks" in read_only_tools
@@ -256,13 +257,18 @@ def test_tool_annotations_hints_classification():
     assert "properties" in read_only_tools
     assert "vaults" in read_only_tools
     assert "base_query" in read_only_tools
+    assert "dev_console" in read_only_tools
+    assert "dev_css" in read_only_tools
+    assert "dev_dom" in read_only_tools
+    assert "dev_errors" in read_only_tools
+    assert "dev_startup" in read_only_tools
 
     destructive_tools = {
         name
         for name, t in tools.items()
         if t.annotations and t.annotations.destructive_hint
     }
-    assert destructive_tools == {"delete", "eval"}
+    assert destructive_tools == {"delete", "eval", "dev_cdp"}
 
     non_idempotent_tools = {
         name
@@ -281,6 +287,9 @@ def test_tool_annotations_hints_classification():
         "base_create",
         "task",
         "template_insert",
+        "dev_cdp",
+        "dev_screenshot",
+        "devtools",
     }
 
     open_world_tools = {
@@ -288,7 +297,7 @@ def test_tool_annotations_hints_classification():
         for name, t in tools.items()
         if t.annotations and t.annotations.open_world_hint
     }
-    assert open_world_tools == {"eval"}
+    assert open_world_tools == {"eval", "dev_cdp"}
 
 
 def test_tool_i18n_titles_zh_cn():
@@ -322,6 +331,16 @@ def test_tool_i18n_titles_zh_cn():
     assert tools["vault"].title == "查询当前库信息"
     assert tools["command"].title == "执行命令"
     assert tools["eval"].title == "执行 JavaScript 代码"
+    assert tools["dev_dom"].title == "查询 DOM 节点"
+    assert tools["dev_css"].title == "检查 CSS 样式"
+    assert tools["dev_console"].title == "获取控制台日志"
+    assert tools["dev_errors"].title == "获取运行时错误"
+    assert tools["dev_debug"].title == "开关 CDP 调试器"
+    assert tools["dev_startup"].title == "启动耗时分析"
+    assert tools["dev_screenshot"].title == "应用窗口截图"
+    assert tools["dev_mobile"].title == "开关移动端模拟"
+    assert tools["devtools"].title == "开关开发者工具窗口"
+    assert tools["dev_cdp"].title == "执行 CDP 协议指令"
 
 
 def test_tool_i18n_titles_en_us_and_fallback(monkeypatch):
@@ -1442,4 +1461,202 @@ async def test_feature_command_template_plugin_tool_executions():
             "plugin:disable",
             "id=dataview",
             "vault=WorkVault",
+        ]
+
+
+def test_feature_developer_tool_titles_en_us():
+    from obsidian_cli_mcp.tools import Feature
+
+    server_en = create_server(
+        cli_path="/mock/obsidian",
+        lang="en_US",
+        features=[Feature.DEVELOPER],
+    )
+    tools_en = server_en._tool_manager._tools
+    assert tools_en["eval"].title == "Execute JavaScript"
+    assert tools_en["dev_dom"].title == "Query DOM Elements"
+    assert tools_en["dev_css"].title == "Inspect CSS Rules"
+    assert tools_en["dev_console"].title == "Get Console Logs"
+    assert tools_en["dev_errors"].title == "Get Runtime Errors"
+    assert tools_en["dev_debug"].title == "Toggle CDP Debugger"
+    assert tools_en["dev_startup"].title == "Startup Performance Breakdown"
+    assert tools_en["dev_screenshot"].title == "Take Window Screenshot"
+    assert tools_en["dev_mobile"].title == "Toggle Mobile Emulation"
+    assert tools_en["devtools"].title == "Toggle Developer Tools"
+    assert tools_en["dev_cdp"].title == "Execute CDP Command"
+
+
+@pytest.mark.asyncio
+async def test_feature_developer_tool_executions():
+    from unittest.mock import AsyncMock, patch
+
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(
+        cli_path="/mock/obsidian",
+        features=[Feature.DEVELOPER],
+    )
+    mock_run = AsyncMock(
+        return_value=CommandExecutionResult(
+            returncode=0, stdout="dev_output", stderr=""
+        )
+    )
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", new=mock_run):
+        # 1. eval
+        res_eval = await server.call_tool(
+            "eval", {"code": "1 + 1", "vault": "DevVault"}
+        )
+        assert _extract_tool_text(res_eval) == "dev_output"
+        assert mock_run.call_args_list[0][0][1] == [
+            "eval",
+            "code=1 + 1",
+            "vault=DevVault",
+        ]
+
+        # 2. dev_cdp
+        res_cdp = await server.call_tool(
+            "dev_cdp",
+            {
+                "method": "Page.captureScreenshot",
+                "params": '{"format": "png"}',
+                "vault": "DevVault",
+            },
+        )
+        assert _extract_tool_text(res_cdp) == "dev_output"
+        assert mock_run.call_args_list[1][0][1] == [
+            "dev:cdp",
+            "method=Page.captureScreenshot",
+            'params={"format": "png"}',
+            "vault=DevVault",
+        ]
+
+        # 3. dev_console (clear=False, limit=50, level='error')
+        res_console = await server.call_tool(
+            "dev_console",
+            {"clear": False, "limit": 50, "level": "error", "vault": "DevVault"},
+        )
+        assert _extract_tool_text(res_console) == "dev_output"
+        assert mock_run.call_args_list[2][0][1] == [
+            "dev:console",
+            "limit=50",
+            "level=error",
+            "vault=DevVault",
+        ]
+
+        # 3b. dev_console (clear=True)
+        res_console_clear = await server.call_tool("dev_console", {"clear": True})
+        assert _extract_tool_text(res_console_clear) == "dev_output"
+        assert mock_run.call_args_list[3][0][1] == ["dev:console", "clear"]
+
+        # 4. dev_css
+        res_css = await server.call_tool(
+            "dev_css",
+            {"selector": ".workspace-leaf", "prop": "color", "vault": "DevVault"},
+        )
+        assert _extract_tool_text(res_css) == "dev_output"
+        assert mock_run.call_args_list[4][0][1] == [
+            "dev:css",
+            "selector=.workspace-leaf",
+            "prop=color",
+            "vault=DevVault",
+        ]
+
+        # 5. dev_debug (state='on')
+        res_dbg_on = await server.call_tool(
+            "dev_debug", {"state": "on", "vault": "DevVault"}
+        )
+        assert _extract_tool_text(res_dbg_on) == "dev_output"
+        assert mock_run.call_args_list[5][0][1] == [
+            "dev:debug",
+            "on",
+            "vault=DevVault",
+        ]
+
+        # 5b. dev_debug (state='off')
+        res_dbg_off = await server.call_tool("dev_debug", {"state": "off"})
+        assert _extract_tool_text(res_dbg_off) == "dev_output"
+        assert mock_run.call_args_list[6][0][1] == ["dev:debug", "off"]
+
+        # 6. dev_dom
+        res_dom = await server.call_tool(
+            "dev_dom",
+            {
+                "selector": ".nav-file",
+                "total": True,
+                "text": True,
+                "inner": False,
+                "all": True,
+                "attr": "data-path",
+                "css": "display",
+                "vault": "DevVault",
+            },
+        )
+        assert _extract_tool_text(res_dom) == "dev_output"
+        assert mock_run.call_args_list[7][0][1] == [
+            "dev:dom",
+            "selector=.nav-file",
+            "total",
+            "text",
+            "all",
+            "attr=data-path",
+            "css=display",
+            "vault=DevVault",
+        ]
+
+        # 7. dev_errors
+        res_err = await server.call_tool(
+            "dev_errors", {"clear": True, "vault": "DevVault"}
+        )
+        assert _extract_tool_text(res_err) == "dev_output"
+        assert mock_run.call_args_list[8][0][1] == [
+            "dev:errors",
+            "clear",
+            "vault=DevVault",
+        ]
+
+        # 8. dev_mobile (state='on')
+        res_mob = await server.call_tool(
+            "dev_mobile", {"state": "on", "vault": "DevVault"}
+        )
+        assert _extract_tool_text(res_mob) == "dev_output"
+        assert mock_run.call_args_list[9][0][1] == [
+            "dev:mobile",
+            "on",
+            "vault=DevVault",
+        ]
+
+        # 8b. dev_mobile (state='off')
+        res_mob_off = await server.call_tool("dev_mobile", {"state": "off"})
+        assert _extract_tool_text(res_mob_off) == "dev_output"
+        assert mock_run.call_args_list[10][0][1] == ["dev:mobile", "off"]
+
+        # 9. dev_screenshot
+        res_shot = await server.call_tool(
+            "dev_screenshot", {"path": "/tmp/shot.png", "vault": "DevVault"}
+        )
+        assert _extract_tool_text(res_shot) == "dev_output"
+        assert mock_run.call_args_list[11][0][1] == [
+            "dev:screenshot",
+            "path=/tmp/shot.png",
+            "vault=DevVault",
+        ]
+
+        # 10. dev_startup (format='text')
+        res_startup_txt = await server.call_tool(
+            "dev_startup", {"format": "text", "vault": "DevVault"}
+        )
+        assert _extract_tool_text(res_startup_txt) == "dev_output"
+        assert mock_run.call_args_list[12][0][1] == [
+            "dev:startup",
+            "format=text",
+            "vault=DevVault",
+        ]
+
+        # 11. devtools
+        res_devtools = await server.call_tool("devtools", {"vault": "DevVault"})
+        assert _extract_tool_text(res_devtools) == "dev_output"
+        assert mock_run.call_args_list[13][0][1] == [
+            "devtools",
+            "vault=DevVault",
         ]

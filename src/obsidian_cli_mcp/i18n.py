@@ -178,6 +178,16 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
         },
         "developer": {
             "eval": "执行 JavaScript 代码",
+            "dev_dom": "查询 DOM 节点",
+            "dev_css": "检查 CSS 样式",
+            "dev_console": "获取控制台日志",
+            "dev_errors": "获取运行时错误",
+            "dev_debug": "开关 CDP 调试器",
+            "dev_startup": "启动耗时分析",
+            "dev_screenshot": "应用窗口截图",
+            "dev_mobile": "开关移动端模拟",
+            "devtools": "开关开发者工具窗口",
+            "dev_cdp": "执行 CDP 协议指令",
         },
     },
     SupportedLang.EN_US: {
@@ -265,6 +275,16 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
         },
         "developer": {
             "eval": "Execute JavaScript",
+            "dev_dom": "Query DOM Elements",
+            "dev_css": "Inspect CSS Rules",
+            "dev_console": "Get Console Logs",
+            "dev_errors": "Get Runtime Errors",
+            "dev_debug": "Toggle CDP Debugger",
+            "dev_startup": "Startup Performance Breakdown",
+            "dev_screenshot": "Take Window Screenshot",
+            "dev_mobile": "Toggle Mobile Emulation",
+            "devtools": "Toggle Developer Tools",
+            "dev_cdp": "Execute CDP Command",
         },
     },
 }
