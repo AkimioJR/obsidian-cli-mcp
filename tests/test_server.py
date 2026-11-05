@@ -19,9 +19,9 @@ def test_server_tools_registered():
     assert "vaults" in tools
     assert "version" in tools
 
-    # 显式指定 all 预设时启用全量 45 项工具
+    # 显式指定 all 预设时启用全量 56 项工具
     server_all = create_server(cli_path="/mock/obsidian", features=["all"])
-    assert len(server_all._tool_manager._tools) == 49
+    assert len(server_all._tool_manager._tools) == 56
 
 
 @pytest.mark.asyncio
@@ -112,7 +112,7 @@ async def test_tool_call_json_result():
 def test_all_tools_have_description_and_schema():
     server = create_server(cli_path="/mock/obsidian", features=["all"])
     tools = server._tool_manager._tools
-    assert len(tools) == 49
+    assert len(tools) == 56
     for tool in tools.values():
         assert tool.description and len(tool.description.strip()) > 0
         assert "properties" in tool.parameters
@@ -224,7 +224,7 @@ def test_feature_preset_standard():
 def test_tool_annotations_all_present():
     server = create_server(cli_path="/mock/obsidian", features=["all"])
     tools = server._tool_manager._tools
-    assert len(tools) == 49
+    assert len(tools) == 56
     for name, tool in tools.items():
         assert tool.annotations is not None, f"Tool {name} is missing annotations"
 
@@ -238,7 +238,7 @@ def test_tool_annotations_hints_classification():
         for name, t in tools.items()
         if t.annotations and t.annotations.read_only_hint
     }
-    assert len(read_only_tools) == 32
+    assert len(read_only_tools) == 36
     assert "read" in read_only_tools
     assert "tags" in read_only_tools
     assert "tasks" in read_only_tools
@@ -261,10 +261,13 @@ def test_tool_annotations_hints_classification():
     }
     assert non_idempotent_tools == {
         "append",
+        "bookmark",
         "command",
         "create",
         "eval",
         "prepend",
+        "random",
+        "tab_open",
         "base_create",
         "task",
         "template_insert",
@@ -385,8 +388,9 @@ def test_feature_enum_class_and_instance_methods():
 
     # 2. Feature.presets
     presets = Feature.presets()
-    assert "all" in presets and len(presets["all"]) == 9
+    assert "all" in presets and len(presets["all"]) == 10
     assert "safe" in presets and Feature.DEVELOPER not in presets["safe"]
+    assert Feature.OTHER in presets["safe"]
 
     # 3. Instance method: feature.register
     server = MCPServer("single-feature-server")
@@ -546,6 +550,7 @@ def test_register_tools_enforces_keyword_only_parameters():
         register_developer_tools,
         register_graph_tools,
         register_note_tools,
+        register_other_tools,
         register_plugin_tools,
         register_property_tools,
         register_tag_tools,
@@ -559,6 +564,7 @@ def test_register_tools_enforces_keyword_only_parameters():
         register_developer_tools,
         register_graph_tools,
         register_note_tools,
+        register_other_tools,
         register_plugin_tools,
         register_property_tools,
         register_tag_tools,
@@ -1020,3 +1026,153 @@ async def test_set_default_vault_validation_and_reset():
     text_clear = _extract_tool_text(res_clear)
     assert "Default vault cleared" in text_clear
     assert "Subsequent tool calls will target Obsidian's active vault" in text_clear
+
+
+@pytest.mark.asyncio
+async def test_feature_other_registration_and_titles():
+    from obsidian_cli_mcp.tools import Feature
+
+    # 1. Registration
+    server = create_server(cli_path="/mock/obsidian", features=[Feature.OTHER])
+    tools = server._tool_manager._tools
+    assert len(tools) == 10  # 3 core + 7 other
+    expected_tools = {
+        "bookmark",
+        "templates",
+        "file",
+        "diff",
+        "tabs",
+        "tab_open",
+        "random",
+    }
+    assert expected_tools.issubset(tools.keys())
+
+    # 2. Titles in zh_CN
+    server_zh = create_server(
+        cli_path="/mock/obsidian", lang="zh_CN", features=[Feature.OTHER]
+    )
+    tools_zh = server_zh._tool_manager._tools
+    assert tools_zh["bookmark"].title == "添加书签"
+    assert tools_zh["templates"].title == "列出模板清单"
+    assert tools_zh["file"].title == "查询文件信息"
+    assert tools_zh["diff"].title == "对比版本差异"
+    assert tools_zh["tabs"].title == "列出打开的标签页"
+    assert tools_zh["tab_open"].title == "打开新标签页"
+    assert tools_zh["random"].title == "界面随机漫游笔记"
+
+    # 3. Titles in en_US
+    server_en = create_server(
+        cli_path="/mock/obsidian", lang="en_US", features=[Feature.OTHER]
+    )
+    tools_en = server_en._tool_manager._tools
+    assert tools_en["bookmark"].title == "Add Bookmark"
+    assert tools_en["templates"].title == "List Templates"
+    assert tools_en["file"].title == "Show File Details"
+    assert tools_en["diff"].title == "Compare Versions"
+    assert tools_en["tabs"].title == "List Open Tabs"
+    assert tools_en["tab_open"].title == "Open New Tab"
+    assert tools_en["random"].title == "Open Random Note in GUI"
+
+
+@pytest.mark.asyncio
+async def test_feature_other_tool_executions():
+    from unittest.mock import AsyncMock, patch
+
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(cli_path="/mock/obsidian", features=[Feature.OTHER])
+
+    mock_run = AsyncMock(
+        return_value=CommandExecutionResult(
+            returncode=0, stdout="mock_output", stderr=""
+        )
+    )
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", new=mock_run):
+        # 1. bookmark
+        res = await server.call_tool(
+            "bookmark",
+            {
+                "file": "MyNote.md",
+                "subpath": "#Heading",
+                "folder": "Docs",
+                "search": "tag:#todo",
+                "url": "https://obsidian.md",
+                "title": "My Bookmark",
+                "vault": "WorkVault",
+            },
+        )
+        assert _extract_tool_text(res) == "mock_output"
+        args = mock_run.call_args[0][1]
+        assert args == [
+            "bookmark",
+            "file=MyNote.md",
+            "subpath=#Heading",
+            "folder=Docs",
+            "search=tag:#todo",
+            "url=https://obsidian.md",
+            "title=My Bookmark",
+            "vault=WorkVault",
+        ]
+
+        # 2. templates
+        res = await server.call_tool("templates", {"total": True, "vault": "WorkVault"})
+        assert _extract_tool_text(res) == "mock_output"
+        args = mock_run.call_args[0][1]
+        assert args == ["templates", "total", "vault=WorkVault"]
+
+        # 3. file
+        res = await server.call_tool(
+            "file", {"file": "TestNote", "path": "Docs/TestNote.md"}
+        )
+        assert _extract_tool_text(res) == "mock_output"
+        args = mock_run.call_args[0][1]
+        assert args == ["file", "file=TestNote", "path=Docs/TestNote.md"]
+
+        # 4. diff
+        res = await server.call_tool(
+            "diff",
+            {
+                "file": "TestNote",
+                "path": "Docs/TestNote.md",
+                "from_version": 1,
+                "to_version": 5,
+                "filter": "local",
+            },
+        )
+        assert _extract_tool_text(res) == "mock_output"
+        args = mock_run.call_args[0][1]
+        assert args == [
+            "diff",
+            "file=TestNote",
+            "path=Docs/TestNote.md",
+            "from=1",
+            "to=5",
+            "filter=local",
+        ]
+
+        # 5. tabs
+        res = await server.call_tool("tabs", {"ids": True})
+        assert _extract_tool_text(res) == "mock_output"
+        args = mock_run.call_args[0][1]
+        assert args == ["tabs", "ids"]
+
+        # 6. tab_open
+        res = await server.call_tool(
+            "tab_open",
+            {"file": "Note.md", "group": "group-1", "view": "markdown"},
+        )
+        assert _extract_tool_text(res) == "mock_output"
+        args = mock_run.call_args[0][1]
+        assert args == [
+            "tab:open",
+            "file=Note.md",
+            "group=group-1",
+            "view=markdown",
+        ]
+
+        # 7. random
+        res = await server.call_tool("random", {"folder": "Articles", "newtab": True})
+        assert _extract_tool_text(res) == "mock_output"
+        args = mock_run.call_args[0][1]
+        assert args == ["random", "folder=Articles", "newtab"]

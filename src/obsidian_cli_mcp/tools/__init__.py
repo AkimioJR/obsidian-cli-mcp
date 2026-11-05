@@ -19,6 +19,7 @@ from .core import register_core_tools
 from .developer import register_developer_tools
 from .graph import register_graph_tools
 from .note import register_note_tools
+from .other import register_other_tools
 from .plugin import register_plugin_tools
 from .property import register_property_tools
 from .tag import register_tag_tools
@@ -38,6 +39,7 @@ class Feature(str, Enum):
     PLUGIN = "plugin"
     BASE = "base"
     DEVELOPER = "developer"
+    OTHER = "other"
 
     def register(
         self,
@@ -82,6 +84,7 @@ class Feature(str, Enum):
                 cls.VAULT,
                 cls.PLUGIN,
                 cls.BASE,
+                cls.OTHER,
             },  # All except developer
         }
 
@@ -151,6 +154,7 @@ _FEATURE_REGISTRY: dict[
     Feature.PLUGIN: register_plugin_tools,
     Feature.BASE: register_base_tools,
     Feature.DEVELOPER: register_developer_tools,
+    Feature.OTHER: register_other_tools,
 }
 
 __all__ = [
@@ -166,6 +170,7 @@ __all__ = [
     "register_developer_tools",
     "register_graph_tools",
     "register_note_tools",
+    "register_other_tools",
     "register_plugin_tools",
     "register_property_tools",
     "register_tag_tools",

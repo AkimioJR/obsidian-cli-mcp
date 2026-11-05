@@ -166,6 +166,15 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
         "developer": {
             "eval": "执行 JavaScript 代码",
         },
+        "other": {
+            "bookmark": "添加书签",
+            "templates": "列出模板清单",
+            "file": "查询文件信息",
+            "diff": "对比版本差异",
+            "tabs": "列出打开的标签页",
+            "tab_open": "打开新标签页",
+            "random": "界面随机漫游笔记",
+        },
     },
     SupportedLang.EN_US: {
         "core": {
@@ -239,6 +248,15 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
         },
         "developer": {
             "eval": "Execute JavaScript",
+        },
+        "other": {
+            "bookmark": "Add Bookmark",
+            "templates": "List Templates",
+            "file": "Show File Details",
+            "diff": "Compare Versions",
+            "tabs": "List Open Tabs",
+            "tab_open": "Open New Tab",
+            "random": "Open Random Note in GUI",
         },
     },
 }
