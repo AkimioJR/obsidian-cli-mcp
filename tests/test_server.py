@@ -923,3 +923,97 @@ async def test_import_file_copy_and_move(tmp_path):
         assert dest2.is_file()
         assert dest2.read_text(encoding="utf-8") == "move me into vault"
         assert not src_file2.exists()  # move 剪切后源文件不再存在
+
+
+@pytest.mark.asyncio
+async def test_set_default_vault_registration(monkeypatch):
+    # 1. 默认未开启扩展时，set_default_vault 不注册
+    monkeypatch.delenv("OBSIDIAN_EXTENSIONS", raising=False)
+    server_default = create_server(cli_path="/mock/obsidian")
+    tools_default = await server_default.list_tools()
+    assert "set_default_vault" not in {t.name for t in tools_default}
+
+    # 2. 显式开启 enable_extensions 时，set_default_vault 在核心工具中注册
+    server_ext = create_server(cli_path="/mock/obsidian", enable_extensions=True)
+    tools_ext = await server_ext.list_tools()
+    tool_map = {t.name: t for t in tools_ext}
+    assert "set_default_vault" in tool_map
+    set_vault_tool = tool_map["set_default_vault"]
+    assert set_vault_tool.annotations is not None
+    assert set_vault_tool.annotations.idempotent_hint is True
+    assert set_vault_tool.title in ("切换默认笔记库", "Set Default Vault")
+
+
+@pytest.mark.asyncio
+async def test_set_default_vault_execution_and_switching():
+    from unittest.mock import AsyncMock, patch
+
+    server = create_server(cli_path="/mock/obsidian", enable_extensions=True)
+
+    # 1. 设置默认笔记库为已知存在的 "ScholarHub"
+    mock_run = AsyncMock()
+    mock_run.side_effect = [
+        # vaults 输出
+        CommandExecutionResult(
+            returncode=0,
+            stdout="ScholarHub\t/path/to/sh\nWork\t/path/to/work",
+            stderr="",
+        ),
+        # 后续 read 调用的输出
+        CommandExecutionResult(returncode=0, stdout="content of note", stderr=""),
+        # 带有覆盖参数 vault="Work" 的 read 调用
+        CommandExecutionResult(returncode=0, stdout="content of work note", stderr=""),
+    ]
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", new=mock_run):
+        # 调用 set_default_vault
+        res1 = await server.call_tool("set_default_vault", {"vault": "ScholarHub"})
+        assert (
+            "Default vault successfully switched from '(none)' to 'ScholarHub'"
+            in _extract_tool_text(res1)
+        )
+
+        # 接下来调用 read 工具（未显式传递 vault 参数），验证底层自动附加 vault=ScholarHub
+        res2 = await server.call_tool("read", {"file": "TestNote.md"})
+        assert isinstance(res2, CallToolResult)
+        assert not res2.is_error
+        read_args = mock_run.call_args_list[1][0][1]
+        assert "vault=ScholarHub" in read_args
+
+        # 临时调用需要访问 Work 库（显式传参 vault="Work"），验证单次覆盖生效
+        res3 = await server.call_tool("read", {"file": "WorkNote.md", "vault": "Work"})
+        assert isinstance(res3, CallToolResult)
+        assert not res3.is_error
+        read_work_args = mock_run.call_args_list[2][0][1]
+        assert "vault=Work" in read_work_args
+
+
+@pytest.mark.asyncio
+async def test_set_default_vault_validation_and_reset():
+    from unittest.mock import AsyncMock, patch
+
+    server = create_server(cli_path="/mock/obsidian", enable_extensions=True)
+
+    # 1. 尝试切换到不存在的未知库
+    with patch(
+        "obsidian_cli_mcp.client.run_cli_command",
+        new=AsyncMock(
+            return_value=CommandExecutionResult(
+                returncode=0, stdout="ScholarHub\nPersonal", stderr=""
+            )
+        ),
+    ):
+        res_unknown = await server.call_tool(
+            "set_default_vault", {"vault": "NonExistentVault"}
+        )
+        text_unknown = _extract_tool_text(res_unknown)
+        assert (
+            "Error: Vault 'NonExistentVault' not found among known vaults"
+            in text_unknown
+        )
+
+    # 2. 清空/重置默认笔记库 (传入空字符串或 None)
+    res_clear = await server.call_tool("set_default_vault", {"vault": ""})
+    text_clear = _extract_tool_text(res_clear)
+    assert "Default vault cleared" in text_clear
+    assert "Subsequent tool calls will target Obsidian's active vault" in text_clear

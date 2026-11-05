@@ -184,10 +184,11 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 <details open>
 <summary><b>Expand to view detailed tool catalog</b></summary>
 
-### 🌟 Core Tools (Core · 3 tools, always loaded by default)
+### 🌟 Core Tools (Core · 3 native + 1 extension, always loaded by default)
 - `version`: Query installed Obsidian desktop application version.
 - `vaults`: List all known Obsidian vaults and their local absolute paths.
 - `vault`: Query current Vault stats (name, path, total files, size, etc.).
+- `set_default_vault`: Dynamically switch default target vault for the session (requires `OBSIDIAN_EXTENSIONS=true`).
 
 ### 1. Notes & Content (Feature: `note` · 9 native + 2 extensions)
 - `read`: Read raw Markdown content by note name or relative path.

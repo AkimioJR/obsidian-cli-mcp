@@ -184,10 +184,11 @@ pip install obsidian-cli-mcp
 <details open>
 <summary><b>展开查看详细工具功能清单</b></summary>
 
-### 🌟 基础核心工具 (Core Tools · 3 项，默认无条件加载)
+### 🌟 基础核心工具 (Core Tools · 3 项原生 + 1 项扩展，默认无条件加载)
 - `version`: 查询当前运行的 Obsidian 桌面客户端版本。
 - `vaults`: 列出本机已知的所有 Vault 笔记库及绝对路径。
 - `vault`: 查询当前 Vault 基本状态（名称、物理路径、文件数、体积等）。
+- `set_default_vault`: 动态切换当前会话默认目标笔记库（需 `OBSIDIAN_EXTENSIONS=true`）。
 
 ### 1. 笔记与内容 (Feature: `note` · 9 项原生 + 2 项扩展)
 - `read`: 按文件名或相对路径读取笔记 Markdown 原文。

@@ -73,6 +73,10 @@ class ObsidianClient:
             return None
         return None
 
+    def set_vault(self, vault: str | None) -> None:
+        """动态设置或重置该客户端实例的默认目标笔记库。"""
+        self.vault = vault.strip() if vault and vault.strip() else None
+
     def _build_args(
         self,
         command: str,

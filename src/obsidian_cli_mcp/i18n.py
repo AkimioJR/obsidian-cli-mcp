@@ -98,6 +98,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "version": "查看 Obsidian 版本",
             "vaults": "列出已知所有库",
             "vault": "查询当前库信息",
+            "set_default_vault": "切换默认笔记库",
         },
         "note": {
             "read": "读取笔记",
@@ -171,6 +172,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "version": "Show Obsidian Version",
             "vaults": "List All Vaults",
             "vault": "Show Vault Info",
+            "set_default_vault": "Set Default Vault",
         },
         "note": {
             "read": "Read Note",
