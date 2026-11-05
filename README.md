@@ -167,7 +167,7 @@ pip install obsidian-cli-mcp
 | `OBSIDIAN_CLI_PATH` | Obsidian CLI 可执行文件的绝对路径                                                                  | 自动在系统 PATH 中探测（如 `which obsidian`） |
 | `OBSIDIAN_TIMEOUT`  | CLI 子进程命令执行超时时间（秒，支持小数浮点或 `none`/`null` 禁用超时）                            | `30.0`                                        |
 | `OBSIDIAN_VERSION`  | 手动指定或覆盖 Obsidian 客户端版本号（用于无头/容器环境兼容性校验，如 `1.14.5`）                   | 启动时自动从 `obsidian version` 探针探测      |
-| `OBSIDIAN_FEATURES` | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,base,eval` 或预设 `standard,safe,all`） | `standard`（默认启用核心工具及日常笔记与图谱特性） |
+| `OBSIDIAN_FEATURES` | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,base,developer,other` 或预设 `standard,safe,all`） | `standard`（默认启用核心工具及日常笔记与图谱特性） |
 | `OBSIDIAN_LANG`     | 人类可读界面与工具标题的本地化语言（支持 `zh_CN`, `en_US` 等）                                     | 自动探测系统环境（未匹配时回退至 `en_US`）    |
 | `OBSIDIAN_EXTENSIONS` | 是否启用非原生 CLI 的扩展复合工具（仅当为 `true`（不区分大小写）时开启，其余情况均为 `false`）       | `false`（默认保持纯粹的官方 CLI 命令映射）    |
 
@@ -250,8 +250,17 @@ pip install obsidian-cli-mcp
 - `base_query`: 对 Base 数据表格执行结构化查询并导出（支持 JSON、CSV、Markdown 等）。
 - `base_create`: 在指定 Base 视图中快速创建新条目。
 
-### 9. 动态脚本执行 (Feature: `eval` · 1 项)
+### 9. 开发者工具 (Feature: `developer` · 1 项)
 - `eval`: 在 Obsidian 运行时环境中直接执行 JavaScript 代码（高级逃生通道）。
+
+### 10. 杂项工具 (Feature: `other` · 7 项)
+- `bookmark`: 在当前笔记库中新增书签（支持文件、块/标题子路径、文件夹、搜索查询或 URL）。
+- `templates`: 列出当前笔记库内所有的模板文件。
+- `file`: 查询单个文件的元数据与系统详细信息（绝对路径、大小、创建与修改时间等）。
+- `diff`: 对比文件的本地历史版本或 Obsidian Sync 云端同步版本差异。
+- `tabs`: 列出当前工作区中打开的所有标签页与分屏布局。
+- `tab_open`: 在 Obsidian 界面中打开新标签页（支持指定文件、标签组 ID 或视图类型）。
+- `random`: 在 Obsidian 界面中随机打开并聚焦一篇笔记。
 
 </details>
 

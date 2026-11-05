@@ -167,7 +167,7 @@ Client configuration:
 | `OBSIDIAN_CLI_PATH` | Absolute path to Obsidian CLI binary                                                                                        | Auto-detected in system `PATH` (`which obsidian`)      |
 | `OBSIDIAN_TIMEOUT`  | CLI subprocess execution timeout in seconds (supports floats, `none`/`null` to disable)                                     | `30.0`                                                 |
 | `OBSIDIAN_VERSION`  | Manually specify/override Obsidian client version (e.g. `1.14.5` for headless/container environments)                       | Auto-detected from `obsidian version` at startup       |
-| `OBSIDIAN_FEATURES` | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,vault,plugin,base,eval` or presets `standard,safe,all`) | `standard` (default: core tools plus standard features) |
+| `OBSIDIAN_FEATURES` | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,vault,plugin,base,developer,other` or presets `standard,safe,all`) | `standard` (default: core tools plus standard features) |
 | `OBSIDIAN_LANG`     | Localization language for human-readable tool titles (supports `zh_CN`, `en_US`)                                            | Auto-detected from system locale (fallback to `en_US`) |
 | `OBSIDIAN_EXTENSIONS` | Whether to enable non-native composite extension tools (only accepts `true` case-insensitively; any other value is `false`) | `false` (defaults to pure official CLI tools only)     |
 
@@ -250,8 +250,17 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `base_query`: Query structured records from a Base file (JSON, CSV, Markdown, etc.).
 - `base_create`: Create a new entry in a Base file.
 
-### 9. Dynamic Scripting (Feature: `eval` · 1 tool)
+### 9. Developer Tools (Feature: `developer` · 1 tool)
 - `eval`: Execute JavaScript code inside Obsidian runtime (advanced escape hatch).
+
+### 10. Miscellaneous Tools (Feature: `other` · 7 tools)
+- `bookmark`: Add a bookmark in the vault (supports file, subpath, folder, search query, or URL).
+- `templates`: List all template files in the vault.
+- `file`: Show metadata and system details for a specific file.
+- `diff`: List or diff local history and Obsidian Sync versions for a file.
+- `tabs`: List all open tabs and workspace splits.
+- `tab_open`: Open a new tab in Obsidian GUI (supports file, tab group ID, or view type).
+- `random`: Open and focus a randomly chosen note in Obsidian GUI.
 
 </details>
 
