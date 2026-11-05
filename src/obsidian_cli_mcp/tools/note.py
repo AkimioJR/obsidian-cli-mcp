@@ -392,3 +392,97 @@ def register_note_tools(
         ),
     ) -> Any:
         return await call_tool(client, "random:read", {"folder": folder}, vault=vault)
+
+    @reg.tool(
+        name="edit",
+        annotations=NON_IDEMPOTENT_WRITE,
+        description=(
+            "Edit an existing note by replacing literal text. "
+            "When replace_all is false, old_str must match uniquely in the note. "
+            "(Extension tool; enabled via OBSIDIAN_EXTENSIONS=true)"
+        ),
+        extension=True,
+    )
+    async def edit(
+        old_str: str = Field(
+            description="Exact literal text snippet to find and replace (required).",
+        ),
+        new_str: str = Field(
+            description="Replacement text (required). Use an empty string to delete old_str.",
+        ),
+        file: str | None = Field(
+            default=None,
+            description="Target file name (resolves like wikilinks).",
+        ),
+        path: str | None = Field(
+            default=None,
+            description="Target file path (exact relative path in vault).",
+        ),
+        replace_all: bool = Field(
+            default=False,
+            description="Whether to replace all occurrences. If false (default), old_str must match exactly once in the file.",
+        ),
+        vault: str | None = Field(
+            default=None,
+            description="Target a specific vault by name.",
+        ),
+    ) -> Any:
+        if not file and not path:
+            return "Error: Either 'file' or 'path' must be provided to specify the target note."
+
+        if not old_str:
+            return "Error: 'old_str' must not be empty. Use 'create' with overwrite=True for full-file replacement."
+
+        target = path or file or "note"
+        if old_str == new_str:
+            return f"No changes needed: 'old_str' and 'new_str' are identical in '{target}'."
+
+        content = await call_tool(
+            client,
+            "read",
+            {
+                "file": file,
+                "path": path,
+            },
+            vault=vault,
+        )
+        if isinstance(content, str) and content.startswith("Error:"):
+            return content
+
+        if not isinstance(content, str):
+            content = str(content)
+
+        count = content.count(old_str)
+        if count == 0:
+            return (
+                f"Error: Target string not found in '{target}'. No changes were made."
+            )
+
+        if count > 1 and not replace_all:
+            return (
+                f"Error: Found {count} occurrences of 'old_str' in '{target}', but replace_all is false. "
+                "Please provide more surrounding lines to uniquely identify the match, or set replace_all=true."
+            )
+
+        new_content = (
+            content.replace(old_str, new_str)
+            if replace_all
+            else content.replace(old_str, new_str, 1)
+        )
+
+        write_res = await call_tool(
+            client,
+            "create",
+            {
+                "name": file,
+                "path": path,
+                "content": new_content,
+                "overwrite": True,
+            },
+            vault=vault,
+        )
+        if isinstance(write_res, str) and write_res.startswith("Error:"):
+            return write_res
+
+        replaced_count = count if replace_all else 1
+        return f"The file '{target}' has been updated successfully ({replaced_count} occurrence(s) replaced)."

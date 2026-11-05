@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -583,3 +584,196 @@ def test_register_tools_enforces_keyword_only_parameters():
             assert p.kind == inspect.Parameter.KEYWORD_ONLY, (
                 f"{fn.__name__} parameter '{p.name}' is not KEYWORD_ONLY (got {p.kind})"
             )
+
+
+def _extract_tool_text(res: Any) -> str:
+    assert isinstance(res, CallToolResult)
+    item = res.content[0]
+    assert isinstance(item, TextContent)
+    return item.text
+
+
+@pytest.mark.asyncio
+async def test_edit_tool_registration(monkeypatch):
+    # 1. 默认未开启扩展时，edit 不注册
+    monkeypatch.delenv("OBSIDIAN_EXTENSIONS", raising=False)
+    server_default = create_server(cli_path="/mock/obsidian")
+    tools_default = await server_default.list_tools()
+    assert "edit" not in {t.name for t in tools_default}
+
+    # 2. 显式开启 enable_extensions 时，edit 作为 note 的扩展工具注册
+    server_ext = create_server(cli_path="/mock/obsidian", enable_extensions=True)
+    tools_ext = await server_ext.list_tools()
+    tool_map = {t.name: t for t in tools_ext}
+    assert "edit" in tool_map
+    edit_tool = tool_map["edit"]
+    assert edit_tool.annotations is not None
+    assert edit_tool.annotations.read_only_hint is False
+    assert edit_tool.title in ("编辑修改笔记", "Edit Note Content")
+
+    # 3. 环境变量 OBSIDIAN_EXTENSIONS=true 时注册
+    monkeypatch.setenv("OBSIDIAN_EXTENSIONS", "true")
+    server_env = create_server(cli_path="/mock/obsidian")
+    tools_env = await server_env.list_tools()
+    assert "edit" in {t.name for t in tools_env}
+
+    # 4. 未启用 note 特性时（如只启用 property），即使开启扩展也不注册 edit
+    server_no_note = create_server(
+        cli_path="/mock/obsidian",
+        features=["property"],
+        enable_extensions=True,
+    )
+    tools_no_note = await server_no_note.list_tools()
+    assert "edit" not in {t.name for t in tools_no_note}
+
+
+@pytest.mark.asyncio
+async def test_edit_tool_execution():
+    from unittest.mock import AsyncMock, patch
+
+    server = create_server(cli_path="/mock/obsidian", enable_extensions=True)
+
+    # 模拟底层的 CLI 执行 (先 read，再 create)
+    mock_run = AsyncMock()
+    mock_run.side_effect = [
+        # read 结果
+        CommandExecutionResult(
+            returncode=0,
+            stdout="# My Note\n\nOriginal line\nFooter",
+            stderr="",
+        ),
+        # create overwrite 结果
+        CommandExecutionResult(
+            returncode=0,
+            stdout="",
+            stderr="",
+        ),
+    ]
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", new=mock_run):
+        res = await server.call_tool(
+            "edit",
+            {
+                "file": "MyNote.md",
+                "old_str": "Original line",
+                "new_str": "Modified content",
+            },
+        )
+        assert isinstance(res, CallToolResult)
+        assert not res.is_error
+        text = _extract_tool_text(res)
+        assert (
+            "The file 'MyNote.md' has been updated successfully (1 occurrence(s) replaced)."
+            in text
+        )
+
+        # 验证 create 命令参数收到的文本确实包含替换后的内容
+        assert mock_run.call_count == 2
+        create_call_args = mock_run.call_args_list[1][0][1]
+        assert "create" in create_call_args
+        assert any(
+            "content=# My Note\n\nModified content\nFooter" in arg
+            for arg in create_call_args
+        )
+
+
+@pytest.mark.asyncio
+async def test_edit_tool_validation_and_errors():
+    from unittest.mock import AsyncMock, patch
+
+    server = create_server(cli_path="/mock/obsidian", enable_extensions=True)
+
+    # 1. 没有 file 也没有 path
+    res1 = await server.call_tool("edit", {"old_str": "a", "new_str": "b"})
+    assert "Either 'file' or 'path' must be provided" in _extract_tool_text(res1)
+
+    # 2. old_str 为空
+    res2 = await server.call_tool(
+        "edit", {"file": "Test.md", "old_str": "", "new_str": "b"}
+    )
+    assert "'old_str' must not be empty" in _extract_tool_text(res2)
+
+    # 3. old_str == new_str (直接返回无变动)
+    res3 = await server.call_tool(
+        "edit", {"file": "Test.md", "old_str": "same", "new_str": "same"}
+    )
+    assert "No changes needed" in _extract_tool_text(res3)
+
+    # 4. 未找到目标内容 (count == 0)
+    with patch(
+        "obsidian_cli_mcp.client.run_cli_command",
+        new=AsyncMock(
+            return_value=CommandExecutionResult(
+                returncode=0, stdout="Some file content", stderr=""
+            )
+        ),
+    ):
+        res4 = await server.call_tool(
+            "edit",
+            {"file": "Test.md", "old_str": "NonExistentText", "new_str": "NewText"},
+        )
+        assert "Target string not found" in _extract_tool_text(res4)
+
+    # 5. 出现多次匹配且 replace_all 为 False (要求唯一性)
+    with patch(
+        "obsidian_cli_mcp.client.run_cli_command",
+        new=AsyncMock(
+            return_value=CommandExecutionResult(
+                returncode=0, stdout="apple orange apple banana", stderr=""
+            )
+        ),
+    ):
+        res5 = await server.call_tool(
+            "edit",
+            {
+                "file": "Test.md",
+                "old_str": "apple",
+                "new_str": "pear",
+                "replace_all": False,
+            },
+        )
+        text5 = _extract_tool_text(res5)
+        assert "Found 2 occurrences of 'old_str'" in text5
+        assert "replace_all is false" in text5
+
+    # 6. 出现多次匹配但 replace_all 为 True (全部替换成功)
+    mock_multi = AsyncMock()
+    mock_multi.side_effect = [
+        CommandExecutionResult(returncode=0, stdout="apple orange apple", stderr=""),
+        CommandExecutionResult(returncode=0, stdout="", stderr=""),
+    ]
+    with patch("obsidian_cli_mcp.client.run_cli_command", new=mock_multi):
+        res6 = await server.call_tool(
+            "edit",
+            {
+                "file": "Test.md",
+                "old_str": "apple",
+                "new_str": "pear",
+                "replace_all": True,
+            },
+        )
+        assert "updated successfully (2 occurrence(s) replaced)" in _extract_tool_text(
+            res6
+        )
+
+    # 7. 删除操作 (new_str 为空字符串)
+    mock_del = AsyncMock()
+    mock_del.side_effect = [
+        CommandExecutionResult(returncode=0, stdout="delete me please", stderr=""),
+        CommandExecutionResult(returncode=0, stdout="", stderr=""),
+    ]
+    with patch("obsidian_cli_mcp.client.run_cli_command", new=mock_del):
+        res7 = await server.call_tool(
+            "edit",
+            {
+                "file": "Test.md",
+                "old_str": " me",
+                "new_str": "",
+                "replace_all": False,
+            },
+        )
+        assert "updated successfully (1 occurrence(s) replaced)" in _extract_tool_text(
+            res7
+        )
+        create_args = mock_del.call_args_list[1][0][1]
+        assert any("content=delete please" in arg for arg in create_args)

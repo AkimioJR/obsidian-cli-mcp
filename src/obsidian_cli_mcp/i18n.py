@@ -109,6 +109,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "rename": "重命名笔记",
             "open": "聚焦打开笔记",
             "random_read": "随机漫游笔记",
+            "edit": "编辑修改笔记",
         },
         "property": {
             "properties": "查看属性概览",
@@ -180,6 +181,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "rename": "Rename Note",
             "open": "Open & Focus Note",
             "random_read": "Read Random Note",
+            "edit": "Edit Note Content",
         },
         "property": {
             "properties": "List Properties",
