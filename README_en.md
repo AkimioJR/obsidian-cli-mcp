@@ -167,7 +167,7 @@ Client configuration:
 | `OBSIDIAN_CLI_PATH`   | Absolute path to Obsidian CLI binary                                                                                                            | Auto-detected in system `PATH` (`which obsidian`)       |
 | `OBSIDIAN_TIMEOUT`    | CLI subprocess execution timeout in seconds (supports floats, `none`/`null` to disable)                                                         | `30.0`                                                  |
 | `OBSIDIAN_VERSION`    | Manually specify/override Obsidian client version (e.g. `1.14.5` for headless/container environments)                                           | Auto-detected from `obsidian version` at startup        |
-| `OBSIDIAN_FEATURES`   | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,explorer,workspace,plugin,base,developer` or presets `standard,safe,all`) | `standard` (default: core tools plus standard features) |
+| `OBSIDIAN_FEATURES`   | Comma-separated feature groups to enable (e.g. `note,property,tag,task,graph,explorer,workspace,command,template,plugin,base,developer` or presets `standard,safe,all`) | `standard` (default: core tools plus standard features) |
 | `OBSIDIAN_LANG`       | Localization language for human-readable tool titles (supports `zh_CN`, `en_US`)                                                                | Auto-detected from system locale (fallback to `en_US`)  |
 | `OBSIDIAN_EXTENSIONS` | Whether to enable non-native composite extension tools (only accepts `true` case-insensitively; any other value is `false`)                     | `false` (defaults to pure official CLI tools only)      |
 
@@ -244,22 +244,26 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `bookmarks`: Read bookmarked and starred items.
 - `bookmark`: Add a bookmark in the vault (supports file, subpath, folder, search query, or URL).
 
-### 8. Commands & Templates (Feature: `plugin` · 9 tools)
+### 8. Commands & Command Palette (Feature: `command` · 2 tools)
 - `command`: Trigger internal Obsidian or plugin commands.
 - `commands`: List all available command IDs.
+
+### 9. Templates & Automation (Feature: `template` · 3 tools)
 - `templates`: List all template files in the vault.
 - `template_read`: Read template file with variable evaluation.
 - `template_insert`: Insert template into currently active note.
+
+### 10. Plugin Management (Feature: `plugin` · 4 tools)
 - `plugins` / `plugins_enabled`: List installed / active community and core plugins.
 - `plugin_enable` / `plugin_disable`: Dynamically enable or disable plugins.
 
-### 9. Database Views & Bases (Feature: `base` · 4 tools, requires Obsidian 1.14+)
+### 11. Database Views & Bases (Feature: `base` · 4 tools, requires Obsidian 1.14+)
 - `bases`: List all `.base` database view files in the vault.
 - `base_views`: List all views configured in a `.base` file.
 - `base_query`: Query structured records from a Base file (JSON, CSV, Markdown, etc.).
 - `base_create`: Create a new entry in a Base file.
 
-### 10. Developer Tools (Feature: `developer` · 1 tool)
+### 12. Developer Tools (Feature: `developer` · 1 tool)
 - `eval`: Execute JavaScript code inside Obsidian runtime (advanced escape hatch).
 
 </details>
