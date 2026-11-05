@@ -22,7 +22,12 @@ def register_other_tools(
     version: Version | None = None,
     enable_extensions: bool = False,
 ) -> None:
-    """Register miscellaneous tools: bookmark, templates, file, diff, tabs, tab_open, random (Feature: other)."""
+    """Register temporary miscellaneous tools: bookmark, templates, file, diff, tabs, tab_open, random (Feature: other).
+
+    WARNING: This feature group temporarily holds tools that have not yet been cleanly categorized into dedicated
+    feature domains. It may undergo breaking changes in future releases as tools are moved. Do not rely on this
+    feature group for long-term stability.
+    """
     reg = ToolRegistrar(
         server, "other", lang, version=version, enable_extensions=enable_extensions
     )

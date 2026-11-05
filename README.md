@@ -161,15 +161,15 @@ pip install obsidian-cli-mcp
 
 ### 环境变量配置
 
-| 环境变量            | 说明                                                                                               | 默认行为                                      |
-| :------------------ | :------------------------------------------------------------------------------------------------- | :-------------------------------------------- |
-| `OBSIDIAN_VAULT`    | 默认操控的目标 Vault 笔记库名称（工具未显式传入 `vault` 参数时自动采用）                           | 未设置时由 Obsidian CLI 自动绑定当前活跃库    |
-| `OBSIDIAN_CLI_PATH` | Obsidian CLI 可执行文件的绝对路径                                                                  | 自动在系统 PATH 中探测（如 `which obsidian`） |
-| `OBSIDIAN_TIMEOUT`  | CLI 子进程命令执行超时时间（秒，支持小数浮点或 `none`/`null` 禁用超时）                            | `30.0`                                        |
-| `OBSIDIAN_VERSION`  | 手动指定或覆盖 Obsidian 客户端版本号（用于无头/容器环境兼容性校验，如 `1.14.5`）                   | 启动时自动从 `obsidian version` 探针探测      |
-| `OBSIDIAN_FEATURES` | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,base,developer,other` 或预设 `standard,safe,all`） | `standard`（默认启用核心工具及日常笔记与图谱特性） |
-| `OBSIDIAN_LANG`     | 人类可读界面与工具标题的本地化语言（支持 `zh_CN`, `en_US` 等）                                     | 自动探测系统环境（未匹配时回退至 `en_US`）    |
-| `OBSIDIAN_EXTENSIONS` | 是否启用非原生 CLI 的扩展复合工具（仅当为 `true`（不区分大小写）时开启，其余情况均为 `false`）       | `false`（默认保持纯粹的官方 CLI 命令映射）    |
+| 环境变量              | 说明                                                                                                                   | 默认行为                                           |
+| :-------------------- | :--------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------- |
+| `OBSIDIAN_VAULT`      | 默认操控的目标 Vault 笔记库名称（工具未显式传入 `vault` 参数时自动采用）                                               | 未设置时由 Obsidian CLI 自动绑定当前活跃库         |
+| `OBSIDIAN_CLI_PATH`   | Obsidian CLI 可执行文件的绝对路径                                                                                      | 自动在系统 PATH 中探测（如 `which obsidian`）      |
+| `OBSIDIAN_TIMEOUT`    | CLI 子进程命令执行超时时间（秒，支持小数浮点或 `none`/`null` 禁用超时）                                                | `30.0`                                             |
+| `OBSIDIAN_VERSION`    | 手动指定或覆盖 Obsidian 客户端版本号（用于无头/容器环境兼容性校验，如 `1.14.5`）                                       | 启动时自动从 `obsidian version` 探针探测           |
+| `OBSIDIAN_FEATURES`   | 按需启用的工具特性组（如 `note,property,tag,task,graph,vault,plugin,base,developer,other` 或预设 `standard,safe,all`） | `standard`（默认启用核心工具及日常笔记与图谱特性） |
+| `OBSIDIAN_LANG`       | 人类可读界面与工具标题的本地化语言（支持 `zh_CN`, `en_US` 等）                                                         | 自动探测系统环境（未匹配时回退至 `en_US`）         |
+| `OBSIDIAN_EXTENSIONS` | 是否启用非原生 CLI 的扩展复合工具（仅当为 `true`（不区分大小写）时开启，其余情况均为 `false`）                         | `false`（默认保持纯粹的官方 CLI 命令映射）         |
 
 ---
 
@@ -254,6 +254,8 @@ pip install obsidian-cli-mcp
 - `eval`: 在 Obsidian 运行时环境中直接执行 JavaScript 代码（高级逃生通道）。
 
 ### 10. 杂项工具 (Feature: `other` · 7 项)
+> ⚠️ **免责与兼容性说明**：`other` 特性组仅作为临时分类收容当前版本中尚不好明确归类的命令（如 `bookmark`、`templates`、`file`、`diff`、`tabs`、`tab_open`、`random`）。后续版本演进中，这些命令可能会被重新拆分并归入专门的功能域（例如 `THEME`、`HOTKEY` 或更细分的模块）。因此**不保证此特性的向后兼容性（未来可能存在破坏性变更），请勿强依赖此特性**。
+
 - `bookmark`: 在当前笔记库中新增书签（支持文件、块/标题子路径、文件夹、搜索查询或 URL）。
 - `templates`: 列出当前笔记库内所有的模板文件。
 - `file`: 查询单个文件的元数据与系统详细信息（绝对路径、大小、创建与修改时间等）。

@@ -39,7 +39,7 @@ class Feature(str, Enum):
     PLUGIN = "plugin"
     BASE = "base"
     DEVELOPER = "developer"
-    OTHER = "other"
+    OTHER = "other"  # Temporary holding group for uncategorized commands; breaking changes may occur, do not rely on it
 
     def register(
         self,
