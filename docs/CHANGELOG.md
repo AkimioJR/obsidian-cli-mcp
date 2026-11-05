@@ -59,7 +59,38 @@
 - **[Packaging]**: 在 `pyproject.toml` 的 Trove Classifiers 中补充 Python 3.15 分类器。
 - **[Test]**: 扩充版本解析、比较以及多版本下的工具 Schema 动态过滤单元测试（43/43 测试全量通过）。
 
+## [0.3.0] - 2026-11-05
+
+### ✨ 新增
+- **[Developer]**: 全量封装 10 个官方开发者/调试命令（`dev_cdp`、`dev_console`、`dev_css`、`dev_debug`、`dev_dom`、`dev_errors`、`dev_mobile`、`dev_screenshot`、`dev_startup`、`devtools`），结合 `eval` 构成完整的 11 项开发者工具矩阵，支持 DOM/CSS 前端审查、日志与未处理异常捕获、应用冷启动耗时 breakdown（自动解析为结构化 JSON）以及窗口截图。
+- **[Extensions]**: 引入复合扩展工具机制（通过 `OBSIDIAN_EXTENSIONS=true` 启用），新增 3 项高效扩展复合工具：
+  - `edit`（`note` 域）：支持基于字面搜索匹配的局部精细修改与删除，避免重写整篇笔记带来的幻觉与大文本 Token 消耗。
+  - `import_file`（`explorer` 域）：支持将外部本地 Markdown 笔记及各类图片/PDF/音视频附件无损直拷入库，零 Token 消耗并免除 JSON 转义开销。
+  - `set_default_vault`（`core` 域）：支持在单会话内动态切换默认目标笔记库并校验库有效性，极大减少多库切换上下文开销。
+- **[Tools]**: 补齐官方基础操作命令，新增原生 `bookmark`（新建书签）、`templates`（模板清单）、`file`（单文件系统信息）、`diff`（版本差异对比）、`tabs`（打开标签列表）、`tab_open`（分屏打开标签页）、`random`（界面漫游笔记）等能力。
+
+### 🔄 重构
+- **[Architecture]**: 全面重构为 **13 大高度内聚、职责清晰的独立 Feature 领域**，彻底消除原本宽泛的 `vault` 与临时过渡的 `other`：
+  - `core`：基础环境探测与系统运维（收纳 `version`、`vaults`、`vault`、`reload`、`restart`）。
+  - `note`：纯正文 Markdown 读写与修改（收纳 `diff`、`random`、`edit*`）。
+  - `explorer`：文件系统与资产入库闭环（收纳 `files`、`file`、`folders`、`folder`、`recents`、`import_file*`）。
+  - `workspace`：工作区窗口布局与标签页操控（收纳 `workspace`、`tabs`、`tab_open`）。
+  - `bookmark`：独立书签与星标收藏系统（收纳 `bookmarks`、`bookmark`，与 `tag`、`task` 对称）。
+  - `command`：命令面板与快捷指令（收纳 `command`、`commands`）。
+  - `template`：模板管理与插入（收纳 `templates`、`template_read`、`template_insert`）。
+  - `plugin`：纯粹的插件扩展生命周期管理（收纳 `plugins`、`plugins_enabled`、`plugin_enable`、`plugin_disable`）。
+- **[Tools]**: 所有工具注册函数严格强制关键字传参（`*` keyword-only parameters），提升调用安全性与代码健壮性。
+- **[i18n]**: 本地化标题字典全面适配 13 大 Feature 领域，支持中英文双语分层自动回退。
+
+### 🎨 视觉与文档
+- **[Assets]**: 全面重绘 `assets/readme/` 矢量视觉图（`hero.svg`、`tools-matrix.svg`、`workflow.svg` 及 `social-preview`），移除所有过时的硬编码工具数量与“1:1 映射”字样，同步最新 13 域架构，并将 Python 版本支持标记更新为 `Python 3.10 – 3.15`。
+- **[Docs]**: 更新中英文双语 `README.md` 与 `README_en.md`，同步环境变量 `OBSIDIAN_FEATURES` 选项与 13 节详细功能清单。
+
+### 🔧 测试与质量
+- **[Test]**: 单元测试套件扩充至 63 项测试，覆盖参数序列化、动态 Schema 过滤、扩展工具门禁、CDP 与 DOM 审查以及所有 13 大功能域，测试通过率 100%。
+
 <!-- ==================== 底部版本比对链接 (Reference Links) ==================== -->
 [0.1.0]: https://github.com/AkimioJR/obsidian-cli-mcp/releases/tag/v0.1.0
 [0.1.1]: https://github.com/AkimioJR/obsidian-cli-mcp/compare/v0.1.0...v0.1.1
 [0.2.0]: https://github.com/AkimioJR/obsidian-cli-mcp/compare/v0.1.1...v0.2.0
+[0.3.0]: https://github.com/AkimioJR/obsidian-cli-mcp/compare/v0.2.0...v0.3.0
