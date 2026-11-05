@@ -115,7 +115,6 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "random": "界面随机漫游笔记",
             "diff": "对比版本差异",
             "edit": "编辑修改笔记",
-            "import_file": "导入外部文件",
         },
         "property": {
             "properties": "查看属性概览",
@@ -147,6 +146,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "folders": "列出文件夹目录",
             "folder": "查询文件夹详情",
             "recents": "列出最近访问文件",
+            "import_file": "导入外部文件",
         },
         "workspace": {
             "workspace": "查询工作区布局",
@@ -214,7 +214,6 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "random": "Open Random Note in GUI",
             "diff": "Compare Versions",
             "edit": "Edit Note Content",
-            "import_file": "Import External File",
         },
         "property": {
             "properties": "List Properties",
@@ -246,6 +245,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "folders": "List Folders",
             "folder": "Show Folder Details",
             "recents": "List Recent Files",
+            "import_file": "Import External File",
         },
         "workspace": {
             "workspace": "Get Workspace Layout",

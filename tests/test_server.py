@@ -830,14 +830,31 @@ async def test_edit_tool_validation_and_errors():
 
 @pytest.mark.asyncio
 async def test_import_file_tool_registration(monkeypatch):
+    from obsidian_cli_mcp.tools import Feature
+
     # 1. 默认未开启扩展时，import_file 不注册
     monkeypatch.delenv("OBSIDIAN_EXTENSIONS", raising=False)
-    server_default = create_server(cli_path="/mock/obsidian")
+    server_default = create_server(
+        cli_path="/mock/obsidian", features=[Feature.EXPLORER]
+    )
     tools_default = await server_default.list_tools()
     assert "import_file" not in {t.name for t in tools_default}
 
-    # 2. 显式开启 enable_extensions 时，import_file 作为 note 的扩展工具注册
-    server_ext = create_server(cli_path="/mock/obsidian", enable_extensions=True)
+    # 2. 仅启用 Feature.NOTE 时，即使开启 enable_extensions，import_file 也不会注册
+    server_note = create_server(
+        cli_path="/mock/obsidian",
+        features=[Feature.NOTE],
+        enable_extensions=True,
+    )
+    tools_note = await server_note.list_tools()
+    assert "import_file" not in {t.name for t in tools_note}
+
+    # 3. 显式开启 enable_extensions 且启用 Feature.EXPLORER 时，import_file 作为 explorer 的扩展工具注册
+    server_ext = create_server(
+        cli_path="/mock/obsidian",
+        features=[Feature.EXPLORER],
+        enable_extensions=True,
+    )
     tools_ext = await server_ext.list_tools()
     tool_map = {t.name: t for t in tools_ext}
     assert "import_file" in tool_map
@@ -851,7 +868,13 @@ async def test_import_file_tool_registration(monkeypatch):
 async def test_import_file_validation_and_errors(tmp_path):
     from unittest.mock import AsyncMock, patch
 
-    server = create_server(cli_path="/mock/obsidian", enable_extensions=True)
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(
+        cli_path="/mock/obsidian",
+        features=[Feature.EXPLORER],
+        enable_extensions=True,
+    )
 
     # 1. source_path 为空
     res1 = await server.call_tool("import_file", {"source_path": ""})
@@ -915,7 +938,13 @@ async def test_import_file_validation_and_errors(tmp_path):
 async def test_import_file_copy_and_move(tmp_path):
     from unittest.mock import AsyncMock, patch
 
-    server = create_server(cli_path="/mock/obsidian", enable_extensions=True)
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(
+        cli_path="/mock/obsidian",
+        features=[Feature.EXPLORER],
+        enable_extensions=True,
+    )
     mock_vault_dir = tmp_path / "vault_root"
     mock_vault_dir.mkdir()
 
