@@ -9,10 +9,10 @@ from obsidian_cli_mcp.server import create_server
 
 
 def test_server_tools_registered():
-    # 默认加载 standard 预设 (5 core + 25 standard = 30)
+    # 默认加载 standard 预设 (5 core + 27 standard = 32)
     server = create_server(cli_path="/mock/obsidian")
     tools = server._tool_manager._tools
-    assert len(tools) == 30
+    assert len(tools) == 32
     assert "read" in tools
     assert "create" in tools
     assert "tags" in tools
@@ -125,8 +125,8 @@ def test_feature_filtering_single():
 
     server = create_server(cli_path="/mock/obsidian", features=[Feature.NOTE])
     tools = server._tool_manager._tools
-    # 5 core tools (version, vaults, vault, reload, restart) + 9 note tools = 14
-    assert len(tools) == 14
+    # 5 core tools (version, vaults, vault, reload, restart) + 11 note tools = 16
+    assert len(tools) == 16
     assert "version" in tools
     assert "vaults" in tools
     assert "vault" in tools
@@ -220,8 +220,8 @@ def test_core_tools_always_registered():
 def test_feature_preset_standard():
     server = create_server(cli_path="/mock/obsidian", features=["standard"])
     tools = server._tool_manager._tools
-    # standard: 5 core + 25 standard (note 9 + property 4 + tag 2 + task 2 + graph 8) = 30
-    assert len(tools) == 30
+    # standard: 5 core + 27 standard (note 11 + property 4 + tag 2 + task 2 + graph 8) = 32
+    assert len(tools) == 32
     assert "read" in tools
     assert "property_read" in tools
     assert "tags" in tools
@@ -1045,15 +1045,12 @@ async def test_feature_other_registration_and_titles():
     # 1. Registration
     server = create_server(cli_path="/mock/obsidian", features=[Feature.OTHER])
     tools = server._tool_manager._tools
-    assert len(tools) == 12  # 5 core + 7 other
+    assert len(tools) == 9  # 5 core + 4 other
     expected_tools = {
         "bookmark",
-        "templates",
         "file",
-        "diff",
         "tabs",
         "tab_open",
-        "random",
     }
     assert expected_tools.issubset(tools.keys())
 
@@ -1063,12 +1060,9 @@ async def test_feature_other_registration_and_titles():
     )
     tools_zh = server_zh._tool_manager._tools
     assert tools_zh["bookmark"].title == "添加书签"
-    assert tools_zh["templates"].title == "列出模板清单"
     assert tools_zh["file"].title == "查询文件信息"
-    assert tools_zh["diff"].title == "对比版本差异"
     assert tools_zh["tabs"].title == "列出打开的标签页"
     assert tools_zh["tab_open"].title == "打开新标签页"
-    assert tools_zh["random"].title == "界面随机漫游笔记"
 
     # 3. Titles in en_US
     server_en = create_server(
@@ -1076,12 +1070,9 @@ async def test_feature_other_registration_and_titles():
     )
     tools_en = server_en._tool_manager._tools
     assert tools_en["bookmark"].title == "Add Bookmark"
-    assert tools_en["templates"].title == "List Templates"
     assert tools_en["file"].title == "Show File Details"
-    assert tools_en["diff"].title == "Compare Versions"
     assert tools_en["tabs"].title == "List Open Tabs"
     assert tools_en["tab_open"].title == "Open New Tab"
-    assert tools_en["random"].title == "Open Random Note in GUI"
 
 
 @pytest.mark.asyncio
@@ -1125,13 +1116,7 @@ async def test_feature_other_tool_executions():
             "vault=WorkVault",
         ]
 
-        # 2. templates
-        res = await server.call_tool("templates", {"total": True, "vault": "WorkVault"})
-        assert _extract_tool_text(res) == "mock_output"
-        args = mock_run.call_args[0][1]
-        assert args == ["templates", "total", "vault=WorkVault"]
-
-        # 3. file
+        # 2. file
         res = await server.call_tool(
             "file", {"file": "TestNote", "path": "Docs/TestNote.md"}
         )
@@ -1139,35 +1124,13 @@ async def test_feature_other_tool_executions():
         args = mock_run.call_args[0][1]
         assert args == ["file", "file=TestNote", "path=Docs/TestNote.md"]
 
-        # 4. diff
-        res = await server.call_tool(
-            "diff",
-            {
-                "file": "TestNote",
-                "path": "Docs/TestNote.md",
-                "from_version": 1,
-                "to_version": 5,
-                "filter": "local",
-            },
-        )
-        assert _extract_tool_text(res) == "mock_output"
-        args = mock_run.call_args[0][1]
-        assert args == [
-            "diff",
-            "file=TestNote",
-            "path=Docs/TestNote.md",
-            "from=1",
-            "to=5",
-            "filter=local",
-        ]
-
-        # 5. tabs
+        # 3. tabs
         res = await server.call_tool("tabs", {"ids": True})
         assert _extract_tool_text(res) == "mock_output"
         args = mock_run.call_args[0][1]
         assert args == ["tabs", "ids"]
 
-        # 6. tab_open
+        # 4. tab_open
         res = await server.call_tool(
             "tab_open",
             {"file": "Note.md", "group": "group-1", "view": "markdown"},
@@ -1180,12 +1143,6 @@ async def test_feature_other_tool_executions():
             "group=group-1",
             "view=markdown",
         ]
-
-        # 7. random
-        res = await server.call_tool("random", {"folder": "Articles", "newtab": True})
-        assert _extract_tool_text(res) == "mock_output"
-        args = mock_run.call_args[0][1]
-        assert args == ["random", "folder=Articles", "newtab"]
 
 
 @pytest.mark.asyncio
@@ -1212,3 +1169,63 @@ async def test_core_reload_and_restart_execution():
         res3 = await server.call_tool("restart", {})
         assert _extract_tool_text(res3) == "mock_output"
         assert mock_run.call_args_list[2][0][1] == ["restart"]
+
+
+@pytest.mark.asyncio
+async def test_note_diff_random_and_plugin_templates():
+    from unittest.mock import AsyncMock, patch
+
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(
+        cli_path="/mock/obsidian", features=[Feature.NOTE, Feature.PLUGIN]
+    )
+    mock_run = AsyncMock(
+        return_value=CommandExecutionResult(
+            returncode=0, stdout="mock_output", stderr=""
+        )
+    )
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", new=mock_run):
+        # 1. diff in note
+        res_diff = await server.call_tool(
+            "diff",
+            {
+                "file": "TestNote",
+                "path": "Docs/TestNote.md",
+                "from_version": 1,
+                "to_version": 5,
+                "filter": "local",
+            },
+        )
+        assert _extract_tool_text(res_diff) == "mock_output"
+        assert mock_run.call_args_list[0][0][1] == [
+            "diff",
+            "file=TestNote",
+            "path=Docs/TestNote.md",
+            "from=1",
+            "to=5",
+            "filter=local",
+        ]
+
+        # 2. random in note
+        res_rnd = await server.call_tool(
+            "random", {"folder": "Articles", "newtab": True}
+        )
+        assert _extract_tool_text(res_rnd) == "mock_output"
+        assert mock_run.call_args_list[1][0][1] == [
+            "random",
+            "folder=Articles",
+            "newtab",
+        ]
+
+        # 3. templates in plugin
+        res_tpl = await server.call_tool(
+            "templates", {"total": True, "vault": "WorkVault"}
+        )
+        assert _extract_tool_text(res_tpl) == "mock_output"
+        assert mock_run.call_args_list[2][0][1] == [
+            "templates",
+            "total",
+            "vault=WorkVault",
+        ]

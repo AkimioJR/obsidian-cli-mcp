@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 from pydantic import Field
@@ -22,7 +22,7 @@ def register_other_tools(
     version: Version | None = None,
     enable_extensions: bool = False,
 ) -> None:
-    """Register temporary miscellaneous tools: bookmark, templates, file, diff, tabs, tab_open, random (Feature: other).
+    """Register temporary miscellaneous tools: bookmark, file, tabs, tab_open (Feature: other).
 
     WARNING: This feature group temporarily holds tools that have not yet been cleanly categorized into dedicated
     feature domains. It may undergo breaking changes in future releases as tools are moved. Do not rely on this
@@ -82,23 +82,6 @@ def register_other_tools(
         )
 
     @reg.tool(
-        name="templates",
-        annotations=READ_ONLY,
-        description="List templates in the vault.",
-    )
-    async def templates(
-        total: bool = Field(
-            default=False,
-            description="Return template count.",
-        ),
-        vault: str | None = Field(
-            default=None,
-            description="Target a specific vault by name.",
-        ),
-    ) -> Any:
-        return await call_tool(client, "templates", {"total": total}, vault=vault)
-
-    @reg.tool(
         name="file",
         annotations=READ_ONLY,
         description="Show information about a specific file.",
@@ -119,50 +102,6 @@ def register_other_tools(
     ) -> Any:
         return await call_tool(
             client, "file", {"file": file, "path": path}, vault=vault
-        )
-
-    @reg.tool(
-        name="diff",
-        annotations=READ_ONLY,
-        description="List or diff local and sync versions of a file.",
-    )
-    async def diff(
-        file: str | None = Field(
-            default=None,
-            description="File name.",
-        ),
-        path: str | None = Field(
-            default=None,
-            description="File path.",
-        ),
-        from_version: int | None = Field(
-            default=None,
-            description="Version number to diff from.",
-        ),
-        to_version: int | None = Field(
-            default=None,
-            description="Version number to diff to.",
-        ),
-        filter: Literal["local", "sync"] | None = Field(
-            default=None,
-            description="Filter by version source (local or sync).",
-        ),
-        vault: str | None = Field(
-            default=None,
-            description="Target a specific vault by name.",
-        ),
-    ) -> Any:
-        return await call_tool(
-            client,
-            "diff",
-            {
-                "file": file,
-                "path": path,
-                "from": from_version,
-                "to": to_version,
-                "filter": filter,
-            },
-            vault=vault,
         )
 
     @reg.tool(
@@ -210,29 +149,6 @@ def register_other_tools(
             "tab:open",
             {"file": file, "group": group, "view": view},
             vault=vault,
-        )
-
-    @reg.tool(
-        name="random",
-        annotations=NON_IDEMPOTENT_WRITE,
-        description="Open a random note in the Obsidian GUI.",
-    )
-    async def random(
-        folder: str | None = Field(
-            default=None,
-            description="Limit to folder.",
-        ),
-        newtab: bool = Field(
-            default=False,
-            description="Open in new tab.",
-        ),
-        vault: str | None = Field(
-            default=None,
-            description="Target a specific vault by name.",
-        ),
-    ) -> Any:
-        return await call_tool(
-            client, "random", {"folder": folder, "newtab": newtab}, vault=vault
         )
 
 

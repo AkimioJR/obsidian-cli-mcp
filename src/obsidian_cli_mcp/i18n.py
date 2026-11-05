@@ -112,6 +112,8 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "rename": "重命名笔记",
             "open": "聚焦打开笔记",
             "random_read": "随机漫游笔记",
+            "random": "界面随机漫游笔记",
+            "diff": "对比版本差异",
             "edit": "编辑修改笔记",
             "import_file": "导入外部文件",
         },
@@ -150,6 +152,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
         "plugin": {
             "command": "执行命令",
             "commands": "列出可用命令",
+            "templates": "列出模板清单",
             "template_read": "读取模板内容",
             "template_insert": "插入模板到当前笔记",
             "plugins": "列出已安装插件",
@@ -168,12 +171,9 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
         },
         "other": {
             "bookmark": "添加书签",
-            "templates": "列出模板清单",
             "file": "查询文件信息",
-            "diff": "对比版本差异",
             "tabs": "列出打开的标签页",
             "tab_open": "打开新标签页",
-            "random": "界面随机漫游笔记",
         },
     },
     SupportedLang.EN_US: {
@@ -195,6 +195,8 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "rename": "Rename Note",
             "open": "Open & Focus Note",
             "random_read": "Read Random Note",
+            "random": "Open Random Note in GUI",
+            "diff": "Compare Versions",
             "edit": "Edit Note Content",
             "import_file": "Import External File",
         },
@@ -233,6 +235,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
         "plugin": {
             "command": "Execute Command",
             "commands": "List Commands",
+            "templates": "List Templates",
             "template_read": "Read Template",
             "template_insert": "Insert Template to Note",
             "plugins": "List Installed Plugins",
@@ -251,12 +254,9 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
         },
         "other": {
             "bookmark": "Add Bookmark",
-            "templates": "List Templates",
             "file": "Show File Details",
-            "diff": "Compare Versions",
             "tabs": "List Open Tabs",
             "tab_open": "Open New Tab",
-            "random": "Open Random Note in GUI",
         },
     },
 }

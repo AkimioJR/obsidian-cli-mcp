@@ -62,6 +62,23 @@ def register_plugin_tools(
         return await call_tool(client, "commands", {"filter": filter}, vault=vault)
 
     @reg.tool(
+        name="templates",
+        annotations=READ_ONLY,
+        description="List templates in the vault.",
+    )
+    async def templates(
+        total: bool = Field(
+            default=False,
+            description="Return template count.",
+        ),
+        vault: str | None = Field(
+            default=None,
+            description="Target a specific vault by name.",
+        ),
+    ) -> Any:
+        return await call_tool(client, "templates", {"total": total}, vault=vault)
+
+    @reg.tool(
         name="template_read",
         annotations=READ_ONLY,
         description="Read a template file's content, with optional resolution of template variables.",

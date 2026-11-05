@@ -192,7 +192,7 @@ pip install obsidian-cli-mcp
 - `restart`: 重启 Obsidian 桌面客户端进程。
 - `set_default_vault`: 动态切换当前会话默认目标笔记库（需 `OBSIDIAN_EXTENSIONS=true`）。
 
-### 1. 笔记与内容 (Feature: `note` · 9 项原生 + 2 项扩展)
+### 1. 笔记与内容 (Feature: `note` · 11 项原生 + 2 项扩展)
 - `read`: 按文件名或相对路径读取笔记 Markdown 原文。
 - `create`: 创建新笔记，支持指定模板、预填充内容、静默覆盖与默认打开。
 - `append`: 向指定笔记末尾或特定标题区域下方（`heading=`，Obsidian 1.14+）追加内容。
@@ -202,6 +202,8 @@ pip install obsidian-cli-mcp
 - `rename`: 重命名指定笔记文件（需 Obsidian 1.12.1+）。
 - `open`: 在 Obsidian 桌面端图形界面中聚焦打开笔记。
 - `random_read`: 随机读取库内的一篇笔记（漫游探索）。
+- `random`: 在 Obsidian 界面中随机打开并聚焦一篇笔记。
+- `diff`: 对比文件的本地历史版本或 Obsidian Sync 云端同步版本差异。
 - `edit`: 局部精细编辑笔记（字面搜索替换，需 `OBSIDIAN_EXTENSIONS=true`）。
 - `import_file`: 导入外部本地文件至笔记库（文件流直拷，零 Token 消耗免 JSON 转义，需 `OBSIDIAN_EXTENSIONS=true`）。
 
@@ -236,9 +238,10 @@ pip install obsidian-cli-mcp
 - `bookmarks`: 查看书签与星标项目列表。
 - `workspace`: 查询当前工作区窗口布局树。
 
-### 7. 命令与模板自动化 (Feature: `plugin` · 8 项)
+### 7. 命令与模板自动化 (Feature: `plugin` · 9 项)
 - `command`: 触发执行 Obsidian 内置或第三方插件命令。
 - `commands`: 列出当前可用的全部命令 ID 清单。
+- `templates`: 列出当前笔记库内所有的模板文件。
 - `template_read`: 读取模板文件并支持占位符变量解析。
 - `template_insert`: 将模板内容插入到当前活跃笔记。
 - `plugins` / `plugins_enabled`: 列出已安装 / 已启用的社区与核心插件。
@@ -253,16 +256,13 @@ pip install obsidian-cli-mcp
 ### 9. 开发者工具 (Feature: `developer` · 1 项)
 - `eval`: 在 Obsidian 运行时环境中直接执行 JavaScript 代码（高级逃生通道）。
 
-### 10. 杂项工具 (Feature: `other` · 7 项)
-> ⚠️ **免责与兼容性说明**：`other` 特性组仅作为临时分类收容当前版本中尚不好明确归类的命令（如 `bookmark`、`templates`、`file`、`diff`、`tabs`、`tab_open`、`random`）。后续版本演进中，这些命令可能会被重新拆分并归入专门的功能域（例如 `THEME`、`HOTKEY` 或更细分的模块）。因此**不保证此特性的向后兼容性（未来可能存在破坏性变更），请勿强依赖此特性**。
+### 10. 杂项工具 (Feature: `other` · 4 项)
+> ⚠️ **免责与兼容性说明**：`other` 特性组仅作为临时分类收容当前版本中尚不好明确归类的命令（如 `bookmark`、`file`、`tabs`、`tab_open`）。后续版本演进中，这些命令可能会被重新拆分并归入专门的功能域（例如 `THEME`、`HOTKEY` 或更细分的模块）。因此**不保证此特性的向后兼容性（未来可能存在破坏性变更），请勿强依赖此特性**。
 
 - `bookmark`: 在当前笔记库中新增书签（支持文件、块/标题子路径、文件夹、搜索查询或 URL）。
-- `templates`: 列出当前笔记库内所有的模板文件。
 - `file`: 查询单个文件的元数据与系统详细信息（绝对路径、大小、创建与修改时间等）。
-- `diff`: 对比文件的本地历史版本或 Obsidian Sync 云端同步版本差异。
 - `tabs`: 列出当前工作区中打开的所有标签页与分屏布局。
 - `tab_open`: 在 Obsidian 界面中打开新标签页（支持指定文件、标签组 ID 或视图类型）。
-- `random`: 在 Obsidian 界面中随机打开并聚焦一篇笔记。
 
 </details>
 

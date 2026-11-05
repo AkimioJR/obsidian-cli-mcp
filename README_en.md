@@ -192,7 +192,7 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `restart`: Restart Obsidian desktop application.
 - `set_default_vault`: Dynamically switch default target vault for the session (requires `OBSIDIAN_EXTENSIONS=true`).
 
-### 1. Notes & Content (Feature: `note` · 9 native + 2 extensions)
+### 1. Notes & Content (Feature: `note` · 11 native + 2 extensions)
 - `read`: Read raw Markdown content by note name or relative path.
 - `create`: Create a new note with optional template, pre-filled content, overwrite, and auto-open.
 - `append`: Append content to the end of a note or under a target heading section (`heading=`, Obsidian 1.14+).
@@ -202,6 +202,8 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `rename`: Rename a note file (requires Obsidian 1.12.1+).
 - `open`: Focus and open note in the Obsidian GUI.
 - `random_read`: Randomly read a note from the vault.
+- `random`: Open and focus a randomly chosen note in Obsidian GUI.
+- `diff`: List or diff local history and Obsidian Sync versions for a file.
 - `edit`: Precise in-place note editing via literal search-and-replace (requires `OBSIDIAN_EXTENSIONS=true`).
 - `import_file`: Import external local file directly into vault (zero token overhead, avoids JSON escaping, requires `OBSIDIAN_EXTENSIONS=true`).
 
@@ -236,9 +238,10 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `bookmarks`: Read bookmarked and starred items.
 - `workspace`: Query workspace window layout tree.
 
-### 7. Commands & Templates (Feature: `plugin` · 8 tools)
+### 7. Commands & Templates (Feature: `plugin` · 9 tools)
 - `command`: Trigger internal Obsidian or plugin commands.
 - `commands`: List all available command IDs.
+- `templates`: List all template files in the vault.
 - `template_read`: Read template file with variable evaluation.
 - `template_insert`: Insert template into currently active note.
 - `plugins` / `plugins_enabled`: List installed / active community and core plugins.
@@ -253,16 +256,13 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 ### 9. Developer Tools (Feature: `developer` · 1 tool)
 - `eval`: Execute JavaScript code inside Obsidian runtime (advanced escape hatch).
 
-### 10. Miscellaneous Tools (Feature: `other` · 7 tools)
-> ⚠️ **Disclaimer & Breaking Changes Warning**: The `other` feature group is merely a temporary holding area for commands that are not yet cleanly categorized into dedicated domains (e.g. `bookmark`, `templates`, `file`, `diff`, `tabs`, `tab_open`, `random`). In future releases, these tools will be reorganized into dedicated feature groups (such as `THEME`, `HOTKEY`, or more granular modules). Therefore, **no backward compatibility is guaranteed for `other` (breaking changes may occur); do not hard-depend on this feature group**.
+### 10. Miscellaneous Tools (Feature: `other` · 4 tools)
+> ⚠️ **Disclaimer & Breaking Changes Warning**: The `other` feature group is merely a temporary holding area for commands that are not yet cleanly categorized into dedicated domains (e.g. `bookmark`, `file`, `tabs`, `tab_open`). In future releases, these tools will be reorganized into dedicated feature groups (such as `THEME`, `HOTKEY`, or more granular modules). Therefore, **no backward compatibility is guaranteed for `other` (breaking changes may occur); do not hard-depend on this feature group**.
 
 - `bookmark`: Add a bookmark in the vault (supports file, subpath, folder, search query, or URL).
-- `templates`: List all template files in the vault.
 - `file`: Show metadata and system details for a specific file.
-- `diff`: List or diff local history and Obsidian Sync versions for a file.
 - `tabs`: List all open tabs and workspace splits.
 - `tab_open`: Open a new tab in Obsidian GUI (supports file, tab group ID, or view type).
-- `random`: Open and focus a randomly chosen note in Obsidian GUI.
 
 </details>
 
