@@ -1871,6 +1871,7 @@ async def test_read_section_registration(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_read_section_execution():
+    import json
     from unittest.mock import AsyncMock, patch
 
     from obsidian_cli_mcp.tools import Feature
@@ -1895,8 +1896,6 @@ title: Paper Note
 # Title
 Top introduction.
 
-
-
 ## 1. Background
 Historical overview.
 
@@ -1913,14 +1912,40 @@ Details on optimizer and learning rate.
 Final words.
 """
 
-    with patch(
-        "obsidian_cli_mcp.client.run_cli_command",
-        new=AsyncMock(
-            return_value=CommandExecutionResult(
-                returncode=0, stdout=mock_content, stderr=""
-            )
-        ),
-    ):
+    mock_outline = json.dumps(
+        [
+            {"level": 1, "heading": "Title", "line": 5},
+            {"level": 2, "heading": "1. Background", "line": 8},
+            {"level": 3, "heading": "1.1 Prior Work", "line": 11},
+            {"level": 2, "heading": "2. Methodology", "line": 14},
+            {"level": 3, "heading": "2.1 Optimization Strategy", "line": 17},
+            {"level": 2, "heading": "3. Conclusion", "line": 20},
+        ]
+    )
+
+    mock_run = AsyncMock()
+    mock_run.side_effect = [
+        # Call 1: read then outline (with subheadings)
+        CommandExecutionResult(returncode=0, stdout=mock_content, stderr=""),
+        CommandExecutionResult(returncode=0, stdout=mock_outline, stderr=""),
+        # Call 2: read then outline (without subheadings)
+        CommandExecutionResult(returncode=0, stdout=mock_content, stderr=""),
+        CommandExecutionResult(returncode=0, stdout=mock_outline, stderr=""),
+        # Call 3: read then outline (fuzzy prefix match)
+        CommandExecutionResult(returncode=0, stdout=mock_content, stderr=""),
+        CommandExecutionResult(returncode=0, stdout=mock_outline, stderr=""),
+        # Call 4: read then outline (missing heading)
+        CommandExecutionResult(returncode=0, stdout=mock_content, stderr=""),
+        CommandExecutionResult(returncode=0, stdout=mock_outline, stderr=""),
+        # Call 5: outline error fail-fast
+        CommandExecutionResult(returncode=0, stdout=mock_content, stderr=""),
+        CommandExecutionResult(returncode=0, stdout="Error: outline failed", stderr=""),
+        # Call 6: outline empty (no headings in note)
+        CommandExecutionResult(returncode=0, stdout=mock_content, stderr=""),
+        CommandExecutionResult(returncode=0, stdout="[]", stderr=""),
+    ]
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", new=mock_run):
         # 2. 提取带有子标题的章节 (include_subheadings=True 默认)
         res_with_sub = await server.call_tool(
             "read_section", {"file": "Paper.md", "heading": "1. Background"}
@@ -1961,7 +1986,22 @@ Final words.
         assert "Available headings" in text_missing
         assert "1. Background" in text_missing
         assert "2. Methodology" in text_missing
-        assert "Code comment" not in text_missing
+
+        # 6. AST 大纲解析失败时快速报错，引导 Agent 查看全文
+        res_err = await server.call_tool(
+            "read_section", {"file": "Paper.md", "heading": "Methodology"}
+        )
+        text_err = _extract_tool_text(res_err)
+        assert "Failed to retrieve outline AST" in text_err
+        assert "Please use 'read'" in text_err
+
+        # 7. 笔记不含任何大纲标题时快速报错，引导 Agent 查看全文
+        res_empty_outline = await server.call_tool(
+            "read_section", {"file": "Paper.md", "heading": "Methodology"}
+        )
+        text_empty = _extract_tool_text(res_empty_outline)
+        assert "does not contain any parsed outline headings" in text_empty
+        assert "Please use 'read'" in text_empty
 
 
 @pytest.mark.asyncio
