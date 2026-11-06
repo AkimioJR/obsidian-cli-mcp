@@ -1,4 +1,3 @@
-import json
 import os
 import re
 import shutil
@@ -195,146 +194,69 @@ def register_explorer_tools(
         else:
             pattern = re.compile(re.escape(clean_query), flags)
 
-        # 1. 尝试获取 Vault 路径进行本地高性能文件系统扫描
+        # 获取 Vault 路径进行文件系统安全扫描
         vault_info = await call_tool(client, "vault", {"info": "path"}, vault=vault)
-        vault_path_str = (
-            str(vault_info).strip()
-            if vault_info and not str(vault_info).startswith("Error:")
-            else ""
-        )
+        if isinstance(vault_info, str) and vault_info.startswith("Error:"):
+            return vault_info
+
+        vault_path_str = str(vault_info).strip()
+        if not vault_path_str:
+            target_vault = vault or "current vault"
+            return (
+                f"Error: Could not determine vault directory path for '{target_vault}'."
+            )
+
+        vault_dir = Path(vault_path_str).resolve()
+        if not vault_dir.exists() or not vault_dir.is_dir():
+            return f"Error: Vault directory '{vault_dir}' does not exist or is not a directory."
+
+        if folder and folder.strip():
+            search_dir = (vault_dir / folder.strip().lstrip("/")).resolve()
+            try:
+                search_dir.relative_to(vault_dir)
+            except ValueError:
+                return f"Error: Folder path '{folder}' resolves outside the vault directory."
+            if not search_dir.exists() or not search_dir.is_dir():
+                return f"No matches found for '{clean_query}' in folder '{folder}' in vault."
+        else:
+            search_dir = vault_dir
 
         matches: list[dict[str, Any]] = []
-        fs_search_success = False
+        glob_pat = f"*.{ext.lstrip('.')}" if ext != "*" else "*"
 
-        if vault_path_str:
-            vault_dir = Path(vault_path_str).resolve()
-            if vault_dir.exists() and vault_dir.is_dir():
-                if folder and folder.strip():
-                    search_dir = (vault_dir / folder.strip().lstrip("/")).resolve()
-                else:
-                    search_dir = vault_dir
+        for file_path in search_dir.rglob(glob_pat):
+            if not file_path.is_file():
+                continue
+            rel_to_vault = file_path.relative_to(vault_dir)
+            if any(part.startswith(".") for part in rel_to_vault.parts):
+                continue
 
-                try:
-                    search_dir.relative_to(vault_dir)
-                    if search_dir.exists() and search_dir.is_dir():
-                        glob_pat = f"*.{ext.lstrip('.')}" if ext != "*" else "*"
-                        for file_path in search_dir.rglob(glob_pat):
-                            if not file_path.is_file():
-                                continue
-                            rel_to_vault = file_path.relative_to(vault_dir)
-                            if any(part.startswith(".") for part in rel_to_vault.parts):
-                                continue
+            try:
+                text = file_path.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
 
-                            try:
-                                text = file_path.read_text(
-                                    encoding="utf-8", errors="replace"
-                                )
-                            except OSError:
-                                continue
-
-                            lines = text.splitlines()
-                            for i, line in enumerate(lines):
-                                if pattern.search(line):
-                                    start_idx = max(0, i - context_lines)
-                                    end_idx = min(len(lines), i + context_lines + 1)
-                                    ctx = "\n".join(
-                                        f"{idx + 1}: {lines[idx]}"
-                                        for idx in range(start_idx, end_idx)
-                                    )
-                                    matches.append(
-                                        {
-                                            "file": str(rel_to_vault),
-                                            "line": i + 1,
-                                            "match": line.strip(),
-                                            "context": ctx,
-                                        }
-                                    )
-                                    if len(matches) >= max_results:
-                                        break
-                            if len(matches) >= max_results:
-                                break
-                        fs_search_success = True
-                except (ValueError, OSError):
-                    # 触发目录越界或文件系统权限限制，转入通道 2
-                    pass
-
-        # 2. 如果文件系统直读不可用（如 macOS TCC 权限保护目录），回退至 Obsidian 运行时 in-memory 搜索
-        if not fs_search_success:
-            js_query = json.dumps(clean_query)
-            js_folder = json.dumps(
-                folder.strip().lstrip("/") if folder and folder.strip() else ""
-            )
-            js_ext = json.dumps(ext.lstrip(".") if ext != "*" else "*")
-            js_max = max_results
-            js_ctx = context_lines
-            js_case = "true" if case_sensitive else "false"
-            js_regex = "true" if regex else "false"
-
-            js_code = f"""
-(async () => {{{{
-    const query = {js_query};
-    const isRegex = {js_regex};
-    const caseSensitive = {js_case};
-    const folder = {js_folder};
-    const ext = {js_ext};
-    const maxResults = {js_max};
-    const contextLines = {js_ctx};
-
-    let re;
-    try {{{{
-        re = isRegex
-            ? new RegExp(query, caseSensitive ? "g" : "gi")
-            : new RegExp(query.replace(/[.*+?^${{{{}}}}|[\\]\\]/g, "\\$&"), caseSensitive ? "g" : "gi");
-    }}}} catch(e) {{{{
-        return {{{{ error: "Invalid regular expression: " + e.message }}}};
-    }}}}
-
-    const files = app.vault.getFiles().filter(f => {{{{
-        if (ext !== "*" && f.extension !== ext) return false;
-        if (folder && !f.path.startsWith(folder)) return false;
-        return true;
-    }}}});
-
-    const matches = [];
-    for (const f of files) {{{{
-        const content = await app.vault.cachedRead(f);
-        const lines = content.split("\\n");
-        for (let i = 0; i < lines.length; i++) {{{{
-            re.lastIndex = 0;
-            if (re.test(lines[i])) {{{{
-                const start = Math.max(0, i - contextLines);
-                const end = Math.min(lines.length, i + contextLines + 1);
-                const ctx = lines.slice(start, end).map((l, idx) => `${{{{start + idx + 1}}}}: ${{l}}`).join("\\n");
-                matches.push({{{{
-                    file: f.path,
-                    line: i + 1,
-                    match: lines[i].trim(),
-                    context: ctx
-                }}}});
-                if (matches.length >= maxResults) break;
-            }}}}
-        }}}}
-        if (matches.length >= maxResults) break;
-    }}}}
-    return {{{{ matches }}}};
-}}}})()
-"""
-            eval_res = await call_tool(client, "eval", {"code": js_code}, vault=vault)
-            if isinstance(eval_res, str) and eval_res.startswith("Error:"):
-                return eval_res
-            if isinstance(eval_res, dict):
-                if "error" in eval_res:
-                    return f"Error: {eval_res['error']}"
-                matches = eval_res.get("matches", [])
-            elif isinstance(eval_res, str) and eval_res.startswith("=>"):
-                try:
-                    parsed = json.loads(eval_res[2:].strip())
-                    if isinstance(parsed, dict):
-                        if "error" in parsed:
-                            return f"Error: {parsed['error']}"
-                        matches = parsed.get("matches", [])
-                except json.JSONDecodeError:
-                    pass
+            lines_in_file = text.splitlines()
+            for i, line_text in enumerate(lines_in_file):
+                if pattern.search(line_text):
+                    start_idx = max(0, i - context_lines)
+                    end_idx = min(len(lines_in_file), i + context_lines + 1)
+                    ctx = "\n".join(
+                        f"{idx + 1}: {lines_in_file[idx]}"
+                        for idx in range(start_idx, end_idx)
+                    )
+                    matches.append(
+                        {
+                            "file": str(rel_to_vault),
+                            "line": i + 1,
+                            "match": line_text.strip(),
+                            "context": ctx,
+                        }
+                    )
+                    if len(matches) >= max_results:
+                        break
+            if len(matches) >= max_results:
+                break
 
         if not matches:
             scope_desc = f" in folder '{folder}'" if folder else ""

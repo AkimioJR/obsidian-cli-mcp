@@ -1845,6 +1845,20 @@ async def test_search_content_execution(tmp_path):
         )
         assert "No matches found" in _extract_tool_text(res_none)
 
+        # 8. 目标 folder 目录越界防御
+        res_traversal = await server.call_tool(
+            "search_content", {"query": "test", "folder": "../outside"}
+        )
+        assert "resolves outside the vault directory" in _extract_tool_text(
+            res_traversal
+        )
+
+        # 9. 目标 folder 不存在时直接返回未找到
+        res_nonexistent_dir = await server.call_tool(
+            "search_content", {"query": "test", "folder": "NonExistentFolder"}
+        )
+        assert "No matches found" in _extract_tool_text(res_nonexistent_dir)
+
 
 @pytest.mark.asyncio
 async def test_read_section_registration(monkeypatch):
