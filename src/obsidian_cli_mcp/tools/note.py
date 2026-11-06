@@ -519,73 +519,156 @@ def register_note_tools(
         heading_re = re.compile(r"^(#{1,6})\s+(.+)$")
         num_prefix_re = re.compile(r"^(\d+[\.\s、]+|[一二三四五六七八九十]+[、\.\s]+)")
 
-        in_code_block = False
-        headings: list[tuple[int, int, str]] = []  # (line_idx, level, title)
+        # 1. 尝试使用 Obsidian 原生 AST outline（获取精确的 level、title 与 line 行号）
+        outline_res = await call_tool(
+            client,
+            "outline",
+            {"file": file, "path": path, "format": "json"},
+            parse_json=True,
+            vault=vault,
+        )
 
-        for i, line in enumerate(lines):
-            stripped = line.strip()
-            if stripped.startswith(("```", "~~~")):
-                in_code_block = not in_code_block
-                continue
-            if in_code_block:
-                continue
+        used_ast = False
+        start_line = -1
+        end_line = -1
+        available_headings: list[str] = []
 
-            m = heading_re.match(line)
-            if m:
-                level = len(m.group(1))
-                title = m.group(2).strip()
-                headings.append((i, level, title))
+        if (
+            isinstance(outline_res, list)
+            and outline_res
+            and isinstance(outline_res[0], dict)
+        ):
+            # 提取大纲项: [{"level": 1, "heading": "Title", "line": 26}, ...]
+            ast_headings: list[tuple[int, int, str]] = []  # (outline_idx, level, title)
+            for idx, item in enumerate(outline_res):
+                lvl = int(item.get("level", 1))
+                title = str(item.get("heading", "")).strip()
+                ast_headings.append((idx, lvl, title))
+                available_headings.append(title)
 
-        matched_idx = -1
-        matched_level = 0
+            matched_ast_idx = -1
+            matched_ast_level = 0
 
-        # 1. 精确匹配（忽略大小写）
-        for idx, lvl, title in headings:
-            if title.lower() == norm_target:
-                matched_idx = idx
-                matched_level = lvl
-                break
-
-        # 2. 移除前导数字/序号前缀匹配（如 "1. Background" -> "background"）
-        if matched_idx == -1:
-            for idx, lvl, title in headings:
-                cleaned_title = num_prefix_re.sub("", title).strip()
-                if cleaned_title.lower() == norm_target:
-                    matched_idx = idx
-                    matched_level = lvl
+            # 匹配策略：精确 -> 序号剥离 -> 模糊包含
+            for idx, lvl, title in ast_headings:
+                if title.lower() == norm_target:
+                    matched_ast_idx = idx
+                    matched_ast_level = lvl
                     break
 
-        # 3. 子字符串模糊匹配
-        if matched_idx == -1:
-            for idx, lvl, title in headings:
-                if norm_target in title.lower():
-                    matched_idx = idx
-                    matched_level = lvl
-                    break
+            if matched_ast_idx == -1:
+                for idx, lvl, title in ast_headings:
+                    cleaned = num_prefix_re.sub("", title).strip()
+                    if cleaned.lower() == norm_target:
+                        matched_ast_idx = idx
+                        matched_ast_level = lvl
+                        break
 
-        if matched_idx == -1:
-            available = [h[2] for h in headings]
-            return f"Error: Heading '{heading}' not found in '{target}'. Available headings: {available}"
+            if matched_ast_idx == -1:
+                for idx, lvl, title in ast_headings:
+                    if norm_target in title.lower():
+                        matched_ast_idx = idx
+                        matched_ast_level = lvl
+                        break
 
-        collected: list[str] = []
-        in_code_block = False
-        for i in range(matched_idx, len(lines)):
-            line = lines[i]
-            stripped = line.strip()
-            if stripped.startswith(("```", "~~~")):
-                in_code_block = not in_code_block
-            elif not in_code_block and i > matched_idx:
-                m = heading_re.match(line)
-                if m:
-                    lvl = len(m.group(1))
+            if matched_ast_idx != -1:
+                start_line = int(outline_res[matched_ast_idx].get("line", 1))
+                # 计算结束行
+                next_boundary_line = -1
+                for next_i in range(matched_ast_idx + 1, len(outline_res)):
+                    next_item = outline_res[next_i]
+                    next_lvl = int(next_item.get("level", 1))
                     if include_subheadings:
-                        if lvl <= matched_level:
+                        if next_lvl <= matched_ast_level:
+                            next_boundary_line = int(next_item.get("line", -1))
                             break
                     else:
+                        next_boundary_line = int(next_item.get("line", -1))
                         break
-            collected.append(line)
 
-        return "\n".join(collected).strip()
+                if next_boundary_line != -1:
+                    end_line = next_boundary_line - 1
+                else:
+                    end_line = len(lines)
+                used_ast = True
+            elif available_headings:
+                # 确定大纲存在但未找到目标标题，直接返回可用大纲
+                return f"Error: Heading '{heading}' not found in '{target}'. Available headings: {available_headings}"
+
+        # 2. 如果未能从 AST 获取（如 outline 命令返回非结构化数据或降级场景），回退至内置正则与代码块解析
+        if not used_ast:
+            in_code_block = False
+            headings: list[tuple[int, int, str]] = []  # (line_idx, level, title)
+
+            for i, line in enumerate(lines):
+                stripped = line.strip()
+                if stripped.startswith(("```", "~~~")):
+                    in_code_block = not in_code_block
+                    continue
+                if in_code_block:
+                    continue
+
+                m = heading_re.match(line)
+                if m:
+                    level = len(m.group(1))
+                    title = m.group(2).strip()
+                    headings.append((i, level, title))
+
+            matched_idx = -1
+            matched_level = 0
+
+            # 1. 精确匹配（忽略大小写）
+            for idx, lvl, title in headings:
+                if title.lower() == norm_target:
+                    matched_idx = idx
+                    matched_level = lvl
+                    break
+
+            # 2. 移除前导数字/序号前缀匹配（如 "1. Background" -> "background"）
+            if matched_idx == -1:
+                for idx, lvl, title in headings:
+                    cleaned_title = num_prefix_re.sub("", title).strip()
+                    if cleaned_title.lower() == norm_target:
+                        matched_idx = idx
+                        matched_level = lvl
+                        break
+
+            # 3. 子字符串模糊匹配
+            if matched_idx == -1:
+                for idx, lvl, title in headings:
+                    if norm_target in title.lower():
+                        matched_idx = idx
+                        matched_level = lvl
+                        break
+
+            if matched_idx == -1:
+                available = [h[2] for h in headings]
+                return f"Error: Heading '{heading}' not found in '{target}'. Available headings: {available}"
+
+            start_line = matched_idx + 1
+            end_line = len(lines)
+            in_code_block = False
+            for i in range(matched_idx + 1, len(lines)):
+                line = lines[i]
+                stripped = line.strip()
+                if stripped.startswith(("```", "~~~")):
+                    in_code_block = not in_code_block
+                elif not in_code_block:
+                    m = heading_re.match(line)
+                    if m:
+                        lvl = len(m.group(1))
+                        if include_subheadings:
+                            if lvl <= matched_level:
+                                end_line = i
+                                break
+                        else:
+                            end_line = i
+                            break
+
+        # 3. 按计算好的 1-based 行号区间精确切片
+        start_idx = max(0, start_line - 1)
+        end_idx = min(len(lines), end_line)
+        return "\n".join(lines[start_idx:end_idx]).strip()
 
     @reg.tool(
         name="edit",

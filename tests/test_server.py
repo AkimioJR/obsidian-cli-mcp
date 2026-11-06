@@ -1962,3 +1962,70 @@ Final words.
         assert "1. Background" in text_missing
         assert "2. Methodology" in text_missing
         assert "Code comment" not in text_missing
+
+
+@pytest.mark.asyncio
+async def test_read_section_with_native_ast_outline():
+    import json
+    from unittest.mock import AsyncMock, patch
+
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(
+        cli_path="/mock/obsidian", features=[Feature.NOTE], enable_extensions=True
+    )
+
+    # 包含 Setext 标题与复杂层级的 Markdown 文档
+    markdown_with_setext = """Setext Title 1
+===
+Content of title 1.
+
+Setext Subtitle 2
+---
+Content of subtitle 2.
+
+# ATX Section 3
+Content of section 3.
+"""
+    # 模拟 Obsidian outline 命令返回的官方原生 AST 结构
+    mock_outline_json = json.dumps(
+        [
+            {"level": 1, "heading": "Setext Title 1", "line": 1},
+            {"level": 2, "heading": "Setext Subtitle 2", "line": 5},
+            {"level": 1, "heading": "ATX Section 3", "line": 9},
+        ]
+    )
+
+    mock_run = AsyncMock()
+    mock_run.side_effect = [
+        # 1st call: read, then outline
+        CommandExecutionResult(returncode=0, stdout=markdown_with_setext, stderr=""),
+        CommandExecutionResult(returncode=0, stdout=mock_outline_json, stderr=""),
+        # 2nd call: read, then outline
+        CommandExecutionResult(returncode=0, stdout=markdown_with_setext, stderr=""),
+        CommandExecutionResult(returncode=0, stdout=mock_outline_json, stderr=""),
+    ]
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", new=mock_run):
+        # 1. 原生 AST 准确识别 Setext 标题并包含子标题
+        res1 = await server.call_tool(
+            "read_section", {"file": "Doc.md", "heading": "Setext Title 1"}
+        )
+        t1 = _extract_tool_text(res1)
+        assert "Setext Title 1" in t1
+        assert "Content of subtitle 2." in t1
+        assert "ATX Section 3" not in t1
+
+        # 2. 原生 AST 准确在下一个标题处截断（include_subheadings=False）
+        res2 = await server.call_tool(
+            "read_section",
+            {
+                "file": "Doc.md",
+                "heading": "Setext Title 1",
+                "include_subheadings": False,
+            },
+        )
+        t2 = _extract_tool_text(res2)
+        assert "Setext Title 1" in t2
+        assert "Content of title 1." in t2
+        assert "Setext Subtitle 2" not in t2
