@@ -114,6 +114,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "random_read": "随机漫游笔记",
             "random": "界面随机漫游笔记",
             "diff": "对比版本差异",
+            "read_section": "按标题切片读取笔记",
             "edit": "编辑修改笔记",
         },
         "property": {
@@ -214,6 +215,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "random_read": "Read Random Note",
             "random": "Open Random Note in GUI",
             "diff": "Compare Versions",
+            "read_section": "Read Note Section",
             "edit": "Edit Note Content",
         },
         "property": {

@@ -1,3 +1,4 @@
+import re
 from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
@@ -459,6 +460,132 @@ def register_note_tools(
         return await call_tool(
             client, "random", {"folder": folder, "newtab": newtab}, vault=vault
         )
+
+    @reg.tool(
+        name="read_section",
+        annotations=READ_ONLY,
+        description=(
+            "Read and extract a specific section or heading block from a markdown note. "
+            "Substantially reduces context and token consumption for long documents. "
+            "(Extension tool; enabled via OBSIDIAN_EXTENSIONS=true)"
+        ),
+        extension=True,
+    )
+    async def read_section(
+        file: str | None = Field(
+            default=None,
+            description="Note name to read (e.g. 'Meeting.md').",
+        ),
+        path: str | None = Field(
+            default=None,
+            description="Exact note path in vault.",
+        ),
+        heading: str = Field(
+            description="Target heading title to extract (case-insensitive, with or without leading '#').",
+        ),
+        include_subheadings: bool = Field(
+            default=True,
+            description="Whether to include content of child subheadings underneath the target heading (default: True).",
+        ),
+        vault: str | None = Field(
+            default=None,
+            description="Target a specific vault by name.",
+        ),
+    ) -> str:
+        if not file and not path:
+            return "Error: Either 'file' or 'path' must be provided."
+        if not heading or not heading.strip():
+            return "Error: 'heading' must not be empty."
+
+        target = file or path
+        content = await call_tool(
+            client,
+            "read",
+            {
+                "file": file,
+                "path": path,
+            },
+            vault=vault,
+        )
+        if isinstance(content, str) and content.startswith("Error:"):
+            return content
+
+        if not isinstance(content, str):
+            content = str(content)
+
+        norm_target = heading.lstrip("#").strip().lower()
+        lines = content.splitlines()
+
+        heading_re = re.compile(r"^(#{1,6})\s+(.+)$")
+        num_prefix_re = re.compile(r"^(\d+[\.\s、]+|[一二三四五六七八九十]+[、\.\s]+)")
+
+        in_code_block = False
+        headings: list[tuple[int, int, str]] = []  # (line_idx, level, title)
+
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if stripped.startswith(("```", "~~~")):
+                in_code_block = not in_code_block
+                continue
+            if in_code_block:
+                continue
+
+            m = heading_re.match(line)
+            if m:
+                level = len(m.group(1))
+                title = m.group(2).strip()
+                headings.append((i, level, title))
+
+        matched_idx = -1
+        matched_level = 0
+
+        # 1. 精确匹配（忽略大小写）
+        for idx, lvl, title in headings:
+            if title.lower() == norm_target:
+                matched_idx = idx
+                matched_level = lvl
+                break
+
+        # 2. 移除前导数字/序号前缀匹配（如 "1. Background" -> "background"）
+        if matched_idx == -1:
+            for idx, lvl, title in headings:
+                cleaned_title = num_prefix_re.sub("", title).strip()
+                if cleaned_title.lower() == norm_target:
+                    matched_idx = idx
+                    matched_level = lvl
+                    break
+
+        # 3. 子字符串模糊匹配
+        if matched_idx == -1:
+            for idx, lvl, title in headings:
+                if norm_target in title.lower():
+                    matched_idx = idx
+                    matched_level = lvl
+                    break
+
+        if matched_idx == -1:
+            available = [h[2] for h in headings]
+            return f"Error: Heading '{heading}' not found in '{target}'. Available headings: {available}"
+
+        collected: list[str] = []
+        in_code_block = False
+        for i in range(matched_idx, len(lines)):
+            line = lines[i]
+            stripped = line.strip()
+            if stripped.startswith(("```", "~~~")):
+                in_code_block = not in_code_block
+            elif not in_code_block and i > matched_idx:
+                m = heading_re.match(line)
+                if m:
+                    lvl = len(m.group(1))
+                    if include_subheadings:
+                        if lvl <= matched_level:
+                            break
+                    else:
+                        break
+            collected.append(line)
+
+        return "\n".join(collected).strip()
 
     @reg.tool(
         name="edit",

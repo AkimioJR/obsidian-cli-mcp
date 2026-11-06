@@ -192,7 +192,7 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `restart`: Restart Obsidian desktop application.
 - `set_default_vault`: Dynamically switch default target vault for the session (requires `OBSIDIAN_EXTENSIONS=true`).
 
-### 1. Notes & Content (Feature: `note` · 11 native + 1 extension)
+### 1. Notes & Content (Feature: `note` · 11 native + 2 extensions)
 - `read`: Read raw Markdown content by note name or relative path.
 - `create`: Create a new note with optional template, pre-filled content, overwrite, and auto-open.
 - `append`: Append content to the end of a note or under a target heading section (`heading=`, Obsidian 1.14+).
@@ -204,6 +204,7 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `random_read`: Randomly read a note from the vault.
 - `random`: Open and focus a randomly chosen note in Obsidian GUI.
 - `diff`: List or diff local history and Obsidian Sync versions for a file.
+- `read_section`: Read and extract specific section/heading content from markdown notes (cuts token overhead for long documents, requires `OBSIDIAN_EXTENSIONS=true`).
 - `edit`: Precise in-place note editing via literal search-and-replace (requires `OBSIDIAN_EXTENSIONS=true`).
 
 ### 2. Properties & Frontmatter (Feature: `property` · 4 tools)

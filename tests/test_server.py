@@ -1844,3 +1844,121 @@ async def test_search_content_execution(tmp_path):
             "search_content", {"query": "nonexistent_word_xyz"}
         )
         assert "No matches found" in _extract_tool_text(res_none)
+
+
+@pytest.mark.asyncio
+async def test_read_section_registration(monkeypatch):
+    from obsidian_cli_mcp.tools import Feature
+
+    # 1. 默认未开启扩展时不注册
+    monkeypatch.delenv("OBSIDIAN_EXTENSIONS", raising=False)
+    server_default = create_server(cli_path="/mock/obsidian")
+    tools_default = await server_default.list_tools()
+    assert "read_section" not in {t.name for t in tools_default}
+
+    # 2. 开启扩展且启用 NOTE 时注册
+    server_ext = create_server(
+        cli_path="/mock/obsidian", features=[Feature.NOTE], enable_extensions=True
+    )
+    tools_ext = await server_ext.list_tools()
+    tool_map = {t.name: t for t in tools_ext}
+    assert "read_section" in tool_map
+    rs_tool = tool_map["read_section"]
+    assert rs_tool.annotations is not None
+    assert rs_tool.annotations.read_only_hint is True
+    assert rs_tool.title in ("按标题切片读取笔记", "Read Note Section")
+
+
+@pytest.mark.asyncio
+async def test_read_section_execution():
+    from unittest.mock import AsyncMock, patch
+
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(
+        cli_path="/mock/obsidian", features=[Feature.NOTE], enable_extensions=True
+    )
+
+    # 1. 参数校验
+    res_no_file = await server.call_tool("read_section", {"heading": "Intro"})
+    assert "Either 'file' or 'path' must be provided" in _extract_tool_text(res_no_file)
+
+    res_no_heading = await server.call_tool(
+        "read_section", {"file": "Test.md", "heading": "  "}
+    )
+    assert "heading' must not be empty" in _extract_tool_text(res_no_heading)
+
+    mock_content = """---
+title: Paper Note
+---
+
+# Title
+Top introduction.
+
+
+
+## 1. Background
+Historical overview.
+
+### 1.1 Prior Work
+Some literature review.
+
+## 2. Methodology
+Proposed approach details.
+
+### 2.1 Optimization Strategy
+Details on optimizer and learning rate.
+
+## 3. Conclusion
+Final words.
+"""
+
+    with patch(
+        "obsidian_cli_mcp.client.run_cli_command",
+        new=AsyncMock(
+            return_value=CommandExecutionResult(
+                returncode=0, stdout=mock_content, stderr=""
+            )
+        ),
+    ):
+        # 2. 提取带有子标题的章节 (include_subheadings=True 默认)
+        res_with_sub = await server.call_tool(
+            "read_section", {"file": "Paper.md", "heading": "1. Background"}
+        )
+        text_with_sub = _extract_tool_text(res_with_sub)
+        assert "## 1. Background" in text_with_sub
+        assert "### 1.1 Prior Work" in text_with_sub
+        assert "## 2. Methodology" not in text_with_sub
+
+        # 3. 提取不带子标题的章节 (include_subheadings=False)
+        res_no_sub = await server.call_tool(
+            "read_section",
+            {
+                "file": "Paper.md",
+                "heading": "2. Methodology",
+                "include_subheadings": False,
+            },
+        )
+        text_no_sub = _extract_tool_text(res_no_sub)
+        assert "## 2. Methodology" in text_no_sub
+        assert "Proposed approach details." in text_no_sub
+        assert "### 2.1 Optimization Strategy" not in text_no_sub
+
+        # 4. 前缀序号自动剥离容错 (搜索 'Methodology' 匹配 '2. Methodology')
+        res_fuzzy = await server.call_tool(
+            "read_section", {"file": "Paper.md", "heading": "Methodology"}
+        )
+        text_fuzzy = _extract_tool_text(res_fuzzy)
+        assert "## 2. Methodology" in text_fuzzy
+        assert "### 2.1 Optimization Strategy" in text_fuzzy
+
+        # 5. 查找不存在的标题时，返回可用标题列表
+        res_missing = await server.call_tool(
+            "read_section", {"file": "Paper.md", "heading": "Evaluation & Metrics"}
+        )
+        text_missing = _extract_tool_text(res_missing)
+        assert "Heading 'Evaluation & Metrics' not found" in text_missing
+        assert "Available headings" in text_missing
+        assert "1. Background" in text_missing
+        assert "2. Methodology" in text_missing
+        assert "Code comment" not in text_missing
