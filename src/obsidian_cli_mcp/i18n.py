@@ -146,6 +146,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "folders": "列出文件夹目录",
             "folder": "查询文件夹详情",
             "recents": "列出最近访问文件",
+            "search_content": "全文检索内容",
             "import_file": "导入外部文件",
         },
         "workspace": {
@@ -245,6 +246,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "folders": "List Folders",
             "folder": "Show Folder Details",
             "recents": "List Recent Files",
+            "search_content": "Search Vault Content",
             "import_file": "Import External File",
         },
         "workspace": {

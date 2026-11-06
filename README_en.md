@@ -230,11 +230,12 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `tasks`: Filter tasks by status (completed/todo), tag, or file.
 - `task`: Toggle checkbox state or mark task completed.
 
-### 6. File Explorer & Resources (Feature: `explorer` · 5 native + 1 extension)
+### 6. File Explorer & Resources (Feature: `explorer` · 5 native + 2 extensions)
 - `files`: List files in vault (supports folder/extension filters).
 - `file`: Show metadata and system details for a specific file.
 - `folders` / `folder`: Inspect directory tree structure and metadata.
 - `recents`: List recently accessed files.
+- `search_content`: Full-vault/folder text and regex search with line context (requires `OBSIDIAN_EXTENSIONS=true`).
 - `import_file`: Import external local file directly into vault (zero token overhead, avoids JSON escaping, requires `OBSIDIAN_EXTENSIONS=true`).
 
 ### 7. Workspace & Navigation (Feature: `workspace` · 3 tools)

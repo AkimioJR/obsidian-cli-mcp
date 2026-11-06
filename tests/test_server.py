@@ -1719,3 +1719,128 @@ async def test_feature_developer_tool_executions():
             "devtools",
             "vault=DevVault",
         ]
+
+
+@pytest.mark.asyncio
+async def test_search_content_registration(monkeypatch):
+    from obsidian_cli_mcp.tools import Feature
+
+    # 1. 默认未开启扩展时不注册
+    monkeypatch.delenv("OBSIDIAN_EXTENSIONS", raising=False)
+    server_default = create_server(cli_path="/mock/obsidian")
+    tools_default = await server_default.list_tools()
+    assert "search_content" not in {t.name for t in tools_default}
+
+    # 2. 开启扩展且启用 EXPLORER 时注册
+    server_ext = create_server(
+        cli_path="/mock/obsidian", features=[Feature.EXPLORER], enable_extensions=True
+    )
+    tools_ext = await server_ext.list_tools()
+    tool_map = {t.name: t for t in tools_ext}
+    assert "search_content" in tool_map
+    sc_tool = tool_map["search_content"]
+    assert sc_tool.annotations is not None
+    assert sc_tool.annotations.read_only_hint is True
+    assert sc_tool.title in ("全文检索内容", "Search Vault Content")
+
+    # 3. 未启用 EXPLORER 时即使开启扩展也不注册
+    server_note = create_server(
+        cli_path="/mock/obsidian", features=[Feature.NOTE], enable_extensions=True
+    )
+    tools_note = await server_note.list_tools()
+    assert "search_content" not in {t.name for t in tools_note}
+
+
+@pytest.mark.asyncio
+async def test_search_content_execution(tmp_path):
+    from unittest.mock import AsyncMock, patch
+
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(
+        cli_path="/mock/obsidian", features=[Feature.EXPLORER], enable_extensions=True
+    )
+
+    # 1. 空查询报错
+    res_empty = await server.call_tool("search_content", {"query": ""})
+    assert "must not be empty" in _extract_tool_text(res_empty)
+
+    # 2. 无效正则报错
+    res_bad_re = await server.call_tool(
+        "search_content", {"query": "[unclosed", "regex": True}
+    )
+    assert "Invalid regular expression" in _extract_tool_text(res_bad_re)
+
+    # 准备模拟文件
+    vault_dir = tmp_path / "mock_vault"
+    vault_dir.mkdir()
+    docs_dir = vault_dir / "Docs"
+    docs_dir.mkdir()
+
+    file1 = vault_dir / "NoteA.md"
+    file1.write_text(
+        "line 1: Intro\nline 2: Machine Learning target\nline 3: Outro\n",
+        encoding="utf-8",
+    )
+
+    file2 = docs_dir / "NoteB.md"
+    file2.write_text(
+        "line 1: Header\nline 2: Deep machine learning model\nline 3: Footer\n",
+        encoding="utf-8",
+    )
+
+    hidden_dir = vault_dir / ".obsidian"
+    hidden_dir.mkdir()
+    (hidden_dir / "config.md").write_text(
+        "Machine Learning should be ignored\n", encoding="utf-8"
+    )
+
+    with patch(
+        "obsidian_cli_mcp.client.run_cli_command",
+        new=AsyncMock(
+            return_value=CommandExecutionResult(
+                returncode=0, stdout=str(vault_dir), stderr=""
+            )
+        ),
+    ):
+        # 3. 正常不区分大小写匹配
+        res_match = await server.call_tool(
+            "search_content", {"query": "machine learning"}
+        )
+        text_match = _extract_tool_text(res_match)
+        assert "Found 2 match(es)" in text_match
+        assert "NoteA.md:2" in text_match
+        assert "Docs/NoteB.md:2" in text_match
+        assert ".obsidian" not in text_match
+
+        # 4. 区分大小写匹配
+        res_case = await server.call_tool(
+            "search_content", {"query": "Machine Learning", "case_sensitive": True}
+        )
+        text_case = _extract_tool_text(res_case)
+        assert "Found 1 match(es)" in text_case
+        assert "NoteA.md:2" in text_case
+        assert "Docs/NoteB.md" not in text_case
+
+        # 5. 指定 folder 限制范围
+        res_folder = await server.call_tool(
+            "search_content", {"query": "machine learning", "folder": "Docs"}
+        )
+        text_folder = _extract_tool_text(res_folder)
+        assert "Found 1 match(es)" in text_folder
+        assert "Docs/NoteB.md:2" in text_folder
+        assert "NoteA.md" not in text_folder
+
+        # 6. 正则匹配
+        res_regex = await server.call_tool(
+            "search_content", {"query": r"Deep\s+machine", "regex": True}
+        )
+        text_regex = _extract_tool_text(res_regex)
+        assert "Found 1 match(es)" in text_regex
+        assert "Docs/NoteB.md:2" in text_regex
+
+        # 7. 未找到匹配
+        res_none = await server.call_tool(
+            "search_content", {"query": "nonexistent_word_xyz"}
+        )
+        assert "No matches found" in _extract_tool_text(res_none)

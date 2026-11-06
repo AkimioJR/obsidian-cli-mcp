@@ -230,11 +230,12 @@ pip install obsidian-cli-mcp
 - `tasks`: 按状态（已完成/待办）、标签或所在文件多维筛选任务。
 - `task`: 切换任务的勾选完成状态。
 
-### 6. 文件与目录资源 (Feature: `explorer` · 5 项原生 + 1 项扩展)
+### 6. 文件与目录资源 (Feature: `explorer` · 5 项原生 + 2 项扩展)
 - `files`: 列出库内文件清单（支持按文件夹与后缀筛选）。
 - `file`: 查询单个文件的元数据与系统详细信息（绝对路径、大小、创建与修改时间等）。
 - `folders` / `folder`: 浏览文件夹目录树与结构详情。
 - `recents`: 列出最近访问的历史文件。
+- `search_content`: 全库/子目录全文内容与正则检索（支持行号与上下文提取，需 `OBSIDIAN_EXTENSIONS=true`）。
 - `import_file`: 导入外部本地文件至笔记库（文件流直拷，零 Token 消耗免 JSON 转义，需 `OBSIDIAN_EXTENSIONS=true`）。
 
 ### 7. 工作区与布局导航 (Feature: `workspace` · 3 项)
