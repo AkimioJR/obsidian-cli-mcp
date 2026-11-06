@@ -122,6 +122,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "property_read": "读取属性值",
             "property_set": "设置属性值",
             "property_remove": "移除属性字段",
+            "update_frontmatter": "批量更新文档元数据",
         },
         "tag": {
             "tags": "列出所有标签",
@@ -223,6 +224,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "property_read": "Read Property",
             "property_set": "Set Property",
             "property_remove": "Remove Property",
+            "update_frontmatter": "Batch Update Frontmatter",
         },
         "tag": {
             "tags": "List All Tags",

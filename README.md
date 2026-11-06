@@ -207,11 +207,12 @@ pip install obsidian-cli-mcp
 - `read_section`: 按大纲标题切片精准提取笔记章节内容（支持子标题折叠/包含，大幅降低长文 Token 消耗，需 `OBSIDIAN_EXTENSIONS=true`）。
 - `edit`: 局部精细编辑笔记（字面搜索替换，需 `OBSIDIAN_EXTENSIONS=true`）。
 
-### 2. 元数据与属性 (Feature: `property` · 4 项)
+### 2. 元数据与属性 (Feature: `property` · 4 项原生 + 1 项扩展)
 - `properties`: 列出库中或指定笔记的全部属性概览。
 - `property_read`: 读取笔记指定 Frontmatter 属性值。
 - `property_set`: 设置属性值（支持 text、list、number、checkbox 等丰富类型）。
 - `property_remove`: 移除笔记中的指定属性字段。
+- `update_frontmatter`: 批量更新/合并/覆盖笔记的 YAML Frontmatter 属性（支持类型自动推断与单次原子操作，需 `OBSIDIAN_EXTENSIONS=true`）。
 
 ### 3. 图谱与双链拓扑 (Feature: `graph` · 8 项)
 - `backlinks`: 获取笔记的反向链接列表（JSON 格式）。

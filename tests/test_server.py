@@ -2083,3 +2083,153 @@ Content of section 3.
         assert "Setext Title 1" in t2
         assert "Content of title 1." in t2
         assert "Setext Subtitle 2" not in t2
+
+
+@pytest.mark.asyncio
+async def test_update_frontmatter_registration(monkeypatch):
+    from obsidian_cli_mcp.tools import Feature
+
+    # 1. 默认未开启扩展时不注册
+    monkeypatch.delenv("OBSIDIAN_EXTENSIONS", raising=False)
+    server_default = create_server(cli_path="/mock/obsidian")
+    tools_default = await server_default.list_tools()
+    assert "update_frontmatter" not in {t.name for t in tools_default}
+
+    # 2. 开启扩展且启用 PROPERTY 时注册
+    server_ext = create_server(
+        cli_path="/mock/obsidian", features=[Feature.PROPERTY], enable_extensions=True
+    )
+    tools_ext = await server_ext.list_tools()
+    tool_map = {t.name: t for t in tools_ext}
+    assert "update_frontmatter" in tool_map
+    tool = tool_map["update_frontmatter"]
+    assert tool.annotations is not None
+    assert tool.annotations.idempotent_hint is True
+    assert tool.title in ("批量更新文档元数据", "Batch Update Frontmatter")
+
+    # 3. 未启用 PROPERTY 时不注册
+    server_note = create_server(
+        cli_path="/mock/obsidian", features=[Feature.NOTE], enable_extensions=True
+    )
+    tools_note = await server_note.list_tools()
+    assert "update_frontmatter" not in {t.name for t in tools_note}
+
+
+@pytest.mark.asyncio
+async def test_update_frontmatter_execution():
+    import json
+    from unittest.mock import patch
+
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(
+        cli_path="/mock/obsidian", features=[Feature.PROPERTY], enable_extensions=True
+    )
+
+    # 1. 未提供 file 与 path 报错
+    res_no_file = await server.call_tool("update_frontmatter", {"properties": {"a": 1}})
+    assert "Either 'file' or 'path' must be provided" in _extract_tool_text(res_no_file)
+
+    # 2. 非法参数类型触发 ToolError
+    from mcp.server.mcpserver.exceptions import ToolError
+
+    with pytest.raises(ToolError):
+        await server.call_tool(
+            "update_frontmatter", {"file": "Doc.md", "properties": "invalid_not_a_dict"}
+        )
+
+    # 3. 正常 merge 模式（自动推断 list, number, checkbox, text，并将 None 作为删除）
+    called_commands = []
+
+    async def mock_cli_merge(cli_path, args, timeout=None):
+        called_commands.append(list(args))
+        return CommandExecutionResult(returncode=0, stdout="OK", stderr="")
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", side_effect=mock_cli_merge):
+        res_merge = await server.call_tool(
+            "update_frontmatter",
+            {
+                "file": "Doc.md",
+                "properties": {
+                    "tags": ["ai", "mcp"],
+                    "score": 98,
+                    "published": True,
+                    "title": "My Note",
+                    "obsolete": None,
+                },
+                "mode": "merge",
+            },
+        )
+        text_merge = _extract_tool_text(res_merge)
+        assert "Successfully updated frontmatter for 'Doc.md'" in text_merge
+        assert "updated 4 property/properties" in text_merge
+        assert "removed 1 property/properties" in text_merge
+
+        assert any(
+            cmd[0] == "property:set"
+            and "name=tags" in cmd
+            and "type=list" in cmd
+            and "value=ai,mcp" in cmd
+            for cmd in called_commands
+        )
+        assert any(
+            cmd[0] == "property:set"
+            and "name=score" in cmd
+            and "type=number" in cmd
+            and "value=98" in cmd
+            for cmd in called_commands
+        )
+        assert any(
+            cmd[0] == "property:set"
+            and "name=published" in cmd
+            and "type=checkbox" in cmd
+            and "value=true" in cmd
+            for cmd in called_commands
+        )
+        assert any(
+            cmd[0] == "property:set" and "name=title" in cmd and "type=text" in cmd
+            for cmd in called_commands
+        )
+        assert any(
+            cmd[0] == "property:remove" and "name=obsolete" in cmd
+            for cmd in called_commands
+        )
+
+    # 4. replace 模式：读取已有属性并删除缺失字段
+    called_commands_replace = []
+
+    async def mock_cli_replace(cli_path, args, timeout=None):
+        cmd = list(args)
+        called_commands_replace.append(cmd)
+        if cmd[0] == "properties":
+            return CommandExecutionResult(
+                returncode=0,
+                stdout=json.dumps(
+                    {"old_field_1": "x", "old_field_2": "y", "keep_field": "z"}
+                ),
+                stderr="",
+            )
+        return CommandExecutionResult(returncode=0, stdout="OK", stderr="")
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", side_effect=mock_cli_replace):
+        res_replace = await server.call_tool(
+            "update_frontmatter",
+            {
+                "path": "Notes/Doc.md",
+                "properties": {"keep_field": "new_val", "new_field": 123},
+                "mode": "replace",
+            },
+        )
+        text_replace = _extract_tool_text(res_replace)
+        assert "Successfully updated frontmatter for 'Notes/Doc.md'" in text_replace
+        assert "removed 2 property/properties" in text_replace
+        assert "updated 2 property/properties" in text_replace
+
+        assert any(
+            cmd[0] == "property:remove" and "name=old_field_1" in cmd
+            for cmd in called_commands_replace
+        )
+        assert any(
+            cmd[0] == "property:remove" and "name=old_field_2" in cmd
+            for cmd in called_commands_replace
+        )

@@ -207,11 +207,12 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `read_section`: Read and extract specific section/heading content from markdown notes (cuts token overhead for long documents, requires `OBSIDIAN_EXTENSIONS=true`).
 - `edit`: Precise in-place note editing via literal search-and-replace (requires `OBSIDIAN_EXTENSIONS=true`).
 
-### 2. Properties & Frontmatter (Feature: `property` · 4 tools)
+### 2. Properties & Frontmatter (Feature: `property` · 4 native + 1 extension)
 - `properties`: List all property keys across vault or for a specific file.
 - `property_read`: Read specific Frontmatter property value.
 - `property_set`: Set property value (supports text, list, number, checkbox).
 - `property_remove`: Remove a property from frontmatter.
+- `update_frontmatter`: Batch update, merge, or replace YAML frontmatter properties in one call (with automatic type inference, requires `OBSIDIAN_EXTENSIONS=true`).
 
 ### 3. Graph & Links (Feature: `graph` · 8 tools)
 - `backlinks`: Get note backlink incoming edges (JSON format).
