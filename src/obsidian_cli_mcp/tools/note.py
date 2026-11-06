@@ -1,4 +1,8 @@
+import contextlib
+import datetime
+import json
 import re
+from pathlib import Path
 from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
@@ -15,6 +19,105 @@ from .base import (
     ToolRegistrar,
     call_tool,
 )
+
+
+def _parse_daily_date(date_str: str | None) -> datetime.date:
+    today = datetime.date.today()
+    if not date_str or not date_str.strip():
+        return today
+    norm = date_str.strip().lower()
+    if norm in ("today", "now"):
+        return today
+    if norm == "yesterday":
+        return today - datetime.timedelta(days=1)
+    if norm == "tomorrow":
+        return today + datetime.timedelta(days=1)
+    if norm.startswith(("+", "-")):
+        try:
+            days = int(norm)
+            return today + datetime.timedelta(days=days)
+        except ValueError:
+            pass
+    try:
+        return datetime.date.fromisoformat(norm)
+    except ValueError:
+        pass
+    for fmt in ("%Y/%m/%d", "%Y.%m.%d", "%Y%m%d", "%Y年%m月%d日"):
+        try:
+            return datetime.datetime.strptime(norm, fmt).date()
+        except ValueError:
+            pass
+    raise ValueError(
+        f"Cannot parse date '{date_str}'. Expected 'YYYY-MM-DD', 'yesterday', 'today', 'tomorrow', or relative offset like '+1'/'-1'."
+    )
+
+
+def _moment_to_strftime(fmt: str) -> str:
+    tokens = [
+        ("YYYY", "%Y"),
+        ("YY", "%y"),
+        ("MMMM", "%B"),
+        ("MMM", "%b"),
+        ("MM", "%m"),
+        ("DD", "%d"),
+        ("dddd", "%A"),
+        ("ddd", "%a"),
+        ("HH", "%H"),
+        ("mm", "%M"),
+        ("ss", "%S"),
+    ]
+    res = fmt
+    for m_token, s_token in tokens:
+        res = res.replace(m_token, s_token)
+    return res
+
+
+async def _resolve_daily_note_info(
+    client: ObsidianClient, vault: str | None
+) -> tuple[str, str, str | None]:
+    """Returns (folder, format_str, template_path) for daily notes in vault."""
+    vault_info = await call_tool(client, "vault", {"info": "path"}, vault=vault)
+    folder = ""
+    date_format = "YYYY-MM-DD"
+    template: str | None = None
+
+    if vault_info and not str(vault_info).startswith("Error:"):
+        vault_path = Path(str(vault_info).strip()).resolve()
+        daily_json = vault_path / ".obsidian" / "daily-notes.json"
+        if daily_json.is_file():
+            with contextlib.suppress(
+                OSError, json.JSONDecodeError, ValueError, KeyError
+            ):
+                data = json.loads(
+                    daily_json.read_text(encoding="utf-8", errors="replace")
+                )
+                if isinstance(data, dict):
+                    folder = data.get("folder", "") or ""
+                    date_format = data.get("format", "YYYY-MM-DD") or "YYYY-MM-DD"
+                    template = data.get("template") or None
+                    return folder, date_format, template
+
+        periodic_json = (
+            vault_path / ".obsidian" / "plugins" / "periodic-notes" / "data.json"
+        )
+        if periodic_json.is_file():
+            with contextlib.suppress(
+                OSError, json.JSONDecodeError, ValueError, KeyError
+            ):
+                data = json.loads(
+                    periodic_json.read_text(encoding="utf-8", errors="replace")
+                )
+                if isinstance(data, dict):
+                    daily_cfg = data.get("daily", {})
+                    if isinstance(daily_cfg, dict) and daily_cfg.get("enabled", True):
+                        folder = daily_cfg.get("folder", "") or ""
+                        date_format = (
+                            daily_cfg.get("format", "YYYY-MM-DD") or "YYYY-MM-DD"
+                        )
+                        template = daily_cfg.get("template") or None
+                        return folder, date_format, template
+
+    return folder, date_format, template
 
 
 def register_note_tools(
@@ -686,3 +789,119 @@ def register_note_tools(
 
         replaced_count = count if replace_all else 1
         return f"The file '{target}' has been updated successfully ({replaced_count} occurrence(s) replaced)."
+
+    @reg.tool(
+        name="daily",
+        annotations=NON_IDEMPOTENT_WRITE,
+        description=(
+            "Manage daily notes (read, create, append, prepend, or get path). "
+            "Automatically resolves vault daily note configuration (folder, format, and template from .obsidian/daily-notes.json). "
+            "Supports natural dates like today, yesterday, tomorrow, +1, -1, or ISO YYYY-MM-DD. "
+            "(Extension tool; enabled via OBSIDIAN_EXTENSIONS=true)"
+        ),
+        extension=True,
+    )
+    async def daily(
+        action: Literal["read", "create", "append", "prepend", "get_path"] = Field(
+            default="read",
+            description="Action to perform: read (default), create, append, prepend, or get_path.",
+        ),
+        date: str | None = Field(
+            default=None,
+            description="Target date: today (default), yesterday, tomorrow, +1/-1, or YYYY-MM-DD.",
+        ),
+        content: str | None = Field(
+            default=None,
+            description="Content to append, prepend, or initialize with.",
+        ),
+        heading: str | None = Field(
+            default=None,
+            description="Target heading section when appending or prepending.",
+        ),
+        vault: str | None = Field(
+            default=None,
+            description="Target a specific vault by name.",
+        ),
+    ) -> Any:
+        try:
+            dt = _parse_daily_date(date)
+        except ValueError as e:
+            return f"Error: {e}"
+
+        folder, date_format, template = await _resolve_daily_note_info(client, vault)
+        strftime_pat = _moment_to_strftime(date_format)
+        file_stem = dt.strftime(strftime_pat)
+        filename = f"{file_stem}.md" if not file_stem.endswith(".md") else file_stem
+        if folder.strip():
+            note_path = f"{folder.strip().strip('/')}/{filename}"
+        else:
+            note_path = filename
+
+        # 1. get_path: 直接返回计算出的笔记路径
+        if action == "get_path":
+            return note_path
+
+        # 2. read: 读取日记内容
+        if action == "read":
+            read_res = await call_tool(client, "read", {"path": note_path}, vault=vault)
+            if isinstance(read_res, str) and (
+                read_res.startswith("Error:") or "not found" in read_res.lower()
+            ):
+                return (
+                    f"Daily note '{note_path}' (for date {dt.isoformat()}) does not exist yet. "
+                    "Use action='create' or action='append' to create it."
+                )
+            return read_res
+
+        # 3. create: 创建日记（若已存在则由 CLI 报错）
+        if action == "create":
+            create_args: dict[str, Any] = {
+                "path": note_path,
+                "content": content if content is not None else "",
+                "overwrite": False,
+            }
+            if template:
+                create_args["template"] = template
+            create_res = await call_tool(client, "create", create_args, vault=vault)
+            return create_res
+
+        # 4. append / prepend: 追加或前置插入内容（如不存在则自动先行创建）
+        if action in ("append", "prepend"):
+            if content is None or not content.strip():
+                return f"Error: 'content' must be provided when action is '{action}'."
+
+            file_check = await call_tool(
+                client, "file", {"path": note_path}, vault=vault
+            )
+            if isinstance(file_check, str) and (
+                file_check.startswith("Error:") or "not found" in file_check.lower()
+            ):
+                init_args: dict[str, Any] = {
+                    "path": note_path,
+                    "content": "",
+                    "overwrite": False,
+                }
+                if template:
+                    init_args["template"] = template
+                await call_tool(client, "create", init_args, vault=vault)
+
+            op_args: dict[str, Any] = {
+                "path": note_path,
+                "content": content,
+            }
+            if heading and heading.strip():
+                op_args["heading"] = heading.strip()
+
+            op_res = await call_tool(client, action, op_args, vault=vault)
+            if isinstance(op_res, str) and op_res.startswith("Error:"):
+                return op_res
+
+            heading_desc = (
+                f" under heading '{heading.strip()}'"
+                if heading and heading.strip()
+                else ""
+            )
+            action_past = "appended to" if action == "append" else "prepended to"
+            return f"Successfully {action_past} daily note '{note_path}'{heading_desc}."
+
+        return f"Error: Unsupported daily action '{action}'."

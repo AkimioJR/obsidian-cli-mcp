@@ -192,7 +192,7 @@ pip install obsidian-cli-mcp
 - `restart`: 重启 Obsidian 桌面客户端进程。
 - `set_default_vault`: 动态切换当前会话默认目标笔记库（需 `OBSIDIAN_EXTENSIONS=true`）。
 
-### 1. 笔记与内容 (Feature: `note` · 11 项原生 + 2 项扩展)
+### 1. 笔记与内容 (Feature: `note` · 11 项原生 + 3 项扩展)
 - `read`: 按文件名或相对路径读取笔记 Markdown 原文。
 - `create`: 创建新笔记，支持指定模板、预填充内容、静默覆盖与默认打开。
 - `append`: 向指定笔记末尾或特定标题区域下方（`heading=`，Obsidian 1.14+）追加内容。
@@ -206,6 +206,7 @@ pip install obsidian-cli-mcp
 - `diff`: 对比文件的本地历史版本或 Obsidian Sync 云端同步版本差异。
 - `read_section`: 按大纲标题切片精准提取笔记章节内容（支持子标题折叠/包含，大幅降低长文 Token 消耗，需 `OBSIDIAN_EXTENSIONS=true`）。
 - `edit`: 局部精细编辑笔记（字面搜索替换，需 `OBSIDIAN_EXTENSIONS=true`）。
+- `daily`: 快捷管理每日笔记（支持 read / create / append / prepend / get_path，自动解析 .obsidian/daily-notes.json 配置与模板，需 `OBSIDIAN_EXTENSIONS=true`）。
 
 ### 2. 元数据与属性 (Feature: `property` · 4 项原生 + 1 项扩展)
 - `properties`: 列出库中或指定笔记的全部属性概览。

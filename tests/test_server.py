@@ -2233,3 +2233,157 @@ async def test_update_frontmatter_execution():
             cmd[0] == "property:remove" and "name=old_field_2" in cmd
             for cmd in called_commands_replace
         )
+
+
+@pytest.mark.asyncio
+async def test_daily_registration(monkeypatch):
+    from obsidian_cli_mcp.tools import Feature
+
+    # 1. 默认未开启扩展时不注册
+    monkeypatch.delenv("OBSIDIAN_EXTENSIONS", raising=False)
+    server_default = create_server(cli_path="/mock/obsidian")
+    tools_default = await server_default.list_tools()
+    assert "daily" not in {t.name for t in tools_default}
+
+    # 2. 开启扩展且启用 NOTE 时注册
+    server_ext = create_server(
+        cli_path="/mock/obsidian", features=[Feature.NOTE], enable_extensions=True
+    )
+    tools_ext = await server_ext.list_tools()
+    tool_map = {t.name: t for t in tools_ext}
+    assert "daily" in tool_map
+    tool = tool_map["daily"]
+    assert tool.annotations is not None
+    assert tool.annotations.idempotent_hint is False
+    assert tool.title in ("日记操作", "Daily Note Operations")
+
+    # 3. 未启用 NOTE 时不注册
+    server_prop = create_server(
+        cli_path="/mock/obsidian", features=[Feature.PROPERTY], enable_extensions=True
+    )
+    tools_prop = await server_prop.list_tools()
+    assert "daily" not in {t.name for t in tools_prop}
+
+
+@pytest.mark.asyncio
+async def test_daily_execution(tmp_path):
+    import datetime
+    import json
+    from unittest.mock import patch
+
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(
+        cli_path="/mock/obsidian", features=[Feature.NOTE], enable_extensions=True
+    )
+
+    vault_dir = tmp_path / "mock_vault"
+    vault_dir.mkdir()
+    obsidian_dir = vault_dir / ".obsidian"
+    obsidian_dir.mkdir()
+
+    # 写入自定义 daily-notes.json 配置
+    daily_config = {
+        "folder": "DailyJournal",
+        "format": "YYYY-MM-DD",
+        "template": "Templates/DailyTemplate",
+    }
+    (obsidian_dir / "daily-notes.json").write_text(
+        json.dumps(daily_config), encoding="utf-8"
+    )
+
+    # 1. 非法日期格式测试
+    res_bad_date = await server.call_tool("daily", {"date": "invalid_date_xxx"})
+    assert "Cannot parse date" in _extract_tool_text(res_bad_date)
+
+    # 2. get_path 测试 (today, yesterday, tomorrow, +3, ISO)
+    today_str = datetime.date.today().isoformat()
+    yesterday_str = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
+
+    called_commands = []
+
+    async def mock_cli_daily(cli_path, args, timeout=None):
+        cmd = list(args)
+        called_commands.append(cmd)
+        if cmd[0] == "vault":
+            return CommandExecutionResult(
+                returncode=0, stdout=str(vault_dir), stderr=""
+            )
+        if cmd[0] == "read":
+            if "exists" in cmd[1]:
+                return CommandExecutionResult(
+                    returncode=0, stdout="# Today Daily Note Content", stderr=""
+                )
+            return CommandExecutionResult(
+                returncode=1, stdout="Error: File not found.", stderr=""
+            )
+        if cmd[0] == "file":
+            # 模拟文件是否存在
+            return CommandExecutionResult(returncode=0, stdout="info", stderr="")
+        return CommandExecutionResult(returncode=0, stdout="OK", stderr="")
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", side_effect=mock_cli_daily):
+        # 2.1 action=get_path for today
+        res_path_today = await server.call_tool("daily", {"action": "get_path"})
+        assert _extract_tool_text(res_path_today) == f"DailyJournal/{today_str}.md"
+
+        # 2.2 action=get_path for yesterday
+        res_path_yest = await server.call_tool(
+            "daily", {"action": "get_path", "date": "yesterday"}
+        )
+        assert _extract_tool_text(res_path_yest) == f"DailyJournal/{yesterday_str}.md"
+
+        # 2.3 action=get_path for explicit ISO date
+        res_path_iso = await server.call_tool(
+            "daily", {"action": "get_path", "date": "2026-01-15"}
+        )
+        assert _extract_tool_text(res_path_iso) == "DailyJournal/2026-01-15.md"
+
+        # 3. action=create: 携带模板与内容创建
+        _ = await server.call_tool(
+            "daily",
+            {
+                "action": "create",
+                "date": "2026-01-15",
+                "content": "# Custom Content",
+            },
+        )
+        assert any(
+            cmd[0] == "create"
+            and "path=DailyJournal/2026-01-15.md" in cmd
+            and "template=Templates/DailyTemplate" in cmd
+            for cmd in called_commands
+        )
+
+        # 4. action=read: 日记不存在时提示引导创建
+        res_read_not_found = await server.call_tool(
+            "daily", {"action": "read", "date": "2026-01-15"}
+        )
+        assert "does not exist yet" in _extract_tool_text(res_read_not_found)
+        assert "Use action='create'" in _extract_tool_text(res_read_not_found)
+
+        # 5. action=append / prepend: 内容缺失校验
+        res_empty_append = await server.call_tool(
+            "daily", {"action": "append", "content": ""}
+        )
+        assert "'content' must be provided" in _extract_tool_text(res_empty_append)
+
+        # 6. action=append: 正常追加并支持 heading
+        res_append = await server.call_tool(
+            "daily",
+            {
+                "action": "append",
+                "date": "2026-01-15",
+                "content": "- [ ] Buy milk",
+                "heading": "Tasks",
+            },
+        )
+        assert "Successfully appended to daily note" in _extract_tool_text(res_append)
+        assert "under heading 'Tasks'" in _extract_tool_text(res_append)
+        assert any(
+            cmd[0] == "append"
+            and "path=DailyJournal/2026-01-15.md" in cmd
+            and "heading=Tasks" in cmd
+            and "content=- [ ] Buy milk" in cmd
+            for cmd in called_commands
+        )

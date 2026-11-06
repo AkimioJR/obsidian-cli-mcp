@@ -116,6 +116,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "diff": "对比版本差异",
             "read_section": "按标题切片读取笔记",
             "edit": "编辑修改笔记",
+            "daily": "日记操作",
         },
         "property": {
             "properties": "查看属性概览",
@@ -218,6 +219,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "diff": "Compare Versions",
             "read_section": "Read Note Section",
             "edit": "Edit Note Content",
+            "daily": "Daily Note Operations",
         },
         "property": {
             "properties": "List Properties",
