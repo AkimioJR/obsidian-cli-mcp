@@ -247,7 +247,7 @@ def register_explorer_tools(
                     )
                     matches.append(
                         {
-                            "file": str(rel_to_vault),
+                            "file": rel_to_vault.as_posix(),
                             "line": i + 1,
                             "match": line_text.strip(),
                             "context": ctx,
@@ -340,7 +340,7 @@ def register_explorer_tools(
 
         if dest.exists() and not overwrite:
             return (
-                f"Error: Destination file '{dest_rel}' already exists in vault. "
+                f"Error: Destination file '{dest_rel.as_posix()}' already exists in vault. "
                 "Set overwrite=True to replace it."
             )
 
@@ -356,9 +356,7 @@ def register_explorer_tools(
             action_name = "move" if move else "copy"
             return f"Error during file {action_name}: {e}"
 
-        return (
-            f"The file '{dest_rel}' has been successfully {action_verb} into the vault."
-        )
+        return f"The file '{dest_rel.as_posix()}' has been successfully {action_verb} into the vault."
 
 
 __all__ = ["register_explorer_tools"]
