@@ -1,3 +1,5 @@
+import contextlib
+from collections import deque
 from typing import Any
 
 from mcp.server.mcpserver import MCPServer
@@ -275,4 +277,129 @@ def register_graph_tools(
             "wordcount",
             {"file": file, "path": path, "active": active},
             vault=vault,
+        )
+
+    @reg.tool(
+        name="find_path",
+        annotations=READ_ONLY,
+        description=(
+            "Find the shortest bidirectional link path between two notes in the vault graph "
+            "via breadth-first search over outgoing links and backlinks. "
+            "(Extension tool; enabled via OBSIDIAN_EXTENSIONS=true)"
+        ),
+        extension=True,
+    )
+    async def find_path(
+        start_note: str = Field(
+            description="Source note (name or vault-relative path) (required).",
+        ),
+        end_note: str = Field(
+            description="Target note (name or vault-relative path) (required).",
+        ),
+        max_depth: int = Field(
+            default=3,
+            description="Maximum traversal depth in hops (default: 3, max: 6).",
+        ),
+        vault: str | None = Field(
+            default=None,
+            description="Target a specific vault by name.",
+        ),
+    ) -> Any:
+        if not start_note.strip():
+            return "Error: 'start_note' must be provided."
+        if not end_note.strip():
+            return "Error: 'end_note' must be provided."
+        if start_note.strip() == end_note.strip():
+            return f"Start and end notes are identical: '{start_note.strip()}'."
+
+        max_depth = min(max(max_depth, 1), 6)
+
+        async def fetch_neighbors(note_ref: str) -> tuple[list[str], list[str]]:
+            """Returns (outgoing, incoming) lists for the given note."""
+            links_res = await call_tool(
+                client, "links", {"path": note_ref}, vault=vault
+            )
+            backlinks_res = await call_tool(
+                client,
+                "backlinks",
+                {"path": note_ref, "format": "json"},
+                parse_json=True,
+                vault=vault,
+            )
+
+            outgoing: list[str] = []
+            if isinstance(links_res, str) and links_res.strip():
+                for line in links_res.splitlines():
+                    clean = line.strip()
+                    if clean and not clean.startswith("Error:"):
+                        outgoing.append(clean)
+            elif isinstance(links_res, list):
+                outgoing.extend(str(item) for item in links_res if item)
+
+            incoming: list[str] = []
+            if isinstance(backlinks_res, list):
+                for item in backlinks_res:
+                    if isinstance(item, dict):
+                        ref = str(item.get("file", "")).strip()
+                        if ref:
+                            incoming.append(ref)
+            elif isinstance(backlinks_res, str) and not backlinks_res.startswith(
+                "Error:"
+            ):
+                import json as _json
+
+                with contextlib.suppress(_json.JSONDecodeError):
+                    parsed = _json.loads(backlinks_res)
+                    if isinstance(parsed, list):
+                        for item in parsed:
+                            if isinstance(item, dict):
+                                ref = str(item.get("file", "")).strip()
+                                if ref:
+                                    incoming.append(ref)
+
+            return outgoing, incoming
+
+        # BFS 双向边（出链 + 反链视为无向邻接）
+        start = start_note.strip()
+        end = end_note.strip()
+
+        visited: set[str] = {start.lower()}
+        queue: deque[tuple[str, list[str]]] = deque([(start, [start])])
+        depth_of: dict[str, int] = {start.lower(): 0}
+
+        while queue:
+            current, path = queue.popleft()
+            cur_depth = depth_of[current.lower()]
+
+            if cur_depth >= max_depth:
+                continue
+
+            outgoing, incoming = await fetch_neighbors(current)
+            neighbors = []
+            seen_neighbors: set[str] = set()
+            for ref in outgoing + incoming:
+                key = ref.lower()
+                if key not in seen_neighbors:
+                    seen_neighbors.add(key)
+                    neighbors.append(ref)
+
+            for neighbor in neighbors:
+                nkey = neighbor.lower()
+                if nkey in visited:
+                    continue
+                new_path = path + [neighbor]
+                if nkey == end.lower():
+                    depth = cur_depth + 1
+                    lines = [f"Path found ({depth} hop(s)):"]
+                    for i, node in enumerate(new_path):
+                        prefix = "  -> " if i else "  "
+                        lines.append(f"{prefix}{node}")
+                    return "\n".join(lines)
+                visited.add(nkey)
+                depth_of[nkey] = cur_depth + 1
+                queue.append((neighbor, new_path))
+
+        return (
+            f"No link path found between '{start}' and '{end}' within "
+            f"{max_depth} hop(s). Try increasing max_depth (up to 6)."
         )
