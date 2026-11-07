@@ -89,8 +89,32 @@
 ### 🔧 测试与质量
 - **[Test]**: 单元测试套件扩充至 63 项测试，覆盖参数序列化、动态 Schema 过滤、扩展工具门禁、CDP 与 DOM 审查以及所有 13 大功能域，测试通过率 100%。
 
+## [0.4.0] - 2026-11-07
+
+### ✨ 新增
+- **[Extensions]**: 新增 6 项扩展复合工具（通过 `OBSIDIAN_EXTENSIONS=true` 启用）：
+  - `search_content`（`explorer` 域）：全库文本内容搜索。
+  - `read_section`（`note` 域）：基于标题层级的章节切片读取。
+  - `update_frontmatter`（`property` 域）：批量更新笔记元数据。
+  - `daily`（`note` 域）：自动化每日笔记工作流。
+  - `attach_media`（`explorer` 域）：一步完成媒体附件嵌入。
+  - `find_path`（`graph` 域）：双链最短路径发现。
+
+### 🔄 重构
+- **[Tools]**: `read_section` 升级为使用 Obsidian 原生 AST outline 进行精确章节切片，替代 js eval 回退实现。
+- **[Tools]**: `search_content` 移除 js eval 回退路径，提升安全性与简洁性。
+- **[Tools]**: `outline` 解析失败时改为 fail-fast 错误指引，替代静默回退。
+
+### 🐛 修复
+- **[Server]**: 修复 stdio MCP 协议管道被子进程吞没的严重启动缺陷：obsidian CLI 子进程继承服务器 stdin 并将其读取至 EOF，导致客户端发送的 `initialize` 等请求被子进程消费，服务器无任何响应直至超时（影响 Claude Desktop、Cursor、Codex 等所有 stdio MCP 宿主）。现已在版本探测子进程与所有工具调用子进程中显式隔离 stdin（`DEVNULL`）。
+- **[Explorer]**: 路径表示统一采用 posix 风格，修复 Windows 平台跨平台兼容问题。
+
+### 🔧 测试与质量
+- **[Test]**: 单元测试套件扩充至 76 项，覆盖全部新增扩展工具与 stdin 隔离行为，测试通过率 100%。
+
 <!-- ==================== 底部版本比对链接 (Reference Links) ==================== -->
 [0.1.0]: https://github.com/AkimioJR/obsidian-cli-mcp/releases/tag/v0.1.0
 [0.1.1]: https://github.com/AkimioJR/obsidian-cli-mcp/compare/v0.1.0...v0.1.1
 [0.2.0]: https://github.com/AkimioJR/obsidian-cli-mcp/compare/v0.1.1...v0.2.0
 [0.3.0]: https://github.com/AkimioJR/obsidian-cli-mcp/compare/v0.2.0...v0.3.0
+[0.4.0]: https://github.com/AkimioJR/obsidian-cli-mcp/compare/v0.3.0...v0.4.0

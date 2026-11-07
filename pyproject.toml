@@ -1,6 +1,6 @@
 [project]
 name = "obsidian-cli-mcp"
-version = "0.3.0"
+version = "0.4.0"
 description = "A MCP server to interact with Obsidian vault via Obsidian CLI"
 readme = "README.md"
 license = "MIT"
