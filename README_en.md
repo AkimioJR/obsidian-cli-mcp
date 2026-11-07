@@ -215,7 +215,7 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `property_remove`: Remove a property from frontmatter.
 - `update_frontmatter`: Batch update, merge, or replace YAML frontmatter properties in one call (with automatic type inference, requires `OBSIDIAN_EXTENSIONS=true`).
 
-### 3. Graph & Links (Feature: `graph` · 8 tools)
+### 3. Graph & Links (Feature: `graph` · 8 native + 1 extension)
 - `backlinks`: Get note backlink incoming edges (JSON format).
 - `links`: Get outgoing link edges from a note.
 - `unresolved`: List hanging links with no target note created yet.
@@ -224,6 +224,7 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `outline`: Get heading outline hierarchy (JSON format).
 - `aliases`: List all aliases for the vault or note.
 - `wordcount`: Get character and word count statistics.
+- `find_path`: Bidirectional BFS to find the shortest link path between two notes (over outgoing links and backlinks, requires `OBSIDIAN_EXTENSIONS=true`).
 
 ### 4. Tags (Feature: `tag` · 2 tools)
 - `tags`: Get all tags and their frequency distribution (JSON format).
@@ -233,13 +234,14 @@ All tools support an optional `vault` parameter for multi-vault switching. All t
 - `tasks`: Filter tasks by status (completed/todo), tag, or file.
 - `task`: Toggle checkbox state or mark task completed.
 
-### 6. File Explorer & Resources (Feature: `explorer` · 5 native + 2 extensions)
+### 6. File Explorer & Resources (Feature: `explorer` · 5 native + 3 extensions)
 - `files`: List files in vault (supports folder/extension filters).
 - `file`: Show metadata and system details for a specific file.
 - `folders` / `folder`: Inspect directory tree structure and metadata.
 - `recents`: List recently accessed files.
 - `search_content`: Full-vault/folder text and regex search with line context (requires `OBSIDIAN_EXTENSIONS=true`).
 - `import_file`: Import external local file directly into vault (zero token overhead, avoids JSON escaping, requires `OBSIDIAN_EXTENSIONS=true`).
+- `attach_media`: Copy a local media file into the vault's configured attachment folder and optionally embed it into a note in one step (resolves `.obsidian/app.json` attachment config, requires `OBSIDIAN_EXTENSIONS=true`).
 
 ### 7. Workspace & Navigation (Feature: `workspace` · 3 tools)
 - `workspace`: Query workspace window layout tree.

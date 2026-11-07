@@ -1,3 +1,5 @@
+import contextlib
+import json
 import os
 import re
 import shutil
@@ -357,6 +359,169 @@ def register_explorer_tools(
             return f"Error during file {action_name}: {e}"
 
         return f"The file '{dest_rel.as_posix()}' has been successfully {action_verb} into the vault."
+
+    @reg.tool(
+        name="attach_media",
+        annotations=NON_IDEMPOTENT_WRITE,
+        description=(
+            "Copy a local media file (image, PDF, audio, video, etc.) into the vault\x27s configured attachment folder "
+            "and optionally embed it into a target note in one step. Resolves the attachment directory from "
+            ".obsidian/app.json (attachmentFolderPath). "
+            "(Extension tool; enabled via OBSIDIAN_EXTENSIONS=true)"
+        ),
+        extension=True,
+    )
+    async def attach_media(
+        source_path: str = Field(
+            description="Absolute or relative path to the local media file on host (required).",
+        ),
+        note: str | None = Field(
+            default=None,
+            description="Target note (name or vault-relative path) to embed the media into. If omitted, only copies the file.",
+        ),
+        filename: str | None = Field(
+            default=None,
+            description="Custom vault filename for the media (defaults to source filename).",
+        ),
+        heading: str | None = Field(
+            default=None,
+            description="Target heading under which to insert the embed (appends at end if omitted).",
+        ),
+        vault: str | None = Field(
+            default=None,
+            description="Target a specific vault by name.",
+        ),
+    ) -> Any:
+        if not source_path or not source_path.strip():
+            return "Error: 'source_path' must be provided."
+
+        src = Path(os.path.expanduser(source_path.strip())).resolve()
+        if not src.exists():
+            return f"Error: Source file '{source_path}' does not exist."
+        if not src.is_file():
+            return f"Error: Source path '{source_path}' is not a regular file."
+
+        vault_info = await call_tool(client, "vault", {"info": "path"}, vault=vault)
+        if isinstance(vault_info, str) and vault_info.startswith("Error:"):
+            return vault_info
+        vault_path_str = str(vault_info).strip()
+        if not vault_path_str:
+            target_vault = vault or "current vault"
+            return (
+                f"Error: Could not determine vault directory path for '{target_vault}'."
+            )
+
+        vault_dir = Path(vault_path_str).resolve()
+        if not vault_dir.exists() or not vault_dir.is_dir():
+            return f"Error: Vault directory '{vault_dir}' does not exist or is not a directory."
+
+        # 读取附件目录配置 (attachmentFolderPath)
+        attach_dir = ""
+        app_json = vault_dir / ".obsidian" / "app.json"
+        if app_json.is_file():
+            with contextlib.suppress(OSError, json.JSONDecodeError):
+                data = json.loads(
+                    app_json.read_text(encoding="utf-8", errors="replace")
+                )
+                if isinstance(data, dict):
+                    raw = data.get("attachmentFolderPath", "")
+                    attach_dir = str(raw) if isinstance(raw, str) else ""
+
+        # Obsidian 约定: "./xxx" 表示当前笔记同目录, "/" 或空 表示库根目录
+        if attach_dir.startswith("./"):
+            # 相对于目标笔记所在目录（若有 note）或库根目录
+            base = vault_dir
+            if note and note.strip():
+                parent_res = await call_tool(
+                    client, "file", {"path": note.strip()}, vault=vault
+                )
+                if (
+                    (
+                        (not isinstance(parent_res, str))
+                        or (
+                            not parent_res.startswith("Error:")
+                            and "not found" not in parent_res.lower()
+                        )
+                    )
+                    and isinstance(parent_res, dict)
+                    and "path" in parent_res
+                ):
+                    # 尝试解析出笔记路径
+                    base = (vault_dir / str(parent_res["path"])).parent
+            attach_dir = (
+                str(base.relative_to(vault_dir) / attach_dir[2:])
+                if str(base.relative_to(vault_dir)) != "."
+                else attach_dir[2:]
+            )
+
+        dest_dir = (
+            vault_dir / attach_dir.lstrip("/") if attach_dir.strip() else vault_dir
+        )
+
+        vault_filename = filename.strip() if filename and filename.strip() else src.name
+        dest = (dest_dir / vault_filename).resolve()
+        try:
+            dest.relative_to(vault_dir)
+        except ValueError:
+            return "Error: Destination path resolves outside the vault directory."
+
+        if dest.exists():
+            return (
+                f"Error: File '{vault_filename}' already exists in attachment folder. "
+                "Set a different 'filename'."
+            )
+
+        try:
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(str(src), str(dest))
+        except OSError as e:
+            return f"Error during file copy: {e}"
+
+        vault_rel = dest.relative_to(vault_dir).as_posix()
+        stem = dest.stem
+        embed = f"![[{stem}]]"
+
+        # 2. 嵌入到目标笔记
+        if note and note.strip():
+            note_ref = note.strip()
+            read_res = await call_tool(client, "read", {"path": note_ref}, vault=vault)
+            if isinstance(read_res, str) and read_res.startswith("Error:"):
+                read_res = await call_tool(
+                    client, "read", {"file": note_ref}, vault=vault
+                )
+                if isinstance(read_res, str) and read_res.startswith("Error:"):
+                    return (
+                        f"Error: Target note '{note_ref}' not found. "
+                        f"Media file was still copied to '{vault_rel}'."
+                    )
+
+            content = str(read_res)
+            if heading and heading.strip():
+                content = content.rstrip() + f"\n\n## {heading.strip()}\n\n{embed}\n"
+            else:
+                content = content.rstrip() + f"\n\n{embed}\n"
+
+            write_args: dict[str, Any] = {"content": content, "overwrite": True}
+            if "/" in note_ref and note_ref.endswith(".md"):
+                write_args["path"] = note_ref
+            else:
+                write_args["name"] = note_ref
+
+            write_res = await call_tool(client, "create", write_args, vault=vault)
+            if isinstance(write_res, str) and write_res.startswith("Error:"):
+                return write_res
+
+            heading_desc = (
+                f" under heading '{heading.strip()}'"
+                if heading and heading.strip()
+                else ""
+            )
+            return (
+                f"Media '{vault_rel}' copied into vault and embedded into '{note_ref}'"
+                f"{heading_desc} as {embed}."
+            )
+
+        return f"Media '{vault_rel}' copied into vault (not embedded; no target note provided)."
 
 
 __all__ = ["register_explorer_tools"]

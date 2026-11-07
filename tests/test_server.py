@@ -2387,3 +2387,244 @@ async def test_daily_execution(tmp_path):
             and "content=- [ ] Buy milk" in cmd
             for cmd in called_commands
         )
+
+
+@pytest.mark.asyncio
+async def test_attach_media_registration(monkeypatch):
+    from obsidian_cli_mcp.tools import Feature
+
+    # 1. 默认未开启扩展时不注册
+    monkeypatch.delenv("OBSIDIAN_EXTENSIONS", raising=False)
+    server_default = create_server(cli_path="/mock/obsidian")
+    tools_default = await server_default.list_tools()
+    assert "attach_media" not in {t.name for t in tools_default}
+
+    # 2. 开启扩展且启用 EXPLORER 时注册
+    server_ext = create_server(
+        cli_path="/mock/obsidian", features=[Feature.EXPLORER], enable_extensions=True
+    )
+    tools_ext = await server_ext.list_tools()
+    tool_map = {t.name: t for t in tools_ext}
+    assert "attach_media" in tool_map
+    tool = tool_map["attach_media"]
+    assert tool.annotations is not None
+    assert tool.annotations.idempotent_hint is False
+    assert tool.title in ("导入并嵌入媒体附件", "Attach & Embed Media")
+
+    # 3. 未启用 EXPLORER 时不注册
+    server_note = create_server(
+        cli_path="/mock/obsidian", features=[Feature.NOTE], enable_extensions=True
+    )
+    tools_note = await server_note.list_tools()
+    assert "attach_media" not in {t.name for t in tools_note}
+
+
+@pytest.mark.asyncio
+async def test_attach_media_execution(tmp_path):
+    import json
+    from unittest.mock import patch
+
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(
+        cli_path="/mock/obsidian", features=[Feature.EXPLORER], enable_extensions=True
+    )
+
+    vault_dir = tmp_path / "mock_vault"
+    vault_dir.mkdir()
+    obsidian_dir = vault_dir / ".obsidian"
+    obsidian_dir.mkdir()
+    (obsidian_dir / "app.json").write_text(
+        json.dumps({"attachmentFolderPath": "./attachments"}), encoding="utf-8"
+    )
+
+    # 本地源媒体文件
+    src_media = tmp_path / "photo.jpg"
+    src_media.write_bytes(b"fake-image-bytes")
+
+    called_commands = []
+
+    async def mock_cli(cli_path, args, timeout=None):
+        cmd = list(args)
+        called_commands.append(cmd)
+        if cmd[0] == "vault":
+            return CommandExecutionResult(
+                returncode=0, stdout=str(vault_dir), stderr=""
+            )
+        if cmd[0] == "read":
+            # path= 失败则模拟 file= 成功（模拟名称解析）
+            if any(a.startswith("path=") for a in cmd[1:]):
+                return CommandExecutionResult(
+                    returncode=1, stdout="Error: File not found.", stderr=""
+                )
+            return CommandExecutionResult(
+                returncode=0, stdout="# My Note\nExisting content", stderr=""
+            )
+        return CommandExecutionResult(returncode=0, stdout="OK", stderr="")
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", side_effect=mock_cli):
+        # 1. 源文件不存在
+        res_missing = await server.call_tool(
+            "attach_media", {"source_path": str(tmp_path / "nonexistent.jpg")}
+        )
+        assert "does not exist" in _extract_tool_text(res_missing)
+
+        # 2. 仅复制（无 note 参数）-> 复制到 attachments/ 目录
+        called_commands.clear()
+        res_copy_only = await server.call_tool(
+            "attach_media", {"source_path": str(src_media)}
+        )
+        text_copy = _extract_tool_text(res_copy_only)
+        assert "copied into vault" in text_copy
+        assert "attachments/photo.jpg" in text_copy
+        dest_file = vault_dir / "attachments" / "photo.jpg"
+        assert dest_file.is_file()
+        assert dest_file.read_bytes() == b"fake-image-bytes"
+
+        # 3. 已存在同名文件时拒绝（先清理再测）
+        res_exists = await server.call_tool(
+            "attach_media", {"source_path": str(src_media)}
+        )
+        assert "already exists" in _extract_tool_text(res_exists)
+        (vault_dir / "attachments" / "photo.jpg").unlink()
+
+        # 4. 复制并嵌入到目标笔记
+        called_commands.clear()
+        res_embed = await server.call_tool(
+            "attach_media",
+            {"source_path": str(src_media), "note": "My Note"},
+        )
+        text_embed = _extract_tool_text(res_embed)
+        assert "embedded into" in text_embed
+        assert "![[photo]]" in text_embed
+        assert any(cmd[0] == "create" and "overwrite" in cmd for cmd in called_commands)
+
+        # 5. 指定 heading 与自定义 filename
+        called_commands.clear()
+        res_heading = await server.call_tool(
+            "attach_media",
+            {
+                "source_path": str(src_media),
+                "note": "My Note",
+                "filename": "custom-name.jpg",
+                "heading": "Gallery",
+            },
+        )
+        text_heading = _extract_tool_text(res_heading)
+        assert "custom-name.jpg" in text_heading
+        assert "## Gallery" in text_heading or "heading" in text_heading
+
+
+@pytest.mark.asyncio
+async def test_find_path_registration(monkeypatch):
+    from obsidian_cli_mcp.tools import Feature
+
+    # 1. 默认未开启扩展时不注册
+    monkeypatch.delenv("OBSIDIAN_EXTENSIONS", raising=False)
+    server_default = create_server(cli_path="/mock/obsidian")
+    tools_default = await server_default.list_tools()
+    assert "find_path" not in {t.name for t in tools_default}
+
+    # 2. 开启扩展且启用 GRAPH 时注册
+    server_ext = create_server(
+        cli_path="/mock/obsidian", features=[Feature.GRAPH], enable_extensions=True
+    )
+    tools_ext = await server_ext.list_tools()
+    tool_map = {t.name: t for t in tools_ext}
+    assert "find_path" in tool_map
+    tool = tool_map["find_path"]
+    assert tool.annotations is not None
+    assert tool.annotations.read_only_hint is True
+    assert tool.title in ("发现双链路径", "Find Link Path")
+
+    # 3. 未启用 GRAPH 时不注册
+    server_note = create_server(
+        cli_path="/mock/obsidian", features=[Feature.NOTE], enable_extensions=True
+    )
+    tools_note = await server_note.list_tools()
+    assert "find_path" not in {t.name for t in tools_note}
+
+
+@pytest.mark.asyncio
+async def test_find_path_execution():
+    from unittest.mock import patch
+
+    from obsidian_cli_mcp.tools import Feature
+
+    server = create_server(
+        cli_path="/mock/obsidian", features=[Feature.GRAPH], enable_extensions=True
+    )
+
+    # 1. 起点或终点缺失报错
+    res_no_start = await server.call_tool(
+        "find_path", {"start_note": "", "end_note": "B"}
+    )
+    assert "'start_note' must be provided" in _extract_tool_text(res_no_start)
+
+    res_no_end = await server.call_tool(
+        "find_path", {"start_note": "A", "end_note": ""}
+    )
+    assert "'end_note' must be provided" in _extract_tool_text(res_no_end)
+
+    # 2. 起终点相同
+    res_same = await server.call_tool(
+        "find_path", {"start_note": "A.md", "end_note": "A.md"}
+    )
+    assert "identical" in _extract_tool_text(res_same)
+
+    # 构造链式图谱: A -> B -> C -> D
+    graph = {
+        "A.md": (["B.md"], []),
+        "B.md": (["C.md"], ["A.md"]),
+        "C.md": (["D.md"], ["B.md"]),
+        "D.md": ([], ["C.md"]),
+    }
+
+    async def mock_cli(cli_path, args, timeout=None):
+        cmd = list(args)
+        note_ref = None
+        for a in cmd[1:]:
+            if a.startswith("path="):
+                note_ref = a[len("path=") :]
+                break
+        if note_ref and note_ref in graph:
+            outgoing, incoming = graph[note_ref]
+            if cmd[0] == "links":
+                return CommandExecutionResult(
+                    returncode=0, stdout="\n".join(outgoing), stderr=""
+                )
+            if cmd[0] == "backlinks":
+                import json
+
+                payload = [{"file": ref} for ref in incoming]
+                return CommandExecutionResult(
+                    returncode=0, stdout=json.dumps(payload), stderr=""
+                )
+        return CommandExecutionResult(returncode=0, stdout="", stderr="")
+
+    with patch("obsidian_cli_mcp.client.run_cli_command", side_effect=mock_cli):
+        # 3. 找到直接路径 A -> B -> C -> D (3 hops)
+        res_found = await server.call_tool(
+            "find_path", {"start_note": "A.md", "end_note": "D.md", "max_depth": 3}
+        )
+        text_found = _extract_tool_text(res_found)
+        assert "Path found (3 hop(s))" in text_found
+        assert "A.md" in text_found
+        assert "B.md" in text_found
+        assert "C.md" in text_found
+        assert "D.md" in text_found
+
+        # 4. 深度不足时报告未找到
+        res_too_shallow = await server.call_tool(
+            "find_path", {"start_note": "A.md", "end_note": "D.md", "max_depth": 2}
+        )
+        assert "No link path found" in _extract_tool_text(res_too_shallow)
+
+        # 5. 通过反链发现路径 (D -> C -> B 反向)
+        res_reverse = await server.call_tool(
+            "find_path", {"start_note": "D.md", "end_note": "A.md", "max_depth": 3}
+        )
+        text_reverse = _extract_tool_text(res_reverse)
+        assert "Path found" in text_reverse
+        assert "D.md" in text_reverse
+        assert "A.md" in text_reverse

@@ -142,6 +142,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "outline": "获取大纲标题",
             "aliases": "查看笔记别名",
             "wordcount": "统计字数字符",
+            "find_path": "发现双链路径",
         },
         "explorer": {
             "files": "检索库内文件",
@@ -151,6 +152,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "recents": "列出最近访问文件",
             "search_content": "全文检索内容",
             "import_file": "导入外部文件",
+            "attach_media": "导入并嵌入媒体附件",
         },
         "workspace": {
             "workspace": "查询工作区布局",
@@ -245,6 +247,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "outline": "Get Note Outline",
             "aliases": "List Aliases",
             "wordcount": "Count Words & Characters",
+            "find_path": "Find Link Path",
         },
         "explorer": {
             "files": "List Files in Vault",
@@ -254,6 +257,7 @@ _TOOL_TITLES: dict[SupportedLang, dict[str, dict[str, str]]] = {
             "recents": "List Recent Files",
             "search_content": "Search Vault Content",
             "import_file": "Import External File",
+            "attach_media": "Attach & Embed Media",
         },
         "workspace": {
             "workspace": "Get Workspace Layout",

@@ -215,7 +215,7 @@ pip install obsidian-cli-mcp
 - `property_remove`: 移除笔记中的指定属性字段。
 - `update_frontmatter`: 批量更新/合并/覆盖笔记的 YAML Frontmatter 属性（支持类型自动推断与单次原子操作，需 `OBSIDIAN_EXTENSIONS=true`）。
 
-### 3. 图谱与双链拓扑 (Feature: `graph` · 8 项)
+### 3. 图谱与双链拓扑 (Feature: `graph` · 8 项原生 + 1 项扩展)
 - `backlinks`: 获取笔记的反向链接列表（JSON 格式）。
 - `links`: 获取笔记的外向链接列表。
 - `unresolved`: 列出未创建实体的悬空双链（等待补全的想法）。
@@ -224,6 +224,7 @@ pip install obsidian-cli-mcp
 - `outline`: 获取笔记的大纲标题层级结构（JSON 格式）。
 - `aliases`: 列出库中或指定文件的别名列表。
 - `wordcount`: 统计字数与字符数分布。
+- `find_path`: 双向 BFS 搜索两篇笔记之间的最短双链路径（基于出链与反链构建邻接图，需 `OBSIDIAN_EXTENSIONS=true`）。
 
 ### 4. 标签管理 (Feature: `tag` · 2 项)
 - `tags`: 获取所有标签及其统计分布（JSON 格式）。
@@ -233,7 +234,7 @@ pip install obsidian-cli-mcp
 - `tasks`: 按状态（已完成/待办）、标签或所在文件多维筛选任务。
 - `task`: 切换任务的勾选完成状态。
 
-### 6. 文件与目录资源 (Feature: `explorer` · 5 项原生 + 2 项扩展)
+### 6. 文件与目录资源 (Feature: `explorer` · 5 项原生 + 3 项扩展)
 - `files`: 列出库内文件清单（支持按文件夹与后缀筛选）。
 - `file`: 查询单个文件的元数据与系统详细信息（绝对路径、大小、创建与修改时间等）。
 - `folders` / `folder`: 浏览文件夹目录树与结构详情。
