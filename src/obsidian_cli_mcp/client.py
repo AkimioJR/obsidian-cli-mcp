@@ -63,6 +63,7 @@ class ObsidianClient:
             proc = subprocess.run(
                 [self.cli_path, "version"],
                 capture_output=True,
+                stdin=subprocess.DEVNULL,
                 text=True,
                 timeout=5.0,
                 check=False,
